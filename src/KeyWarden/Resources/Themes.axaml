@@ -1,0 +1,64 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:views="clr-namespace:KeyWarden.Views">
+  <ResourceDictionary.ThemeDictionaries>
+
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="Color.MacOS.Close">#FFFF6059</Color>
+      <Color x:Key="Color.MacOS.Minimize">#FFFFBE2F</Color>
+      <Color x:Key="Color.MacOS.Maximize">#FF29c941</Color>
+      <Color x:Key="Color.Window">#ffffff</Color>
+      <Color x:Key="Color.Border">#22000000</Color>
+      <Color x:Key="Color.Sidebar.Background">#203040</Color>
+      <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
+      <Color x:Key="Color.Button.Foreground">#b1b7bc</Color>
+
+      <SolidColorBrush x:Key="Brush.Settings.Background.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+
+
+      <SolidColorBrush x:Key="Brush.StrongButton.Foreground" Color="#fff" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background" Color="{DynamicResource SystemAccentColorDark1}" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Hover" Color="{DynamicResource SystemAccentColorDark2}" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Press" Color="{DynamicResource SystemAccentColorDark3}" />
+
+      <SolidColorBrush x:Key="Brush.StrongButton.Border.Inactive" Color="#efefef" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Foreground.Inactive" Color="#adadad" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Inactive" Color="#f7f7f7" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Inactive.Hover" Color="#dfdfdf" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Inactive.Press" Color="{DynamicResource SystemAccentColorDark3}" />
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="Color.MacOS.Close">#FFFF5E56</Color>
+      <Color x:Key="Color.MacOS.Minimize">#FFFCBB2D</Color>
+      <Color x:Key="Color.MacOS.Maximize">#FF25C53C</Color>
+      <Color x:Key="Color.Window">#262626</Color>
+      <Color x:Key="Color.Border">#000000</Color>
+      <Color x:Key="Color.Sidebar.Background">#203040</Color>
+      <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
+      <Color x:Key="Color.Button.Foreground">#b1b7bc</Color>
+
+
+      <SolidColorBrush x:Key="Brush.Settings.Background.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+
+
+      <SolidColorBrush x:Key="Brush.StrongButton.Foreground" Color="#fff" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background" Color="{DynamicResource SystemAccentColor}" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Hover" Color="{DynamicResource SystemAccentColorDark1}" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Press" Color="{DynamicResource SystemAccentColorDark2}" />
+
+      <SolidColorBrush x:Key="Brush.StrongButton.Border.Inactive" Color="#3c3c3c" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Foreground.Inactive" Color="#797979" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Inactive" Color="#313131" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Inactive.Hover" Color="#2c2c2c" />
+      <SolidColorBrush x:Key="Brush.StrongButton.Background.Inactive.Press" Color="{DynamicResource SystemAccentColorDark2}" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <Design.PreviewWith>
+    <Border Padding="0" Width="600" Height="400">
+      <views:MainView/>
+    </Border>
+  </Design.PreviewWith>
+
+</ResourceDictionary>

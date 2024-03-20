@@ -13,12 +13,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "tests\UnitTests\UnitTests.csproj", "{88AD9C44-14AD-452C-B904-997FF6D99D3B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyWarden", "src\KeyWarden\KeyWarden.csproj", "{EB4248AF-F29F-49B0-96F3-6757A762A073}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyWarden.Windows", "src\KeyWarden.Windows\KeyWarden.Windows.csproj", "{CC879A46-2815-42B6-84DA-395299F5663D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88AD9C44-14AD-452C-B904-997FF6D99D3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88AD9C44-14AD-452C-B904-997FF6D99D3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88AD9C44-14AD-452C-B904-997FF6D99D3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88AD9C44-14AD-452C-B904-997FF6D99D3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB4248AF-F29F-49B0-96F3-6757A762A073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB4248AF-F29F-49B0-96F3-6757A762A073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB4248AF-F29F-49B0-96F3-6757A762A073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB4248AF-F29F-49B0-96F3-6757A762A073}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC879A46-2815-42B6-84DA-395299F5663D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC879A46-2815-42B6-84DA-395299F5663D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC879A46-2815-42B6-84DA-395299F5663D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC879A46-2815-42B6-84DA-395299F5663D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BA10FE77-36A2-41BD-83B9-AA9C1E1A23A2}
 	EndGlobalSection
 EndGlobal

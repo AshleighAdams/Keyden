@@ -2,8 +2,6 @@ root = true
 
 [*]
 charset = utf-8
-indent_style = tab
-indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 end_of_line = lf
@@ -19,11 +17,14 @@ indent_size = 2
 indent_style = space
 
 # XML Files
-[*.{xml,xsd}]
+[*.{xml,xsd,axaml}]
 indent_size = 2
-indent_style = tab
+indent_style = space
 
 [*.cs]
+indent_style = tab
+indent_size = 4
+
 #### Naming styles ####
 
 # Naming rules
