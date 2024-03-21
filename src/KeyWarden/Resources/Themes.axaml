@@ -8,6 +8,7 @@
       <Color x:Key="Color.MacOS.Minimize">#FFFFBE2F</Color>
       <Color x:Key="Color.MacOS.Maximize">#FF29c941</Color>
       <Color x:Key="Color.Window">#ffffff</Color>
+      <SolidColorBrush x:Key="Color.Window.Glass" Color="#ffffff" Opacity="0.7" />
       <Color x:Key="Color.Border">#22000000</Color>
       <Color x:Key="Color.Sidebar.Background">#203040</Color>
       <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
@@ -33,6 +34,7 @@
       <Color x:Key="Color.MacOS.Minimize">#FFFCBB2D</Color>
       <Color x:Key="Color.MacOS.Maximize">#FF25C53C</Color>
       <Color x:Key="Color.Window">#262626</Color>
+      <SolidColorBrush x:Key="Color.Window.Glass" Color="#262626" Opacity="0.7" />
       <Color x:Key="Color.Border">#000000</Color>
       <Color x:Key="Color.Sidebar.Background">#203040</Color>
       <Color x:Key="Color.Sidebar.Foreground">#fff</Color>

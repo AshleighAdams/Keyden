@@ -32,7 +32,7 @@
               <Button.Flyout>
                 <MenuFlyout Placement="BottomEdgeAlignedLeft">
                   <MenuItem Name="SettingsButton" Header="Settings"/>
-                  <MenuItem Name="AboutBuytton" Header="About"/>
+                  <MenuItem Name="AboutButton" Header="About"/>
                 </MenuFlyout>
               </Button.Flyout>
               <Button.Styles>

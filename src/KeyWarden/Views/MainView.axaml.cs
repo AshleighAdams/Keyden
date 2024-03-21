@@ -21,6 +21,15 @@ public partial class MainView : UserControl
 		TitlebarLeft.DoubleTapped += OnDoubleClicked;
 		TitlebarRight.DoubleTapped += OnDoubleClicked;
 		SyncButton.Click += SyncButton_Click;
+		AboutButton.Click += AboutButton_Click;
+	}
+
+	private void AboutButton_Click(object? sender, RoutedEventArgs e)
+	{
+		if (VisualRoot is not Window window)
+			return;
+
+		new AboutWindow().ShowDialog(window);
 	}
 
 	private void SyncButton_Click(object? sender, RoutedEventArgs e)
