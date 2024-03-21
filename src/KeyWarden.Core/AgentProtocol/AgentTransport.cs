@@ -53,7 +53,7 @@ internal record struct AgentMessage
 	public required ReadOnlySegmentedMemory<byte> Contents { get; set; }
 }
 
-internal sealed class SshAgentTransport
+internal sealed class AgentTransport
 {
 	public required Stream Stream { get; init; }
 	public int MaxContentLength { get; set; } = 1024 * 5; // copies the OpenSSH portable max

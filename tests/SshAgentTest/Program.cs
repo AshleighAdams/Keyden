@@ -16,7 +16,7 @@ if (false)
 
 	await pipeClient.ConnectAsync();
 
-	var connection = new SshAgentTransport()
+	var connection = new AgentTransport()
 	{
 		Stream = pipeClient,
 	};
@@ -58,7 +58,7 @@ var pipeServer = new NamedPipeServerStream(
 
 await pipeServer.WaitForConnectionAsync();
 
-var test = new SshAgentTransport()
+var test = new AgentTransport()
 {
 	Stream = pipeServer,
 };
