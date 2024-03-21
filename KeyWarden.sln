@@ -19,6 +19,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyWarden", "src\KeyWarden\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyWarden.Windows", "src\KeyWarden.Windows\KeyWarden.Windows.csproj", "{CC879A46-2815-42B6-84DA-395299F5663D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyWarden.Core", "src\KeyWarden.Core\KeyWarden.Core.csproj", "{D2D4664C-0A6C-40CD-9915-D6C6814664C6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SshAgentTest", "tests\SshAgentTest\SshAgentTest.csproj", "{C3E5C456-F45E-4FC9-8EEB-AF6337CE26A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +41,14 @@ Global
 		{CC879A46-2815-42B6-84DA-395299F5663D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC879A46-2815-42B6-84DA-395299F5663D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC879A46-2815-42B6-84DA-395299F5663D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2D4664C-0A6C-40CD-9915-D6C6814664C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2D4664C-0A6C-40CD-9915-D6C6814664C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2D4664C-0A6C-40CD-9915-D6C6814664C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2D4664C-0A6C-40CD-9915-D6C6814664C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E5C456-F45E-4FC9-8EEB-AF6337CE26A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E5C456-F45E-4FC9-8EEB-AF6337CE26A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E5C456-F45E-4FC9-8EEB-AF6337CE26A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E5C456-F45E-4FC9-8EEB-AF6337CE26A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
