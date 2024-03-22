@@ -1,10 +1,9 @@
 using System;
 using System.Buffers.Binary;
 using System.Diagnostics;
-using System.Runtime.Intrinsics;
 using System.Text;
 
-namespace KeyWarden.SshAgent;
+namespace KeyWarden.AgentProtocol;
 
 internal static class AgentProtocolPrimitiveExtensions
 {

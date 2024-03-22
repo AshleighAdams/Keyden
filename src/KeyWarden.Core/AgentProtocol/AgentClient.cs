@@ -4,12 +4,14 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace KeyWarden.SshAgent;
+namespace KeyWarden.AgentProtocol;
 
 // https://datatracker.ietf.org/doc/html/draft-miller-ssh-agent#name-private-key-operations
 // https://www.rfc-editor.org/rfc/rfc4251.html
 internal enum AgentMessageType : byte
 {
+	TerminateConnection = 0,
+
 	// client to agent
 	RequestIdentities = 11,
 	SignRequest = 13,
@@ -43,8 +45,8 @@ internal enum Constraints : byte
 internal enum SignatureFlags : byte
 {
 	Reserved = 1,
-	RsaSha2_256 = 2,
-	RsaSha2_512 = 4,
+	RsaSha256 = 2,
+	RsaSha512 = 4,
 }
 
 internal record struct AgentMessage
@@ -53,7 +55,7 @@ internal record struct AgentMessage
 	public required ReadOnlySegmentedMemory<byte> Contents { get; set; }
 }
 
-internal sealed class AgentTransport
+internal sealed class AgentClient : IAsyncDisposable
 {
 	public required Stream Stream { get; init; }
 	public int MaxContentLength { get; set; } = 1024 * 5; // copies the OpenSSH portable max
@@ -62,10 +64,20 @@ internal sealed class AgentTransport
 	{
 		const int headerLength = 5;
 		var headerBytes = new byte[headerLength];
-		await Stream.ReadAsync(headerBytes, 0, headerBytes.Length, ct);
+		await Stream.ReadAsync(headerBytes, ct);
 
-		var length = BinaryPrimitives.ReadUInt32BigEndian(headerBytes.AsSpan(0,4));
-		var type = headerBytes[4];
+		var length = (int)BinaryPrimitives.ReadUInt32BigEndian(headerBytes.AsSpan(0,4));
+		var type = (AgentMessageType)headerBytes[4];
+
+		if (type == AgentMessageType.TerminateConnection)
+		{
+			Stream.Close();
+			return new AgentMessage()
+			{
+				Type = AgentMessageType.TerminateConnection,
+				Contents = new(),
+			};
+		}
 
 		var contentLength = length - 1;
 		if (contentLength < 0 || contentLength >= MaxContentLength)
@@ -75,13 +87,13 @@ internal sealed class AgentTransport
 		if (contentLength > 0)
 		{
 			var contentsBuffer = new byte[contentLength];
-			await Stream.ReadAsync(contentsBuffer, 0, (int)contentLength, ct);
+			await Stream.ReadAsync(contentsBuffer, 0, contentLength, ct);
 			contents = contentsBuffer;
 		}
 
 		return new AgentMessage()
 		{
-			Type = (AgentMessageType)type,
+			Type = type,
 			Contents = new(contents),
 		};
 	}
@@ -101,5 +113,11 @@ internal sealed class AgentTransport
 
 		await Stream.WriteAsync(buffer, ct);
 		await Stream.FlushAsync();
+		await Task.Delay(200);
+	}
+	
+	public ValueTask DisposeAsync()
+	{
+		return ((IAsyncDisposable)Stream).DisposeAsync();
 	}
 }

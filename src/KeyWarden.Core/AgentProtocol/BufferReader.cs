@@ -1,6 +1,6 @@
 using System;
 
-namespace KeyWarden.SshAgent;
+namespace KeyWarden.AgentProtocol;
 
 internal class BufferReader
 {
@@ -14,7 +14,7 @@ internal class BufferReader
 
 	public ReadOnlyMemory<byte> NextBlock(int length)
 	{
-		if (Position + length >= Buffer.Length)
+		if (Position + length > Buffer.Length)
 			throw new ArgumentOutOfRangeException(nameof(length));
 
 		var position = Position;
