@@ -111,7 +111,7 @@ file class AgentK : ISshAgentHandler
 	public ValueTask<IReadOnlyList<SshKey>> GetPublicKeys(ClientInfo info, CancellationToken ct)
 	{
 		var procs = string.Join(" via ", info.Processes.Select(p => p.ProcessName));
-		Console.WriteLine($"{info.Username} is requesting keys {procs}");
+		Console.WriteLine($"{info.Username} is requesting keys via {procs}");
 
 		return new(Keys.Select(k => k with { PrivateKey = default }).ToArray());
 	}
@@ -119,11 +119,12 @@ file class AgentK : ISshAgentHandler
 	public ValueTask<SshKey> GetPrivateKey(SshKey publicKey, ClientInfo info, CancellationToken ct)
 	{
 		var procs = string.Join(" via ", info.Processes.Select(p => p.ProcessName));
-		Console.WriteLine($"{info.Username} via {procs} is requesting access to key {publicKey.Name}");
 
 		var matchingKey = Keys
 			.Where(k => k.PublicKey.Span.SequenceEqual(publicKey.PublicKey.Span))
 			.FirstOrDefault();
+
+		Console.WriteLine($"{info.Username} is requesting access to key {(matchingKey.IsEmpty ? "unknown" : matchingKey.Name)} via {procs}");
 
 		return new(matchingKey);
 	}

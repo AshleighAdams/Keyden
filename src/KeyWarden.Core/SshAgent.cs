@@ -1,7 +1,8 @@
 using KeyWarden.AgentProtocol;
 
-using Microsoft.DevTunnels.Ssh;
-using Microsoft.DevTunnels.Ssh.Algorithms;
+using Renci.SshNet;
+using Renci.SshNet.Security;
+using Renci.SshNet.Security.Cryptography;
 
 using System;
 using System.Buffers.Binary;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -162,56 +164,41 @@ public class SshAgent
 							await client.SendMessage(FailureMessage);
 							continue;
 						}
-						using var keyPair = KeyPair.ImportKeyBytes(privateKey.PrivateKey.Value.ToArray());
+						using var keyStream = new MemoryStream(privateKey.PrivateKey.Value.ToArray());
+						using var privateSshFile = new PrivateKeyFile(keyStream);
+						var privateSshKey = privateSshFile.Key;
 
-						// figure out the key type
-						int length = (int)BinaryPrimitives.ReadUInt32BigEndian(publicKeyBlob.Span.Slice(0, sizeof(uint)));
-						var keyType = publicKeyBlob.Slice(sizeof(uint), length);
-
-						if (keyPair is Rsa.KeyPair rsaKeyPair)
+						var algorithm = privateSshKey switch
 						{
-							var signResponse = new BufferWriter();
-							using var rsaAlg = RSAOpenSsl.Create(rsaKeyPair.ExportParameters(includePrivate: true));
-
-							HashAlgorithmName hashAlg;
-							string hashAlgStr;
-							if (sigFlags.HasFlag(SignatureFlags.RsaSha512))
+							RsaKey rsaKey => sigFlags switch
 							{
-								hashAlg = HashAlgorithmName.SHA512;
-								hashAlgStr = "rsa-sha2-512";
-							}
-							else if (sigFlags.HasFlag(SignatureFlags.RsaSha256))
+								SignatureFlags.RsaSha512 => new KeyHostAlgorithm("rsa-sha2-512", privateSshKey, new RsaDigitalSignature(rsaKey, HashAlgorithmName.SHA512)),
+								SignatureFlags.RsaSha256 => new KeyHostAlgorithm("rsa-sha2-256", privateSshKey, new RsaDigitalSignature(rsaKey, HashAlgorithmName.SHA256)),
+								_ => null,
+							},
+							_ => privateSshFile.HostKeyAlgorithms.ToArray() switch
 							{
-								hashAlg = HashAlgorithmName.SHA256;
-								hashAlgStr = "rsa-sha2-256";
-							}
-							else
-							{
-								await client.SendMessage(FailureMessage);
-								continue;
-							}
+								[HostAlgorithm only] => only,
+								[HostAlgorithm first, ..] => null, // TODO: which one do we use?
+								[] => null,
+							},
+						};
 
-							var signature = rsaAlg.SignData(data.Span, hashAlg, RSASignaturePadding.Pkcs1);
-
-							var formattedSig = new BufferWriter();
-							formattedSig.WriteString(hashAlgStr);
-							formattedSig.WriteBlob(signature);
-
-							signResponse.WriteUInt32((uint)formattedSig.Length);
-							var sigBlock = signResponse.NextBlock(formattedSig.Length);
-							formattedSig.DataWritten.CopyTo(sigBlock);
-
-							await client.SendMessage(new()
-							{
-								Type = AgentMessageType.SignResponse,
-								Contents = signResponse.DataWritten,
-							});
-						}
-						else
+						if (algorithm is null)
 						{
 							await client.SendMessage(FailureMessage);
 							continue;
 						}
+
+						var signed = algorithm.Sign(data.ToArray());
+
+						var signResponse = new BufferWriter();
+						signResponse.WriteBlob(signed);
+						await client.SendMessage(new()
+						{
+							Type = AgentMessageType.SignResponse,
+							Contents = signResponse.DataWritten,
+						});
 					}
 					break;
 				case AgentMessageType.Lock:
