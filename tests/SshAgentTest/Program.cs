@@ -10,8 +10,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-var agent = new SshAgent(new AgentK());
-await Task.Delay(1000000000);
+//var agent = new SshAgent(new TestAgent());
+//await Task.Delay(1000000000);
 
 var pipe = new NamedPipeClientStream(".", "openssh-ssh-agent", PipeDirection.InOut, PipeOptions.WriteThrough | PipeOptions.Asynchronous, System.Security.Principal.TokenImpersonationLevel.Identification, System.IO.HandleInheritability.Inheritable);
 

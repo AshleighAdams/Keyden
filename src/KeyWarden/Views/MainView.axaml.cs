@@ -5,6 +5,8 @@ using Avalonia.Interactivity;
 using KeyWarden.ViewModels;
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace KeyWarden.Views;
 
@@ -22,6 +24,21 @@ public partial class MainView : UserControl
 		TitlebarRight.DoubleTapped += OnDoubleClicked;
 		SyncButton.Click += SyncButton_Click;
 		AboutButton.Click += AboutButton_Click;
+
+		Loaded += (e, s) =>
+		{
+			if (DataContext is not MainViewModel model)
+				throw new Exception("DataContext has an unexpected type!");
+			model.HandleAuthPrompt = OnHandleAuthPrompt;
+		};
+	}
+
+	private async Task<bool> OnHandleAuthPrompt(SshKey key, ClientInfo info, CancellationToken ct)
+	{
+		var window = new AuthPrompt(key);
+		window.Show();
+
+		return await window.Result;
 	}
 
 	private void AboutButton_Click(object? sender, RoutedEventArgs e)

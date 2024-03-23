@@ -37,6 +37,12 @@ public abstract class MainViewModel : ViewModelBase
 	private AgentK Handler { get; }
 	private SshAgent Agent { get; }
 
+	public Func<SshKey, ClientInfo, CancellationToken, Task<bool>>? HandleAuthPrompt
+	{
+		get => Handler.HandleAuthPrompt;
+		set => Handler.HandleAuthPrompt = value;
+	}
+
 	protected MainViewModel(ISshKeyStore keyStore)
 	{
 		KeyStore = keyStore;
