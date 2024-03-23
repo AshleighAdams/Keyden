@@ -5,7 +5,6 @@ using Renci.SshNet.Security;
 using Renci.SshNet.Security.Cryptography;
 
 using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -29,6 +28,12 @@ public record struct SshKey
 	{
 		get => _Name ?? string.Empty;
 		set => _Name = value;
+	}
+	private string _Fingerprint;
+	public string Fingerprint
+	{
+		get => _Fingerprint ?? string.Empty;
+		set => _Fingerprint = value;
 	}
 
 	public ReadOnlyMemory<byte> PublicKey { get; set; }

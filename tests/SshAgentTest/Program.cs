@@ -23,7 +23,7 @@ await using var client = new AgentClient()
 };
 
 var request = new BufferWriter();
-request.WriteBlob(Convert.FromBase64String("AAAAB3NzaC1yc2EAAAADAQABAAACAQC3eZLmmAWVMacMBp9j7UVRs4oUZLDB6bUcEzNoHRrKhjgDoF3mKP1yZrBRssvhG4b+lyCLw/cUBBjW3PdEhQ7qrzATprkguplfRzB3IRoXkanF1T5ZmxaJIVigo60k2eH6BG1PGnDNTAR6AITiq1UdJ3Ye14GNfT+rOM8ZCJQbNsEhT6Xr/cIsmb874R1fYAZUckjZqqAympzssGlJNde5ZG/0DEsZu3/ITPDMOWPHnG0Ci7law4toJdjpHQNULs/YYGRESvmmc907POqDr4eiusO2IsEGRva/7be9p5/dW2fzs1TqpSSVzMBTePlQ+XEdFU7h1uXxTUOAv+bagiSN04QyHOJOfXsvdma50ClT0O9PYvz3bfAPElbIbXW+Vkytc/f9/IAgGpB/PmWXM2UXuBdeyCoQ5wrsmS/w6/VWTsvhKJf0QTbCrlWXEn4PPnxQnoKXpKn0ZiTU/BYK2DKX3xNydXM0Eu8pYZq9vBUGZGUlsEeHCvE3plkIYzBj20JPnYiGlo6aF8/ilkoLHWd3j5G1bOH27KxjGMZCpSf9g+j8xe5N2LJiNTK6H3qrV3Vw4HhEvmjOSkfcrP/ImVYmkUcv0Zbx2Ky1jEWVhyH5pGD5pG/A/MaF/R7oNRe08eYWDccRWa18AALT9t0zEzPgfsXQylzM4D7Vp/xsXlRxvQ=="));
+request.WriteBlob(Convert.FromBase64String("AAAAC3NzaC1lZDI1NTE5AAAAIGwxX7gxgXMnT06x4g7wpdhsh3szsgemOFh4zDhBcfww"));
 request.WriteString("hello");
 request.WriteUInt32(4);
 await client.SendMessage(new()
@@ -33,15 +33,13 @@ await client.SendMessage(new()
 });
 
 var responseMsg = await client.ReadMessage();
-File.WriteAllBytes("response.bin", responseMsg.Contents.ContiguousMemory.ToArray());
 var response = new BufferReader(responseMsg.Contents.ContiguousMemory);
-var ident = response.ReadString();
 var sig = response.ReadBlob();
 
 
 int x = 0;
 
-file class AgentK : ISshAgentHandler
+file class TestAgent : ISshAgentHandler
 {
 	private readonly List<SshKey> Keys = new()
 	{
