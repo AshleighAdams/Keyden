@@ -5,18 +5,13 @@ using Microsoft.DevTunnels.Ssh.Algorithms;
 
 using System;
 using System.Buffers.Binary;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Pipes;
-using System.Linq;
-using System.Runtime.InteropServices.Marshalling;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
-using SshBuffer = Microsoft.DevTunnels.Ssh.Buffer;
 
 namespace KeyWarden;
 
@@ -76,7 +71,7 @@ public class SshAgent
 	{
 		var cts = new CancellationTokenSource();
 
-		var pipeServer = new NamedPipeServerStream(
+		using var pipeServer = new NamedPipeServerStream(
 			pipeName: Options.PipeName,
 			direction: PipeDirection.InOut,
 			maxNumberOfServerInstances: NamedPipeServerStream.MaxAllowedServerInstances,
@@ -90,20 +85,27 @@ public class SshAgent
 		// listen for another another connection
 		BeginConnection();
 
+		try
+		{
+			await HandleConnection(pipeServer, cts.Token);
+		}
+		catch (EndOfStreamException)
+		{
+		}
+		finally
+		{
+			cts.Cancel();
+		}
+	}
+
+	private async Task HandleConnection(NamedPipeServerStream pipeServer, CancellationToken ct)
+	{
 		await using var client = new AgentClient()
 		{
 			Stream = pipeServer,
 		};
 
-		var processes = new List<Process>();
-		var p = pipeServer.GetProcess();
-
-		while (p is not null)
-		{
-			processes.Add(p);
-			p = p.GetParent();
-		}
-
+		var processes = pipeServer.GetParentProcesses();
 		ClientInfo? clientInfo = null;
 
 		while (true)
@@ -126,7 +128,7 @@ public class SshAgent
 			{
 				case AgentMessageType.RequestIdentities:
 					{
-						var keys = await Handler.GetPublicKeys(clientInfo, cts.Token);
+						var keys = await Handler.GetPublicKeys(clientInfo, ct);
 
 						var keysAnswer = new BufferWriter();
 						keysAnswer.WriteUInt32((uint)keys.Count);
@@ -154,14 +156,14 @@ public class SshAgent
 						{
 							PublicKey = publicKeyBlob,
 						};
-						var privateKey = await Handler.GetPrivateKey(publicKey, clientInfo, cts.Token);
+						var privateKey = await Handler.GetPrivateKey(publicKey, clientInfo, ct);
 						if (privateKey is { IsEmpty: true } or { PrivateKey: null })
 						{
 							await client.SendMessage(FailureMessage);
 							continue;
 						}
 						using var keyPair = KeyPair.ImportKeyBytes(privateKey.PrivateKey.Value.ToArray());
-						
+
 						// figure out the key type
 						int length = (int)BinaryPrimitives.ReadUInt32BigEndian(publicKeyBlob.Span.Slice(0, sizeof(uint)));
 						var keyType = publicKeyBlob.Slice(sizeof(uint), length);

@@ -62,14 +62,10 @@ internal sealed class AgentClient : IAsyncDisposable
 
 	public async Task<AgentMessage> ReadMessage(CancellationToken ct = default)
 	{
-		const int headerLength = 5;
-		var headerBytes = new byte[headerLength];
-		await Stream.ReadAsync(headerBytes, ct);
-
-		var length = (int)BinaryPrimitives.ReadUInt32BigEndian(headerBytes.AsSpan(0,4));
-		var type = (AgentMessageType)headerBytes[4];
-
-		if (type == AgentMessageType.TerminateConnection)
+		var lengthBytes = new byte[sizeof(uint)];
+		await Stream.ReadExactlyAsync(lengthBytes, ct);
+		var length = (int)BinaryPrimitives.ReadUInt32BigEndian(lengthBytes);
+		if (length == 0)
 		{
 			Stream.Close();
 			return new AgentMessage()
@@ -79,6 +75,8 @@ internal sealed class AgentClient : IAsyncDisposable
 			};
 		}
 
+		var type = (AgentMessageType)Stream.ReadByte();
+
 		var contentLength = length - 1;
 		if (contentLength < 0 || contentLength >= MaxContentLength)
 			throw new Exception($"Agent message content length of {length} is out of range");
@@ -87,7 +85,7 @@ internal sealed class AgentClient : IAsyncDisposable
 		if (contentLength > 0)
 		{
 			var contentsBuffer = new byte[contentLength];
-			await Stream.ReadAsync(contentsBuffer, 0, contentLength, ct);
+			await Stream.ReadExactlyAsync(contentsBuffer, ct);
 			contents = contentsBuffer;
 		}
 
@@ -112,8 +110,8 @@ internal sealed class AgentClient : IAsyncDisposable
 			message.Contents.CopyTo(buffer.AsMemory().Slice(headerLength));
 
 		await Stream.WriteAsync(buffer, ct);
-		await Stream.FlushAsync();
-		await Task.Delay(200);
+		//await Stream.FlushAsync();
+		//await Task.Delay(200);
 	}
 	
 	public ValueTask DisposeAsync()

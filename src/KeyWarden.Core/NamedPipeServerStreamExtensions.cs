@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Pipes;
@@ -23,6 +24,18 @@ internal unsafe static partial class ProcessExtensions
 		}
 
 		return null;
+	}
+	public static IReadOnlyList<Process> GetParentProcesses(this NamedPipeServerStream pipeServer)
+	{
+		var processes = new List<Process>();
+		var p = pipeServer.GetProcess();
+
+		while (p is not null)
+		{
+			processes.Add(p);
+			p = p.GetParent();
+		}
+		return processes;
 	}
 
 	[LibraryImport("ntdll.dll")]
