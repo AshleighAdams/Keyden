@@ -21,7 +21,7 @@
 
     <DockPanel Name="Sidebar" Background="{DynamicResource Color.Sidebar.Background}">
       <Border Padding="10,0,12,10">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Spacing="10">
           <DockPanel Height="50" Name="TitlebarLeft" IsHitTestVisible="True" Background="Transparent">
             <Button DockPanel.Dock="Right"
                     Padding="2"
@@ -46,6 +46,15 @@
             </Button>
             <TextBlock Classes="window-name" Padding="8,0,0,0" Foreground="{DynamicResource Color.Sidebar.Foreground}" Text="KeyWarden" FontSize="12" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
           </DockPanel>
+
+          <ListBox Background="Transparent"
+                   Classes="keys"
+                   SelectedIndex="0">
+            <views:TabItem Icon="fa-key" Text="Keys" />
+            <views:TabItem Icon="fa-folder-open" Text="Vaults" />
+            <views:TabItem Icon="fa-clock-rotate-left" Text="Activity" />
+          </ListBox>
+
         </StackPanel>
       </Border>
     </DockPanel>

@@ -23,4 +23,8 @@
   <ItemGroup>
     <ProjectReference Include="..\KeyWarden.Core\KeyWarden.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\TabItem.axaml" />
+  </ItemGroup>
 </Project>

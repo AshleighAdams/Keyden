@@ -27,6 +27,8 @@ public partial class MainView : UserControl
 
 		Loaded += (e, s) =>
 		{
+			if (DataContext is null)
+				return;
 			if (DataContext is not MainViewModel model)
 				throw new Exception("DataContext has an unexpected type!");
 			model.HandleAuthPrompt = OnHandleAuthPrompt;

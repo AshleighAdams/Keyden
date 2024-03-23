@@ -27,11 +27,15 @@ internal unsafe static partial class ProcessExtensions
 	}
 	public static IReadOnlyList<Process> GetParentProcesses(this NamedPipeServerStream pipeServer)
 	{
+		var set = new HashSet<Process>();
 		var processes = new List<Process>();
 		var p = pipeServer.GetProcess();
 
 		while (p is not null)
 		{
+			if (!set.Add(p))
+				break;
+
 			processes.Add(p);
 			p = p.GetParent();
 		}
