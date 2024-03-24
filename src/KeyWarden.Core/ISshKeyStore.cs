@@ -31,7 +31,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 		return new(matchingKey);
 	}
 
-	private async Task<string> Run(string cmd)
+	private async Task<string> Run(string cmd, CancellationToken ct)
 	{
 		var info = new ProcessStartInfo("op", cmd)
 		{
@@ -43,50 +43,69 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 
 		var proc = Process.Start(info) ?? throw new SystemException("Failed to start op");
 		var output = await proc!.StandardOutput.ReadToEndAsync();
-		await proc.WaitForExitAsync();
+		await proc.WaitForExitAsync(ct);
 
 		return output;
 	}
 
+	private SemaphoreSlim ConcurrencyLimiter = new(10);
 	public async Task SyncKeys(CancellationToken ct = default)
 	{
-		var keysJson = await Run("item list --categories \"SSH Key\" --format json");
+		var keysJson = await Run("item list --categories \"SSH Key\" --format json", ct);
 		var keysDoc = JsonDocument.Parse(keysJson);
+
+		var tasks = new List<Task>();
 
 		var newKeys = new List<SshKey>();
 		foreach (var item in keysDoc.RootElement.EnumerateArray())
 		{
-			var id = item.GetProperty("id").GetString();
-			var name = item.GetProperty("title").GetString();
-			var fingerprint = item.GetProperty("additional_information").GetString();
-
-			ArgumentException.ThrowIfNullOrEmpty(id);
-			ArgumentException.ThrowIfNullOrEmpty(name);
-			ArgumentException.ThrowIfNullOrEmpty(fingerprint);
-
-			var keyJson = await Run($"item get {id} --format json");
-			var keyDoc = JsonDocument.Parse(keyJson);
-
-			string? publicKey = null;
-			string? privateKey = null;
-
-			foreach (var field in keyDoc.RootElement.GetProperty("fields").EnumerateArray())
+			tasks.Add(Task.Run(async () =>
 			{
-				var fieldId = field.GetProperty("id").GetString();
+				await ConcurrencyLimiter.WaitAsync(ct);
 
-				if (fieldId == "public_key")
-					publicKey = field.GetProperty("value").GetString();
-				else if (fieldId == "private_key")
-					privateKey = field.GetProperty("value").GetString();
-			}
+				var id = item.GetProperty("id").GetString();
+				var name = item.GetProperty("title").GetString();
+				var fingerprint = item.GetProperty("additional_information").GetString();
 
-			if (publicKey is null || privateKey is null)
-				continue;
+				ArgumentException.ThrowIfNullOrEmpty(id);
+				ArgumentException.ThrowIfNullOrEmpty(name);
+				ArgumentException.ThrowIfNullOrEmpty(fingerprint);
 
-			var publicKeyBytes = Convert.FromBase64String(publicKey.Substring(publicKey.IndexOf(' ')));
+				var keyJson = await Run($"item get {id} --format json", ct);
+				var keyDoc = JsonDocument.Parse(keyJson);
 
-			newKeys.Add(new() { Name = name, Fingerprint = fingerprint, PublicKey = publicKeyBytes, PrivateKey = Encoding.ASCII.GetBytes(privateKey) });
+				string? publicKey = null;
+				string? privateKey = null;
+
+				foreach (var field in keyDoc.RootElement.GetProperty("fields").EnumerateArray())
+				{
+					var fieldId = field.GetProperty("id").GetString();
+
+					if (fieldId == "public_key")
+						publicKey = field.GetProperty("value").GetString();
+					else if (fieldId == "private_key")
+						privateKey = field.GetProperty("value").GetString();
+				}
+
+				if (publicKey is null || privateKey is null)
+					return;
+
+				var publicKeyBytes = Convert.FromBase64String(publicKey.Substring(publicKey.IndexOf(' ')));
+
+				lock (newKeys)
+				{
+					newKeys.Add(new()
+					{
+						Name = name,
+						Fingerprint = fingerprint,
+						PublicKey = publicKeyBytes,
+						PrivateKey = Encoding.ASCII.GetBytes(privateKey),
+					});
+				}
+			}));
 		}
+
+		await Task.WhenAll(tasks);
 
 		PrivateKeys.Clear();
 		PublicKeys.Clear();
