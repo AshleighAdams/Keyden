@@ -75,6 +75,35 @@ public abstract class MainViewModel : ViewModelBase
 		}
 	}
 
+
+	private int _TabIndexSelected;
+	public int TabIndexSelected
+	{
+		get => _TabIndexSelected;
+		set
+		{
+			if (value == _TabIndexSelected)
+				return;
+
+			this.RaisePropertyChanging(nameof(TabIndexSelected));
+			this.RaisePropertyChanging(nameof(IsKeysTabSelected));
+			this.RaisePropertyChanging(nameof(IsVaultsSelected));
+			this.RaisePropertyChanging(nameof(IsActivitySelected));
+			this.RaisePropertyChanging(nameof(IsMainListVisible));
+			_TabIndexSelected = value;
+			this.RaisePropertyChanged(nameof(TabIndexSelected));
+			this.RaisePropertyChanged(nameof(IsKeysTabSelected));
+			this.RaisePropertyChanged(nameof(IsVaultsSelected));
+			this.RaisePropertyChanged(nameof(IsActivitySelected));
+			this.RaisePropertyChanged(nameof(IsMainListVisible));
+
+		}
+	}
+	public bool IsKeysTabSelected => TabIndexSelected is 0;
+	public bool IsVaultsSelected => TabIndexSelected is 1;
+	public bool IsActivitySelected => TabIndexSelected is 2;
+	public bool IsMainListVisible => TabIndexSelected is 0 or 1;
+
 	public bool IsKeySelected => _SelectedKey is not null;
 	private bool _IsSyncing;
 	public bool IsSyncing

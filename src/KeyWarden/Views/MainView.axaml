@@ -47,9 +47,10 @@
             <TextBlock Classes="window-name" Padding="8,0,0,0" Foreground="{DynamicResource Color.Sidebar.Foreground}" Text="KeyWarden" FontSize="12" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
           </DockPanel>
 
-          <ListBox Background="Transparent"
+          <ListBox Name="Tabs"
+                   Background="Transparent"
                    Classes="keys"
-                   SelectedIndex="0">
+                   SelectedIndex="{Binding TabIndexSelected}">
             <views:TabItem Icon="fa-key" Text="Keys" />
             <views:TabItem Icon="fa-folder-open" Text="Vaults" />
             <views:TabItem Icon="fa-clock-rotate-left" Text="Activity" />
@@ -83,7 +84,7 @@
       </Border>
       <DockPanel DockPanel.Dock="Bottom">
 
-        <Grid>
+        <Grid IsVisible="{Binding IsMainListVisible}">
           <Grid.ColumnDefinitions>
             <ColumnDefinition MinWidth="150" Width="250" />
             <ColumnDefinition Width="1" />
@@ -92,7 +93,7 @@
 
           <ScrollViewer>
             <Border Padding="8">
-              <StackPanel Orientation="Vertical">
+              <StackPanel Orientation="Vertical" IsVisible="{Binding IsKeysTabSelected}">
 
                 <ListBox ItemsSource="{Binding Keys}"
                          SelectedItem="{Binding SelectedKey}"
@@ -127,7 +128,7 @@
                         Background="{DynamicResource Color.Border}"
                         HorizontalAlignment="Stretch"/>
 
-          <Grid Grid.Column="2">
+          <Grid Grid.Column="2" IsVisible="{Binding IsKeysTabSelected}">
             <StackPanel IsVisible="{Binding IsKeySelected}"
                         Orientation="Vertical"
                         VerticalAlignment="Top">
