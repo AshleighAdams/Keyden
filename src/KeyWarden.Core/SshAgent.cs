@@ -181,7 +181,6 @@ public class SshAgent
 								SignatureFlags.RsaSha256 => new KeyHostAlgorithm("rsa-sha2-256", privateSshKey, new RsaDigitalSignature(rsaKey, HashAlgorithmName.SHA256)),
 								_ => null,
 							},
-							ED25519Key ed25519Key => null, // new KeyHostAlgorithm("ssh-ed25519", ed25519Key), // broken rn
 							_ => privateSshFile.HostKeyAlgorithms.ToArray() switch
 							{
 								[HostAlgorithm only] => only,

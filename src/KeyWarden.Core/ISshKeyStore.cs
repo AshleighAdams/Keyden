@@ -84,7 +84,15 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 					if (fieldId == "public_key")
 						publicKey = field.GetProperty("value").GetString();
 					else if (fieldId == "private_key")
+					{
 						privateKey = field.GetProperty("value").GetString();
+
+						if (field.TryGetProperty("ssh_formats", out var sshFormats) &&
+							sshFormats.TryGetProperty("openssh", out var openSshKey))
+						{
+							privateKey = openSshKey.GetProperty("value").GetString();
+						}
+					}
 				}
 
 				if (publicKey is null || privateKey is null)
