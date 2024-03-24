@@ -2,6 +2,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 using DynamicData;
 
+using Projektanker.Icons.Avalonia;
+
 using ReactiveUI;
 
 using System;
@@ -105,11 +107,23 @@ public abstract class MainViewModel : ViewModelBase
 	public bool IsMainListVisible => TabIndexSelected is 0 or 1;
 
 	public bool IsKeySelected => _SelectedKey is not null;
+
+	public IconAnimation SyncingAnimation => IsSyncing ? IconAnimation.Spin : IconAnimation.None;
 	private bool _IsSyncing;
 	public bool IsSyncing
 	{
 		get => _IsSyncing;
-		set => this.RaiseAndSetIfChanged(ref _IsSyncing, value, nameof(IsSyncing));
+		set
+		{
+			if (value == _IsSyncing)
+				return;
+
+			this.RaisePropertyChanging(nameof(IsSyncing));
+			this.RaisePropertyChanging(nameof(SyncingAnimation));
+			_IsSyncing = value;
+			this.RaisePropertyChanged(nameof(IsSyncing));
+			this.RaisePropertyChanged(nameof(SyncingAnimation));
+		}
 	}
 	public string SelectedKeyName => _SelectedKey?.Name ?? "Unknown Key";
 	public string SelectedKeyDescriptor => _SelectedKey?.Fingerprint ?? "Unknown";

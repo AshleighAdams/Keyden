@@ -73,8 +73,7 @@
           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="16">
             <Button Name="SyncButton" Classes="strong" IsEnabled="{Binding !IsSyncing}">
               <StackPanel Orientation="Horizontal">
-                <i:Icon Value="fa-sync" FontSize="14" IsVisible="{Binding !IsSyncing}"/>
-                <i:Icon Value="fa-sync" Animation="Spin" FontSize="14" IsVisible="{Binding IsSyncing}"/>
+                <i:Icon Value="fa-sync" Animation="{Binding SyncingAnimation}" FontSize="14"/>
                 <TextBlock Text="Sync" VerticalAlignment="Center"/>
               </StackPanel>
             </Button>
