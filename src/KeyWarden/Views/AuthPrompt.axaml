@@ -15,7 +15,7 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
-        Background="{DynamicResource Color.Window}"
+        Background="{DynamicResource Brush.Auth.Background}"
         Topmost="True">
   <StackPanel Spacing="20">
     <TextBlock Text="Key Access Requested"
@@ -28,9 +28,9 @@
       <Run FontWeight="SemiBold" Text="{Binding AppName}"/> to use the key
     </TextBlock>
 
-    <Border Background="#44000000"
+    <Border Background="{DynamicResource Brush.Auth.Key.Background}"
             CornerRadius="8"
-            BorderBrush="#aaa"
+            BorderBrush="{DynamicResource Brush.Auth.Key.Border}"
             BorderThickness="1"
             Padding="12,10">
       <StackPanel Orientation="Horizontal" Spacing="8">
@@ -46,7 +46,7 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Spacing="5">
-      <Button Name="DenyButton" Classes="deny">Deny</Button>
+      <Button Name="DenyButton" Classes="deny">Cancel</Button>
       <Button Name="AuthButton" Classes="confirm">Authorize</Button>
     </StackPanel>
   </StackPanel>

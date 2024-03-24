@@ -16,6 +16,23 @@
 
       <SolidColorBrush x:Key="Brush.Settings.Background.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
 
+      <SolidColorBrush x:Key="Brush.Auth.Background" Color="#f7f7f7" />
+      <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#efefef" />
+      <SolidColorBrush x:Key="Brush.Auth.Key.Border" Color="#e1e1e1" />
+
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Border" Color="Transparent" />
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Foreground" Color="#fff" />
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Background" Color="{DynamicResource SystemAccentColorDark1}" />
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Background.Hover" Color="{DynamicResource SystemAccentColorDark2}" />
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Background.Press" Color="{DynamicResource SystemAccentColorDark3}" />
+
+      <SolidColorBrush x:Key="Brush.DenyButton.Border" Color="#e1e1e1" />
+      <SolidColorBrush x:Key="Brush.DenyButton.Foreground" Color="Black" />
+      <SolidColorBrush x:Key="Brush.DenyButton.Background" Color="#efefef" />
+      <SolidColorBrush x:Key="Brush.DenyButton.Background.Hover" Color="#dfdfdf" />
+      <SolidColorBrush x:Key="Brush.DenyButton.Background.Press" Color="{DynamicResource SystemAccentColorLight3}" />
+
+
 
       <SolidColorBrush x:Key="Brush.StrongButton.Foreground" Color="#fff" />
       <SolidColorBrush x:Key="Brush.StrongButton.Background" Color="{DynamicResource SystemAccentColorDark1}" />
@@ -42,6 +59,23 @@
 
 
       <SolidColorBrush x:Key="Brush.Settings.Background.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+
+      <SolidColorBrush x:Key="Brush.Auth.Background" Color="#333333" />
+      <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#262626" />
+      <SolidColorBrush x:Key="Brush.Auth.Key.Border" Color="#3c3c3c" />
+
+
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Border" Color="Transparent" />
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Foreground" Color="#fff" />
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Background" Color="{DynamicResource SystemAccentColor}" />
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Background.Hover" Color="{DynamicResource SystemAccentColorDark1}" />
+      <SolidColorBrush x:Key="Brush.ConfirmButton.Background.Press" Color="{DynamicResource SystemAccentColorDark2}" />
+
+      <SolidColorBrush x:Key="Brush.DenyButton.Border" Color="#3c3c3c" />
+      <SolidColorBrush x:Key="Brush.DenyButton.Foreground" Color="#ffffff" />
+      <SolidColorBrush x:Key="Brush.DenyButton.Background" Color="{DynamicResource SystemAccentColor}" Opacity="0.2" />
+      <SolidColorBrush x:Key="Brush.DenyButton.Background.Hover" Color="{DynamicResource SystemAccentColorDark1}" />
+      <SolidColorBrush x:Key="Brush.DenyButton.Background.Press" Color="{DynamicResource SystemAccentColorDark2}" />
 
 
       <SolidColorBrush x:Key="Brush.StrongButton.Foreground" Color="#fff" />

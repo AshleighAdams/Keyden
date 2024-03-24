@@ -92,32 +92,35 @@
   </Style>
 
   <Style Selector="Button.confirm">
-    <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background}"/>
-    <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+    <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background}"/>
+    <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.ConfirmButton.Border}"/>
 
     <Style Selector="^:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Hover}"/>
-      <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+      <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background.Hover}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
     </Style>
     <Style Selector="^:pressed /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Press}"/>
-      <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+      <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background.Press}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
     </Style>
   </Style>
 
   <Style Selector="Button.deny">
-    <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive}"/>
-    <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+    <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background}"/>
+    <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
     <Setter Property="BorderThickness" Value="1"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource Brush.StrongButton.Border.Inactive}"/>
+    <Setter Property="FontWeight" Value="Normal"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.DenyButton.Border}"/>
 
     <Style Selector="^:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive.Hover}"/>
-      <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+      <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background.Hover}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
     </Style>
     <Style Selector="^:pressed /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive.Press}"/>
-      <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+      <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background.Press}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
     </Style>
   </Style>
 
