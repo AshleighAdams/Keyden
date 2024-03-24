@@ -15,6 +15,7 @@
         HorizontalContentAlignment="Center"
         BorderThickness="0"
         Name="MinimizeButton"
+        Classes="square"
         ToolTip.Tip="Minimize">
       <Button.Resources>
         <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
@@ -35,9 +36,10 @@
     </Button>
 
     <Button Width="46"
-        VerticalAlignment="Stretch"
-        BorderThickness="0"
-        Name="MaximizeButton">
+            VerticalAlignment="Stretch"
+            BorderThickness="0"
+            Name="MaximizeButton"
+            Classes="square">
       <ToolTip.Tip>
         <ToolTip Content="Maximize"
                  Name="MaximizeToolTip"/>
@@ -66,6 +68,7 @@
             VerticalAlignment="Stretch"
             BorderThickness="0"
             Name="CloseButton"
+            Classes="square"
             ToolTip.Tip="Close">
       <Button.Resources>
         <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>

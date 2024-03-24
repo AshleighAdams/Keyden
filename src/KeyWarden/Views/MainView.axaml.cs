@@ -37,7 +37,7 @@ public partial class MainView : UserControl
 
 	private async Task<bool> OnHandleAuthPrompt(SshKey key, ClientInfo info, CancellationToken ct)
 	{
-		var window = new AuthPrompt(key);
+		var window = new AuthPrompt(key, info, ct);
 		window.Show();
 
 		return await window.Result;

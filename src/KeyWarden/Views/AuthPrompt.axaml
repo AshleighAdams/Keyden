@@ -2,18 +2,52 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Width="250" Height="150"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        xmlns:views="clr-namespace:KeyWarden.Views"
+        mc:Ignorable="d"
+        MinWidth="250" MinHeight="150" Padding="24"
+        SizeToContent="WidthAndHeight"
         x:Class="KeyWarden.Views.AuthPrompt"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="AuthPrompt"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        Background="{DynamicResource Color.Window}"
         Topmost="True">
-  <StackPanel>
-    <TextBlock Text="{Binding Key.Name}" TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></TextBlock>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-      <Button Name="DenyButton">Deny</Button>
-      <Button Name="AuthButton">Auth</Button>
+  <StackPanel Spacing="20">
+    <TextBlock Text="Key Access Requested"
+               TextAlignment="Center"
+               FontSize="24"
+               FontWeight="SemiBold"/>
+
+    <TextBlock FontSize="16">
+      <Run>Allow</Run>
+      <Run FontWeight="SemiBold" Text="{Binding AppName}"/> to use the key
+    </TextBlock>
+
+    <Border Background="#44000000"
+            CornerRadius="8"
+            BorderBrush="#aaa"
+            BorderThickness="1"
+            Padding="12,10">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <i:Icon Value="fa-chevron-right" FontSize="10" />
+        <views:KeyIcon />
+        <TextBlock Text="{Binding Key.Name}"
+                   FontWeight="SemiBold"
+                   VerticalAlignment="Center"/>
+      </StackPanel>
+    </Border>
+    
+    <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Spacing="5">
+      <Button Name="DenyButton" Classes="deny">Deny</Button>
+      <Button Name="AuthButton" Classes="confirm">Authorize</Button>
     </StackPanel>
   </StackPanel>
 </Window>
