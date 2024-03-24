@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -41,36 +42,94 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 		return output;
 	}
 
-	private SemaphoreSlim ConcurrencyLimiter = new(10);
 	public async Task SyncKeys(CancellationToken ct = default)
 	{
-		var keysJson = await Run("item list --categories \"SSH Key\" --format json", ct);
-		var keysDoc = JsonDocument.Parse(keysJson);
+		var sw = Stopwatch.StartNew();
+
+		var proc = Process.Start(
+			new ProcessStartInfo("op", "item list --categories \"SSH Key\" --format json")
+			{
+				UseShellExecute = false,
+				WindowStyle = ProcessWindowStyle.Hidden,
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+			}) ?? throw new SystemException("Failed to start op");
+
+		var keysDoc = await JsonDocument.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct);
+		//await proc.WaitForExitAsync(ct);
 
 		var tasks = new List<Task>();
 
+		var newIds = new List<string>();
 		var newKeys = new List<SshKey>();
 		foreach (var item in keysDoc.RootElement.EnumerateArray())
 		{
-			tasks.Add(Task.Run(async () =>
+			var id = item.GetProperty("id").GetString();
+			var name = item.GetProperty("title").GetString();
+			var fingerprint = item.GetProperty("additional_information").GetString();
+
+			ArgumentException.ThrowIfNullOrEmpty(id);
+			ArgumentException.ThrowIfNullOrEmpty(name);
+			ArgumentException.ThrowIfNullOrEmpty(fingerprint);
+
+			newIds.Add(id);
+			newKeys.Add(new()
 			{
-				await ConcurrencyLimiter.WaitAsync(ct);
+				Name = name,
+				Fingerprint = fingerprint,
+			});
+		}
 
-				var id = item.GetProperty("id").GetString();
-				var name = item.GetProperty("title").GetString();
-				var fingerprint = item.GetProperty("additional_information").GetString();
+		proc = Process.Start(
+			new ProcessStartInfo("op", "item get --format json --fields label=public_key,label=private_key")
+			{
+				UseShellExecute = false,
+				WindowStyle = ProcessWindowStyle.Hidden,
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+				RedirectStandardInput = true,
+			}) ?? throw new SystemException("Failed to start op");
 
-				ArgumentException.ThrowIfNullOrEmpty(id);
-				ArgumentException.ThrowIfNullOrEmpty(name);
-				ArgumentException.ThrowIfNullOrEmpty(fingerprint);
+		var input = proc.StandardInput;
+		var output = proc.StandardOutput.BaseStream;
 
-				var keyJson = await Run($"item get {id} --format json", ct);
-				var keyDoc = JsonDocument.Parse(keyJson);
+		var ids = new StringBuilder();
+		bool first = true;
+		ids.Append('[');
+		foreach (var newId in newIds)
+		{
+			if (!first)
+				ids.Append(',');
+			else
+				first = false;
+			ids.Append($$"""{"id":"{{newId}}"}""");
+		}
+		ids.Append(']');
+		await input.WriteAsync(ids);
+		input.Close();
+
+		var ms = new MemoryStream();
+		await output.CopyToAsync(ms);
+
+		new Action(() =>
+		{
+			var outputBytes = ms.ToArray();
+			var outputSpan = (Span<byte>)outputBytes;
+			
+			for (int i = 0; i < newKeys.Count; i++)
+			{
+				// we have to recreate this each time, as 1pass emits "invalid" json
+				var reader = new Utf8JsonReader(outputSpan);
+				var keyDoc = JsonDocument.ParseValue(ref reader);
+
+				// update the span slice off the previous non-seperated json
+				var end = reader.TokenStartIndex + 1; // +1 to consume the end token
+				outputSpan = outputSpan.Slice((int)end);
 
 				string? publicKey = null;
 				string? privateKey = null;
 
-				foreach (var field in keyDoc.RootElement.GetProperty("fields").EnumerateArray())
+				foreach (var field in keyDoc.RootElement.EnumerateArray())
 				{
 					var fieldId = field.GetProperty("id").GetString();
 
@@ -93,24 +152,19 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 
 				var publicKeyBytes = Convert.FromBase64String(publicKey.Substring(publicKey.IndexOf(' ')));
 
-				lock (newKeys)
+				newKeys[i] = newKeys[i] with
 				{
-					newKeys.Add(new()
-					{
-						Name = name,
-						Fingerprint = fingerprint,
-						PublicKey = publicKeyBytes,
-						PrivateKey = Encoding.ASCII.GetBytes(privateKey),
-					});
-				}
-			}));
-		}
-
-		await Task.WhenAll(tasks);
+					PublicKey = publicKeyBytes,
+					PrivateKey = Encoding.ASCII.GetBytes(privateKey),
+				};
+			}
+		})();
 
 		PrivateKeys.Clear();
 		PublicKeys.Clear();
 		PrivateKeys.AddRange(newKeys);
 		PublicKeys.AddRange(newKeys.Select(k => k with { PrivateKey = default }));
+
+		Debug.WriteLine($"Synced with op in {sw.Elapsed.TotalSeconds} seconds");
 	}
 }
