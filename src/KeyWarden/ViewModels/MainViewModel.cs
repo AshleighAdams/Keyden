@@ -9,10 +9,7 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,23 +30,12 @@ public partial class ObservableSshKey : ObservableObject
 	private string _PrivateKey = string.Empty;
 }
 
-public abstract class MainViewModel : ViewModelBase
+public class MainViewModel : ViewModelBase
 {
 	private ISshKeyStore KeyStore { get; }
-	private AgentK Handler { get; }
-	private SshAgent Agent { get; }
-
-	public Func<SshKey, ClientInfo, CancellationToken, Task<bool>>? HandleAuthPrompt
-	{
-		get => Handler.HandleAuthPrompt;
-		set => Handler.HandleAuthPrompt = value;
-	}
-
-	protected MainViewModel(ISshKeyStore keyStore)
+	public MainViewModel(ISshKeyStore keyStore)
 	{
 		KeyStore = keyStore;
-		Handler = new AgentK(keyStore);
-		Agent = new SshAgent(Handler);
 	}
 
 	public string Greeting => "Welcome to Avalonia!";
@@ -76,7 +62,6 @@ public abstract class MainViewModel : ViewModelBase
 			this.RaisePropertyChanged(nameof(SelectedKeyDescriptor));
 		}
 	}
-
 
 	private int _TabIndexSelected;
 	public int TabIndexSelected
@@ -145,14 +130,6 @@ public abstract class MainViewModel : ViewModelBase
 		this.RaisePropertyChanged(nameof(Keys));
 		this.RaisePropertyChanged(nameof(KeyCount));
 		IsSyncing = false;
-	}
-}
-
-public class RuntimeMainViewModel : MainViewModel
-{
-	public RuntimeMainViewModel() :
-		base(new OnePassCliSshKeyStore())
-	{
 	}
 }
 

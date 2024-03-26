@@ -4,6 +4,10 @@ using Avalonia.Markup.Xaml;
 
 using KeyWarden.ViewModels;
 using KeyWarden.Views;
+using System;
+
+using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace KeyWarden;
 
@@ -14,20 +18,40 @@ public partial class App : Application
 		AvaloniaXamlLoader.Load(this);
 	}
 
+	private ServiceProvider? Services { get; set; }
+	public static T GetService<T>() where
+		T : class
+	{
+		if (Current is not App app)
+			throw new Exception($"{nameof(Current)} is not an {nameof(App)}");
+
+		return app.Services?.GetRequiredService<T>()
+			?? throw new Exception("Service provider not yet created");
+	}
+
+	private SshAgent? Agent { get; set; }
 	public override void OnFrameworkInitializationCompleted()
 	{
+		var collection = new ServiceCollection();
+		collection.AddKeyWardenServices();
+
+		Services = collection.BuildServiceProvider();
+
+		var mainViewModel = Services.GetRequiredService<MainViewModel>();
+		Agent = Services.GetRequiredService<SshAgent>();
+
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			desktop.MainWindow = new MainWindow
 			{
-				DataContext = new RuntimeMainViewModel()
+				DataContext = mainViewModel
 			};
 		}
 		else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
 		{
 			singleViewPlatform.MainView = new MainView
 			{
-				DataContext = new RuntimeMainViewModel()
+				DataContext = mainViewModel
 			};
 		}
 

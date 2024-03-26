@@ -1,14 +1,19 @@
+using KeyWarden.ViewModels;
+using KeyWarden.Views;
+
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace KeyWarden;
 
-internal class AgentK : ISshAgentHandler
+public class AgentK : ISshAgentHandler
 {
 	private readonly ISshKeyStore KeyStore;
+	public ObservableCollection<ActivityItem> Activities { get; } = new();
 
 	public AgentK(ISshKeyStore keyStore)
 	{
@@ -20,22 +25,18 @@ internal class AgentK : ISshAgentHandler
 		return new(KeyStore.PublicKeys);
 	}
 
-	public Func<SshKey, ClientInfo, CancellationToken, Task<bool>>? HandleAuthPrompt { get; set; }
-
 	public async ValueTask<SshKey> GetPrivateKey(SshKey publicKey, ClientInfo info, CancellationToken ct)
 	{
-		if (HandleAuthPrompt is null)
-			return default;
-
-		var publicKeyFull = KeyStore.PublicKeys
+		publicKey = KeyStore.PublicKeys
 			.Where(k => k.PublicKey.Span.SequenceEqual(publicKey.PublicKey.Span))
-			.FirstOrDefault();
+			.FirstOrDefault(publicKey);
 
-		if (publicKeyFull.IsEmpty)
-			publicKeyFull = publicKey;
+		var window = new AuthPrompt(publicKey, info, ct);
+		window.Show();
 
-		if (!await HandleAuthPrompt(publicKeyFull, info, ct))
+		if (!await window.Result)
 			return default;
+
 		return await KeyStore.GetPrivateKey(publicKey, ct);
 	}
 }
