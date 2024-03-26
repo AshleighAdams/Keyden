@@ -8,16 +8,17 @@
              x:Class="KeyWarden.Views.ActivityView"
              x:DataType="vm:ActivityViewModel">
   <Design.DataContext>
-    <vm:ActivityViewModel />
+    <vm:DesignActivityViewModel />
   </Design.DataContext>
 
-  <ListBox ItemsSource="{Binding Activities}"
+  <ListBox Name="ActivitiesListBox"
+           ItemsSource="{Binding Activities}"
            ScrollViewer.HorizontalScrollBarVisibility="Auto"
            Background="Transparent">
 
     <ListBox.ItemTemplate>
+      
       <DataTemplate>
-
         <Grid ShowGridLines="false">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="32"/>
