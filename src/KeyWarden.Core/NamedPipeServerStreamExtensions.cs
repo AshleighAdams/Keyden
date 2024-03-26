@@ -19,8 +19,12 @@ internal unsafe static partial class ProcessExtensions
 			IntPtr pipeHandle = pipeServer.SafePipeHandle.DangerousGetHandle();
 			if (!GetNamedPipeClientProcessId(pipeHandle, out int processId))
 				return null;
-		
-			return Process.GetProcessById(processId);
+
+			try
+			{
+				return Process.GetProcessById(processId);
+			}
+			catch (ArgumentException) { }
 		}
 
 		return null;

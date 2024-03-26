@@ -12,6 +12,7 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace KeyWarden;
@@ -45,6 +46,12 @@ public class ClientInfo
 {
 	public required string Username { get; set; }
 	public required IReadOnlyList<Process> Processes { get; set; }
+
+	public Process? MainProcess => Processes
+		.Where(p => p.MainWindowHandle != IntPtr.Zero)
+		.FirstOrDefault();
+
+	public string ApplicationName => MainProcess?.ProcessName ?? "Unknown";
 }
 
 
@@ -76,7 +83,7 @@ public class SshAgent
 
 	private async void BeginConnection()
 	{
-		var cts = new CancellationTokenSource();
+		using var cts = new CancellationTokenSource();
 
 		using var pipeServer = new NamedPipeServerStream(
 			pipeName: Options.PipeName,
@@ -94,19 +101,21 @@ public class SshAgent
 
 		try
 		{
-			await HandleConnection(pipeServer, cts.Token);
+			await HandleConnection(pipeServer, cts);
 		}
-		catch (EndOfStreamException)
-		{
-		}
+		catch (IOException) { }
+		catch (TaskCanceledException) { }
+		catch (OperationCanceledException) { }
 		finally
 		{
 			cts.Cancel();
 		}
 	}
 
-	private async Task HandleConnection(NamedPipeServerStream pipeServer, CancellationToken ct)
+	private async Task HandleConnection(NamedPipeServerStream pipeServer, CancellationTokenSource cts)
 	{
+		var ct = cts.Token;
+
 		await using var client = new AgentClient()
 		{
 			Stream = pipeServer,
@@ -115,9 +124,28 @@ public class SshAgent
 		var processes = pipeServer.GetParentProcesses();
 		ClientInfo? clientInfo = null;
 
+		var messageChannel = Channel.CreateUnbounded<AgentMessage>();
+		_ = Task.Run(async () =>
+		{
+			try
+			{
+				while (true)
+				{
+					var msg = await client.ReadMessage(ct);
+					messageChannel.Writer.TryWrite(msg);
+				}
+			}
+			catch (IOException) { }
+			finally
+			{
+				cts.Cancel();
+			}
+		});
+
 		while (true)
 		{
-			var message = await client.ReadMessage();
+			var message = await messageChannel.Reader.ReadAsync(ct);
+
 			var content = new BufferReader(message.Contents.ContiguousMemory);
 
 			clientInfo ??= new ClientInfo()

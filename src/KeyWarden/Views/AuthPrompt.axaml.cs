@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Threading;
 
 using System.Diagnostics;
 using System.Threading;
@@ -28,34 +29,18 @@ namespace KeyWarden.Views
 			InitializeComponent();
 		}
 
-		private string GetApplicationName()
-		{
-			Process? firstProcess = null;
-			Process? lastProcess = null;
-			foreach (var p in ClientInfo.Processes)
-			{
-				if (p.MainWindowHandle == nint.Zero)
-					continue;
-
-				firstProcess ??= p;
-				lastProcess = p;
-			}
-
-			return firstProcess?.ProcessName ?? "Unknown";
-		}
-
 		private readonly CancellationTokenRegistration? CancelRegistration = null;
 		public AuthPrompt(SshKey key, ClientInfo clientInfo, CancellationToken ct)
 		{
 			Key = key;
 			ClientInfo = clientInfo;
-			AppName = GetApplicationName();
+			AppName = clientInfo.ApplicationName;
 
 			InitializeComponent();
-
-			ct.Register(() =>
+			CancelRegistration = ct.Register(() =>
 			{
-				Close();
+				Tcs.TrySetCanceled();
+				Dispatcher.UIThread.Post(() => Close());
 			});
 
 			DenyButton.Click += DenyButton_Click;
