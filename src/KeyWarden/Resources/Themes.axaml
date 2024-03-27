@@ -10,11 +10,12 @@
       <Color x:Key="Color.Window">#ffffff</Color>
       <SolidColorBrush x:Key="Color.Window.Glass" Color="#ffffff" Opacity="0.7" />
       <Color x:Key="Color.Border">#22000000</Color>
-      <Color x:Key="Color.Sidebar.Background">#203040</Color>
-      <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
       <Color x:Key="Color.Button.Foreground">#b1b7bc</Color>
 
-      <SolidColorBrush x:Key="Brush.Settings.Background.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+      <Color x:Key="Color.Sidebar.Background">#2B2C3A</Color>
+      <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
+      <SolidColorBrush x:Key="Brush.Sidebar.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+      <SolidColorBrush x:Key="Brush.Sidebar.Selected" Color="{DynamicResource SystemAccentColor}" Opacity="0.3" />
 
       <SolidColorBrush x:Key="Brush.Auth.Background" Color="#f7f7f7" />
       <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#efefef" />
@@ -53,12 +54,13 @@
       <Color x:Key="Color.Window">#262626</Color>
       <SolidColorBrush x:Key="Color.Window.Glass" Color="#262626" Opacity="0.7" />
       <Color x:Key="Color.Border">#000000</Color>
-      <Color x:Key="Color.Sidebar.Background">#203040</Color>
-      <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
       <Color x:Key="Color.Button.Foreground">#b1b7bc</Color>
 
 
-      <SolidColorBrush x:Key="Brush.Settings.Background.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+      <Color x:Key="Color.Sidebar.Background">#2B2C3A</Color>
+      <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
+      <SolidColorBrush x:Key="Brush.Sidebar.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+      <SolidColorBrush x:Key="Brush.Sidebar.Selected" Color="{DynamicResource SystemAccentColor}" Opacity="0.3" />
 
       <SolidColorBrush x:Key="Brush.Auth.Background" Color="#333333" />
       <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#262626" />
@@ -93,7 +95,7 @@
 
   <Design.PreviewWith>
     <Border Padding="0" Width="600" Height="400">
-      <views:MainView/>
+      <views:MainView />
     </Border>
   </Design.PreviewWith>
 

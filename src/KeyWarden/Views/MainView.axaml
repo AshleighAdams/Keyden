@@ -37,7 +37,7 @@
                   <Setter Property="Background" Value="Transparent"/>
                 </Style>
                 <Style Selector="Button:pointerover /template/ ContentPresenter">
-                  <Setter Property="Background" Value="{DynamicResource Brush.Settings.Background.Hover}"/>
+                  <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Hover}"/>
                 </Style>
               </Button.Styles>
             </Button>
@@ -46,7 +46,7 @@
 
           <ListBox Name="Tabs"
                    Background="Transparent"
-                   Classes="keys"
+                   Classes="tabs"
                    SelectedIndex="{Binding TabIndexSelected}">
             <views:TabItem Icon="fa-key" Text="Keys" />
             <views:TabItem Icon="fa-folder-open" Text="Vaults" />

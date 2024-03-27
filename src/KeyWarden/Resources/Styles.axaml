@@ -4,6 +4,7 @@
   <Design.PreviewWith>
     <Border Padding="0" Width="600" Height="400">
       <views:MainView/>
+      <!--<views:ActivityView/>-->
     </Border>
   </Design.PreviewWith>
 
@@ -11,12 +12,30 @@
     <Setter Property="Background" Value="{DynamicResource Color.Window}" />
   </Style>
 
+  <Style Selector="ListBox.tabs > ListBoxItem">
+    <Setter Property="CornerRadius" Value="8"/>
+    <Setter Property="Padding" Value="10"/>
+
+    <Style Selector="^:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Hover}"/>
+    </Style>
+
+    <Style Selector="^:selected">
+
+      <Style Selector="^ /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Selected}"/>
+      </Style>
+
+    </Style>
+  </Style>
+
+
   <Style Selector="ListBox.keys > ListBoxItem">
     <Setter Property="CornerRadius" Value="8"/>
     <Setter Property="Padding" Value="10"/>
 
     <Style Selector="^:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource Brush.Settings.Background.Hover}"/>
+      <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Hover}"/>
     </Style>
 
     <Style Selector="^:selected">
