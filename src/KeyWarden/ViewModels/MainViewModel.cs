@@ -15,32 +15,15 @@ using System.Threading.Tasks;
 
 namespace KeyWarden.ViewModels;
 
-public partial class ObservableSshKey : ObservableObject
-{
-	[ObservableProperty]
-	private string _Name = string.Empty;
-
-	[ObservableProperty]
-	private string _Fingerprint = string.Empty;
-
-	[ObservableProperty]
-	private string _PublicKey = string.Empty;
-
-	[ObservableProperty]
-	private string _PrivateKey = string.Empty;
-}
-
 public class MainViewModel : ViewModelBase
 {
-	private ISshKeyStore KeyStore { get; }
-	public MainViewModel(ISshKeyStore keyStore)
+	public AgentK Kay { get; }
+	public MainViewModel(AgentK kay)
 	{
-		KeyStore = keyStore;
+		Kay = kay;
 	}
 
 	public string Greeting => "Welcome to Avalonia!";
-	public ObservableCollection<ObservableSshKey> Keys { get; } = new();
-	public string KeyCount => $"{Keys.Count} Keys";
 
 	private ObservableSshKey? _SelectedKey;
 	public ObservableSshKey? SelectedKey
@@ -116,19 +99,7 @@ public class MainViewModel : ViewModelBase
 	public async void SyncKeys()
 	{
 		IsSyncing = true;
-		this.RaisePropertyChanging(nameof(Keys));
-		this.RaisePropertyChanging(nameof(KeyCount));
-
-		await KeyStore.SyncKeys();
-
-		var obsKeys = KeyStore.PublicKeys
-			.Select(x => new ObservableSshKey() { Name = x.Name, Fingerprint = x.Fingerprint });
-
-		Keys.Clear();
-		Keys.AddRange(obsKeys);
-
-		this.RaisePropertyChanged(nameof(Keys));
-		this.RaisePropertyChanged(nameof(KeyCount));
+		await Kay.SyncKeys();
 		IsSyncing = false;
 	}
 }

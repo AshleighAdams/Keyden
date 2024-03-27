@@ -92,7 +92,7 @@
               <Border Padding="8">
                 <StackPanel Orientation="Vertical" IsVisible="{Binding IsKeysTabSelected}">
 
-                  <ListBox ItemsSource="{Binding Keys}"
+                  <ListBox ItemsSource="{Binding Kay.Keys}"
                            SelectedItem="{Binding SelectedKey}"
                            Background="Transparent"
                            Classes="keys">
@@ -113,7 +113,10 @@
                   </ListBox>
 
                   <Border Padding="10"/>
-                  <TextBlock TextAlignment="Center" Text="{Binding KeyCount}" FontSize="12" Opacity="0.5" />
+                  <TextBlock TextAlignment="Center" FontSize="12" Opacity="0.5">
+                    <Run Text="{Binding Kay.Keys.Count}"/>
+                    <Run Text="Keys"/>
+                  </TextBlock>
                 </StackPanel>
               </Border>
             </ScrollViewer>
