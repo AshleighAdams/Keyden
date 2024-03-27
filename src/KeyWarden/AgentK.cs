@@ -134,7 +134,7 @@ public class AgentK : ISshAgentHandler
 		{
 			NewActivity?.Invoke(new ActivityItem()
 			{
-				Icon = "fa-lock",
+				Icon = "fa-ban", // maybe gavel
 				Importance = ActivityImportance.Normal,
 				Title = "Auth fail",
 				Description = $"{info.ApplicationName}{processChain} was denied access to the key {publicKey.Name}",
@@ -146,7 +146,17 @@ public class AgentK : ISshAgentHandler
 		{
 			NewActivity?.Invoke(new ActivityItem()
 			{
-				Icon = "fa-unlock",
+				Icon = "fa-passport", // authenticated icon
+				//Icon = "fa-id-card", // authenticated icon
+				//Icon = "fa-fingerprint", // another possible authenticated icon, perhaps with biometrics only
+
+				//Icon = "fa-key", // possible authorized icon
+				//Icon = "fa-unlock", // possible authorized icon or based on not timing out
+				//Icon = "fa-lock-open", // possible authorized icon or based on not timing out
+
+				//Icon = "fa-bell-slash", // key does not require authorization nor authentication
+				// Icon = "fa-hourglass", // key authorized based on not timing out
+				//Icon = "fa-hourglass-end", // key timed out?
 				Importance = ActivityImportance.Normal,
 				Title = "Auth success",
 				Description = $"{info.ApplicationName}{processChain} was granted access to the key {publicKey.Name}",
