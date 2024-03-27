@@ -35,13 +35,13 @@
     <Setter Property="Padding" Value="10"/>
 
     <Style Selector="^:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Hover}"/>
+      <Setter Property="Background" Value="{DynamicResource Brush.Key.Hover}"/>
     </Style>
 
     <Style Selector="^:selected">
 
       <Style Selector="^ /template/ ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource SystemAccentColor}"/>
+        <Setter Property="Background" Value="{DynamicResource Brush.Key.Selected}"/>
       </Style>
 
       <Style Selector="^:not(:focus) /template/ ContentPresenter">

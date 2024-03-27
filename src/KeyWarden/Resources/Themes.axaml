@@ -16,6 +16,9 @@
       <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
       <SolidColorBrush x:Key="Brush.Sidebar.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
       <SolidColorBrush x:Key="Brush.Sidebar.Selected" Color="{DynamicResource SystemAccentColor}" Opacity="0.3" />
+      
+      <SolidColorBrush x:Key="Brush.Key.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+      <SolidColorBrush x:Key="Brush.Key.Selected" Color="{DynamicResource SystemAccentColor}" Opacity="0.5" />
 
       <SolidColorBrush x:Key="Brush.Auth.Background" Color="#f7f7f7" />
       <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#efefef" />
@@ -61,6 +64,9 @@
       <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
       <SolidColorBrush x:Key="Brush.Sidebar.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
       <SolidColorBrush x:Key="Brush.Sidebar.Selected" Color="{DynamicResource SystemAccentColor}" Opacity="0.3" />
+
+      <SolidColorBrush x:Key="Brush.Key.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
+      <SolidColorBrush x:Key="Brush.Key.Selected" Color="{DynamicResource SystemAccentColor}" Opacity="0.5" />
 
       <SolidColorBrush x:Key="Brush.Auth.Background" Color="#333333" />
       <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#262626" />
