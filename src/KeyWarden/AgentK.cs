@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData;
 
 using KeyWarden.ViewModels;
+using KeyWarden.Views;
 
 using System;
 using System.Collections.Generic;
@@ -113,6 +114,25 @@ public class AgentK : ISshAgentHandler
 		return new(KeyStore.PublicKeys);
 	}
 
+	private SemaphoreSlim PromptQueue { get; } = new SemaphoreSlim(1);
+	public struct ScopedLock : IDisposable
+	{
+		private SemaphoreSlim? Semaphore { get; set; }
+		public ScopedLock(SemaphoreSlim semaphore) =>
+			Semaphore = semaphore;
+		public void Dispose()
+		{
+			Semaphore?.Release();
+			Semaphore = null;
+		}
+	}
+
+	private class KeyInfo
+	{
+		public DateTime? LastUsed { get; set; }
+	}
+	private readonly Dictionary<string, KeyInfo> KeyInfos = new();
+
 	async ValueTask<SshKey> ISshAgentHandler.GetPrivateKey(SshKey publicKey, ClientInfo info, CancellationToken ct)
 	{
 		var mainProcess = info.MainProcess;
@@ -127,10 +147,13 @@ public class AgentK : ISshAgentHandler
 			.Where(k => k.PublicKey.Span.SequenceEqual(publicKey.PublicKey.Span))
 			.FirstOrDefault(publicKey);
 
-		//var window = new AuthPrompt(publicKey, info, ct);
-		//window.Show();
+		await PromptQueue.WaitAsync(ct);
+		using var @lock = new ScopedLock(PromptQueue);
 
-		if (false)//!await window.Result)
+		var window = new AuthPrompt(publicKey, info, ct);
+		window.Show();
+
+		if (!await window.Result)
 		{
 			NewActivity?.Invoke(new ActivityItem()
 			{
