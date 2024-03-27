@@ -37,23 +37,12 @@ public partial class App : Application
 
 		Services = collection.BuildServiceProvider();
 
-		var mainViewModel = Services.GetRequiredService<MainViewModel>();
-		Agent = Services.GetRequiredService<SshAgent>();
+		Agent = Services.GetService<SshAgent>();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-		{
-			desktop.MainWindow = new MainWindow
-			{
-				DataContext = mainViewModel
-			};
-		}
+			desktop.MainWindow = new MainWindow();
 		else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-		{
-			singleViewPlatform.MainView = new MainView
-			{
-				DataContext = mainViewModel
-			};
-		}
+			singleViewPlatform.MainView = new MainView();
 
 		base.OnFrameworkInitializationCompleted();
 	}

@@ -14,6 +14,8 @@ public partial class MainView : UserControl
 {
 	public MainView()
 	{
+		DataContext = App.GetService<MainViewModel>();
+
 		InitializeComponent();
 
 		//AddHandler(PointerPressedEvent, OnPointerPressed, handledEventsToo: true);
