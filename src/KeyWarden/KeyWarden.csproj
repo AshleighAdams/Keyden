@@ -28,4 +28,10 @@
   <ItemGroup>
     <UpToDateCheckInput Remove="Views\TabItem.axaml" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\KeyOptionsView.axaml.cs">
+      <DependentUpon>KeyOptionsView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

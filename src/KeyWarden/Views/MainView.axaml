@@ -41,7 +41,12 @@
                 </Style>
               </Button.Styles>
             </Button>
-            <TextBlock Classes="window-name" Padding="8,0,0,0" Foreground="{DynamicResource Color.Sidebar.Foreground}" Text="KeyWarden" FontSize="12" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <TextBlock Text="KeyWarden"
+                       Classes="window-name"
+                       Padding="8,0,0,0"
+                       Foreground="{DynamicResource Color.Sidebar.Foreground}"
+                       FontSize="12" FontWeight="SemiBold"
+                       HorizontalAlignment="Left" VerticalAlignment="Center"/>
           </DockPanel>
 
           <ListBox Name="Tabs"
@@ -92,7 +97,8 @@
               <Border Padding="8">
                 <StackPanel Orientation="Vertical" IsVisible="{Binding IsKeysTabSelected}">
 
-                  <ListBox ItemsSource="{Binding Kay.Keys}"
+                  <ListBox Name="KeysListBox"
+                           ItemsSource="{Binding Kay.Keys}"
                            SelectedItem="{Binding SelectedKey}"
                            Background="Transparent"
                            Classes="keys">
@@ -103,8 +109,8 @@
                           <views:KeyIcon Grid.Column="0" />
                           <Border Grid.Column="2">
                             <StackPanel>
-                              <TextBlock Text="{Binding Name}" FontWeight="DemiBold" FontSize="16" TextTrimming="CharacterEllipsis"/>
-                              <TextBlock Text="{Binding Fingerprint}" TextTrimming="CharacterEllipsis" FontWeight="Medium" FontSize="12" Opacity="0.5"/>
+                              <TextBlock Text="{Binding Name}" FontSize="16" TextTrimming="CharacterEllipsis"/>
+                              <TextBlock Text="{Binding Fingerprint}" FontSize="12" TextTrimming="CharacterEllipsis" Opacity="0.5"/>
                             </StackPanel>
                           </Border>
                         </Grid>
@@ -128,19 +134,9 @@
                           Background="{DynamicResource Color.Border}"
                           HorizontalAlignment="Stretch"/>
 
-            <Grid Grid.Column="2" IsVisible="{Binding IsKeysTabSelected}">
-              <StackPanel IsVisible="{Binding IsKeySelected}"
-                          Orientation="Vertical"
-                          VerticalAlignment="Top">
-                <Border Padding="32">
-                  <StackPanel Orientation="Horizontal" Spacing="16">
-                    <views:KeyIcon Width="64"/>
-                    <TextBlock Text="{Binding SelectedKeyName}" VerticalAlignment="Center" FontSize="20.5" FontWeight="SemiBold" />
-                  </StackPanel>
-                </Border>
-              </StackPanel>
-              <TextBlock IsVisible="{Binding !IsKeySelected}" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            </Grid>
+            <views:KeyOptionsView Grid.Column="2"
+                                  Name="KeyOptions"
+                                  IsVisible="{Binding IsKeysTabSelected}"/>
           </Grid>
 
           <Border IsVisible="{Binding IsActivitySelected}">

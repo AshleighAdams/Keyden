@@ -34,7 +34,6 @@ public class AgentK : ISshAgentHandler
 	private readonly ISshKeyStore KeyStore;
 
 	public event Action<ActivityItem>? NewActivity;
-	public event PropertyChangedEventHandler? PropertyChanged;
 
 	public AgentK(ISshKeyStore keyStore)
 	{
@@ -76,7 +75,7 @@ public class AgentK : ISshAgentHandler
 				{
 					Name = key.Name,
 					Fingerprint = key.Fingerprint,
-					PublicKey = Encoding.UTF8.GetString(key.PublicKey.Span),
+					PublicKey = key.PublicKeyText,
 				});
 			}
 		}

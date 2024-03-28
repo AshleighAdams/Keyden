@@ -36,6 +36,12 @@ public record struct SshKey
 		get => _Fingerprint ?? string.Empty;
 		set => _Fingerprint = value;
 	}
+	private string _PublicKeyText;
+	public string PublicKeyText
+	{
+		get => _PublicKeyText ?? string.Empty;
+		set => _PublicKeyText = value;
+	}
 
 	public ReadOnlyMemory<byte> PublicKey { get; set; }
 	public ReadOnlyMemory<byte>? PrivateKey { get; set; }

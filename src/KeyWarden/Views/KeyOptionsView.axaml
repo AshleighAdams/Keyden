@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:KeyWarden.Views"
+             xmlns:vm="clr-namespace:KeyWarden.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+             x:Class="KeyWarden.Views.KeyOptionsView"
+             x:DataType="vm:KeyOptionsViewModel" Padding="16,22,16,0">
+  <Grid>
+
+    <StackPanel IsVisible="{Binding !IsKeyNull}"
+                Orientation="Vertical"
+                VerticalAlignment="Top"
+                Spacing="22">
+      <Border Padding="16,0,0,0">
+        <StackPanel Orientation="Horizontal" Spacing="16">
+          <views:KeyIcon Width="64"/>
+          <TextBlock Text="{Binding Key.Name}"
+                     VerticalAlignment="Center"
+                     FontSize="20.5" FontWeight="SemiBold" />
+        </StackPanel>
+      </Border>
+
+      <Border Margin="0,2" BorderThickness="1" CornerRadius="8">
+        <StackPanel>
+          <Border Padding="16,8" >
+            <StackPanel Spacing="1">
+              <TextBlock FontSize="12" Classes="label">public key</TextBlock>
+              <TextBlock Text="{Binding Key.PublicKey}" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+          </Border>
+          <Border BorderThickness="0,1,0,0"/>
+          <Border Padding="16,8" >
+            <StackPanel Spacing="1">
+              <TextBlock FontSize="12" Classes="label">fingerprint</TextBlock>
+              <TextBlock Text="{Binding Key.Fingerprint}" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+    
+    <TextBlock IsVisible="{Binding IsKeyNull}" Text="Hello Avalonia" HorizontalAlignment="Center" VerticalAlignment="Center" />
+  </Grid>
+
+  <UserControl.Styles>
+    <Style Selector="Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Light}"/>
+    </Style>
+
+    <Style Selector="TextBlock.label">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Label}"/>
+    </Style>
+  </UserControl.Styles>
+
+</UserControl>

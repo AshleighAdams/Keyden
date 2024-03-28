@@ -4,14 +4,19 @@
   <ResourceDictionary.ThemeDictionaries>
 
     <ResourceDictionary x:Key="Light">
+      <FontWeight x:Key="Text.Weight">Medium</FontWeight>
+      
       <Color x:Key="Color.MacOS.Close">#FFFF6059</Color>
       <Color x:Key="Color.MacOS.Minimize">#FFFFBE2F</Color>
       <Color x:Key="Color.MacOS.Maximize">#FF29c941</Color>
       <Color x:Key="Color.Window">#ffffff</Color>
       <SolidColorBrush x:Key="Color.Window.Glass" Color="#ffffff" Opacity="0.7" />
-      <Color x:Key="Color.Border">#22000000</Color>
       <Color x:Key="Color.Button.Foreground">#b1b7bc</Color>
 
+      <Color x:Key="Color.Border">#e5e5e5</Color>
+      <Color x:Key="Color.Border.Light">#e5e5e5</Color>
+      <Color x:Key="Color.Label">#6851d6</Color>
+      
       <Color x:Key="Color.Sidebar.Background">#2B2C3A</Color>
       <Color x:Key="Color.Sidebar.Foreground">#fff</Color>
       <SolidColorBrush x:Key="Brush.Sidebar.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
@@ -51,14 +56,18 @@
     </ResourceDictionary>
 
     <ResourceDictionary x:Key="Dark">
+      <FontWeight x:Key="Text.Weight">Medium</FontWeight>
+      
       <Color x:Key="Color.MacOS.Close">#FFFF5E56</Color>
       <Color x:Key="Color.MacOS.Minimize">#FFFCBB2D</Color>
       <Color x:Key="Color.MacOS.Maximize">#FF25C53C</Color>
       <Color x:Key="Color.Window">#262626</Color>
       <SolidColorBrush x:Key="Color.Window.Glass" Color="#262626" Opacity="0.7" />
-      <Color x:Key="Color.Border">#000000</Color>
       <Color x:Key="Color.Button.Foreground">#b1b7bc</Color>
 
+      <Color x:Key="Color.Border">#000000</Color>
+      <Color x:Key="Color.Border.Light">#404040</Color>
+      <Color x:Key="Color.Label">#bbadff</Color>
 
       <Color x:Key="Color.Sidebar.Background">#2B2C3A</Color>
       <Color x:Key="Color.Sidebar.Foreground">#fff</Color>

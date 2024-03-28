@@ -13,7 +13,6 @@
     <TextBlock Text="{Binding Text}"
                VerticalAlignment="Center"
                FontSize="13"
-               FontWeight="SemiBold"
                Foreground="{DynamicResource Color.Sidebar.Foreground}" />
   </StackPanel>
 </UserControl>

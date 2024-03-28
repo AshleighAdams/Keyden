@@ -18,7 +18,16 @@ public static class ServiceCollectionExtensions
 	{
 		// transient view models
 		collection.AddTransient<MainViewModel>();
-		collection.AddTransient<ActivityViewModel>();
+		if (Design.IsDesignMode)
+		{
+			collection.AddTransient<ActivityViewModel, DesignActivityViewModel>();
+			collection.AddTransient<KeyOptionsViewModel, DesignKeyOptionsViewModel>();
+		}
+		else
+		{
+			collection.AddTransient<ActivityViewModel>();
+			collection.AddTransient<KeyOptionsViewModel>();
+		}
 
 		// singletons, both design and runtime
 		collection.AddSingleton<AgentK>();

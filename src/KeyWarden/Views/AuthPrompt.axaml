@@ -20,12 +20,14 @@
   <StackPanel Spacing="20">
     <TextBlock Text="Key Access Requested"
                TextAlignment="Center"
-               FontSize="24"
-               FontWeight="SemiBold"/>
+               FontSize="21"/>
 
-    <TextBlock FontSize="16">
-      <Run>Allow</Run>
-      <Run FontWeight="SemiBold" Text="{Binding AppName}"/> to use the key
+    <TextBlock FontSize="16"
+               FontWeight="Normal"
+               TextAlignment="Center">
+      Allow
+      <Run FontWeight="SemiBold" Text="{Binding AppName}"/>
+      to use the key
     </TextBlock>
 
     <Border Background="{DynamicResource Brush.Auth.Key.Background}"
@@ -34,7 +36,7 @@
             BorderThickness="1"
             Padding="12,10">
       <StackPanel Orientation="Horizontal" Spacing="8">
-        <i:Icon Value="fa-chevron-right" FontSize="10" />
+        <i:Icon Value="fa-chevron-right" FontSize="10" Opacity="0.5" />
         <views:KeyIcon />
         <TextBlock Text="{Binding Key.Name}"
                    FontWeight="SemiBold"
@@ -50,4 +52,42 @@
       <Button Name="AuthButton" Classes="confirm">Authorize</Button>
     </StackPanel>
   </StackPanel>
+
+  <Window.Styles>
+
+    <Style Selector="Button.confirm">
+      <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Brush.ConfirmButton.Border}"/>
+
+      <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background.Hover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background.Press}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
+      </Style>
+    </Style>
+
+    <Style Selector="Button.deny">
+      <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Brush.DenyButton.Border}"/>
+
+      <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background.Hover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background.Press}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
+      </Style>
+    </Style>
+    
+  </Window.Styles>
 </Window>

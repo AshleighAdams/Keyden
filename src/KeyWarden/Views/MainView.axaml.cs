@@ -26,6 +26,15 @@ public partial class MainView : UserControl
 		TitlebarRight.DoubleTapped += OnDoubleClicked;
 		SyncButton.Click += SyncButton_Click;
 		AboutButton.Click += AboutButton_Click;
+		KeysListBox.SelectionChanged += KeysListBox_SelectionChanged;
+	}
+
+	private void KeysListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+	{
+		if (KeyOptions.DataContext is not KeyOptionsViewModel vm)
+			throw new InvalidCastException($"MainView: KeyOptions view model is not a KeyOptionsViewModel");
+		
+		vm.Key = KeysListBox.SelectedItem as ObservableSshKey;
 	}
 
 	private void AboutButton_Click(object? sender, RoutedEventArgs e)

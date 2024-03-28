@@ -150,11 +150,10 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 				if (publicKey is null || privateKey is null)
 					return;
 
-				var publicKeyBytes = Convert.FromBase64String(publicKey.Substring(publicKey.IndexOf(' ')));
-
 				newKeys[i] = newKeys[i] with
 				{
-					PublicKey = publicKeyBytes,
+					PublicKeyText = publicKey,
+					PublicKey = Convert.FromBase64String(publicKey.Substring(publicKey.IndexOf(' '))),
 					PrivateKey = Encoding.ASCII.GetBytes(privateKey),
 				};
 			}
