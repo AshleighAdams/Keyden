@@ -23,6 +23,11 @@
   <Style Selector="Button">
     <Setter Property="FontWeight" Value="{DynamicResource Text.Weight}"/>
   </Style>
+  
+  <Style Selector="Button:pressed">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+
 
   <Style Selector="CheckBox">
     <Setter Property="FontWeight" Value="{DynamicResource Text.Weight}"/>
@@ -35,9 +40,7 @@
     <Setter Property="Padding" Value="6"/>
   </Style>
 
-  <Style Selector="ListBox.tabs > ListBoxItem">
-    <Setter Property="CornerRadius" Value="8"/>
-    <Setter Property="Padding" Value="10"/>
+  <Style Selector="ListBox > ListBoxItem">
 
     <Style Selector="^:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Hover}"/>
@@ -49,28 +52,21 @@
         <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Selected}"/>
       </Style>
 
-    </Style>
-  </Style>
-
-
-  <Style Selector="ListBox.keys > ListBoxItem">
-    <Setter Property="CornerRadius" Value="8"/>
-    <Setter Property="Padding" Value="10"/>
-
-    <Style Selector="^:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource Brush.Key.Hover}"/>
-    </Style>
-
-    <Style Selector="^:selected">
-
-      <Style Selector="^ /template/ ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource Brush.Key.Selected}"/>
-      </Style>
-
       <Style Selector="^:not(:focus) /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}"/>
       </Style>
 
+    </Style>
+  </Style>
+
+  <Style Selector="ListBox.keys > ListBoxItem">
+    <Setter Property="CornerRadius" Value="8"/>
+    <Setter Property="Padding" Value="10"/>
+    
+    <Style Selector="^:selected">
+      <Style Selector="^:not(:focus) /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Selected}"/>
+      </Style>
     </Style>
   </Style>
 

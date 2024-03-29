@@ -47,7 +47,7 @@ public class DesignActivityViewModel : ActivityViewModel
 		Activities.AddRange(
 		[
 			new (){ Icon = "fa-sync", Title = "Test", Description = "This is a test", Importance = ActivityImportance.Normal },
-			new (){ Icon = "fa-sync", Title = "Test1", Description = "This is a test", Importance = ActivityImportance.Normal },
+			new (){ Icon = "fa-sync", Title = "Test1", Description = "This is a really long test message to just try and see something about this bluh", Importance = ActivityImportance.Normal },
 			new (){ Icon = "fa-sync", Title = "Test2", Description = "This is a test", Importance = ActivityImportance.Normal },
 			new (){ Icon = "fa-sync", Title = "Test3", Description = "This is a test", Importance = ActivityImportance.Normal },
 			new (){ Icon = "fa-sync", Title = "Test4", Description = "This is a test", Importance = ActivityImportance.Normal },
