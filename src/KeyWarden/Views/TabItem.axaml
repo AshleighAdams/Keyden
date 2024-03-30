@@ -7,6 +7,12 @@
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="100"
              x:Class="KeyWarden.Views.TabItem">
 
+  <Design.DesignStyle>
+    <Style Selector="views|TabItem">
+      <Setter Property="Background" Value="{DynamicResource Color.Sidebar.Background}"/>
+    </Style>
+  </Design.DesignStyle>
+
   <Grid RowDefinitions="*,*">
     <Button Grid.Row="0"
             Name="TheButton"
@@ -17,7 +23,7 @@
           <i:Icon Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:TabItem}}, Path=Icon}"
                   Foreground="{DynamicResource Color.Sidebar.Foreground}" />
         </Border>
-      
+
         <TextBlock Grid.Column="2"
                    Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:TabItem}}, Path=Text}"
                    VerticalAlignment="Center"
@@ -50,7 +56,7 @@
         <Style Selector="views|TabItem TextBlock">
           <Setter Property="Foreground" Value="{DynamicResource Color.Sidebar.Foreground}"/>
         </Style>
-        
+
         <Style Selector="views|TabItem.subtle TextBlock">
           <Setter Property="Foreground" Value="{DynamicResource Color.Button.Foreground}"/>
         </Style>
@@ -59,13 +65,13 @@
           <Setter Property="FontSize" Value="12"/>
           <Setter Property="Foreground" Value="{DynamicResource Color.Button.Foreground}"/>
         </Style>
-        
+
         <Style Selector="views|TabItem.subtle Border.icon">
           <Setter Property="RenderTransform" Value="rotate(0deg)"/>
 
           <Setter Property="Transitions">
             <Transitions>
-              <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/><!-- Easing="Linear"-->
+              <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
             </Transitions>
           </Setter>
         </Style>
@@ -76,9 +82,30 @@
       </Button.Styles>
     </Button>
 
-    <ContentPresenter Grid.Row="1"
-                      Name="PART_ContentPresenter"
-                      IsVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:TabItem}}, Path=IsExpanded}"
-                      Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:TabItem}}, Path=ExpandableContent}"/>
+    <StackPanel Grid.Row="1"
+                Name="Resizer"
+                Classes="content"
+                RenderTransformOrigin="0.5 0">
+
+      <ContentPresenter Name="PART_ContentPresenter"
+                        Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:TabItem}}, Path=ExpandableContent}"/>
+
+      <StackPanel.Styles>
+        <Style Selector="views|TabItem StackPanel.content">
+          <Setter Property="Transitions">
+            <Transitions>
+              <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+              <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+              <!-- note: MaxHeight is animated in code -->
+            </Transitions>
+          </Setter>
+        </Style>
+        <Style Selector="views|TabItem[IsExpanded=False] StackPanel.content">
+          <Setter Property="RenderTransform" Value="scaleY(0.5) translateY(-20px)"/>
+          <Setter Property="Opacity" Value="0"/>
+          <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+      </StackPanel.Styles>
+    </StackPanel>
   </Grid>
 </UserControl>

@@ -17,9 +17,8 @@
     </Grid.ColumnDefinitions>
 
     <DockPanel Name="Sidebar" Background="{DynamicResource Color.Sidebar.Background}">
-      <Border Padding="10,0,10,5" DockPanel.Dock="Top">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Spacing="10">
-          <DockPanel Height="50" Name="TitlebarLeft" IsHitTestVisible="True" Background="Transparent">
+        <StackPanel DockPanel.Dock="Top" Orientation="Vertical" HorizontalAlignment="Stretch" Spacing="10">
+          <DockPanel Height="50" Name="TitlebarLeft" IsHitTestVisible="True" Background="Transparent" Margin="10,0">
             <Button DockPanel.Dock="Right"
                     Padding="2"
                     CornerRadius="8">
@@ -48,9 +47,10 @@
                        FontSize="12" FontWeight="SemiBold"
                        HorizontalAlignment="Left" VerticalAlignment="Center"/>
           </DockPanel>
+        </StackPanel>
 
+        <ScrollViewer DockPanel.Dock="Bottom" Padding="10,0">
           <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
-
             <views:TabItem Classes="subtle"
                             Icon="fa-chevron-right"
                             Text="Keys"
@@ -99,8 +99,8 @@
                            Index="1"
                            SelectedIndex="{Binding TabIndexSelected}"/>
           </Grid>
-        </StackPanel>
-      </Border>
+        </ScrollViewer>
+      
     </DockPanel>
 
     <GridSplitter Grid.Column="1"

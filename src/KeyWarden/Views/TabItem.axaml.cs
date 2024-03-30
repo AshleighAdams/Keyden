@@ -1,9 +1,15 @@
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Interactivity;
+using Avalonia.Styling;
+using Avalonia.Threading;
 
 using System;
+using System.Threading;
 
 namespace KeyWarden.Views
 {
@@ -78,13 +84,45 @@ namespace KeyWarden.Views
 		{
 			InitializeComponent();
 
-			TheButton.AddHandler(PointerPressedEvent, TheButton_Click, Avalonia.Interactivity.RoutingStrategies.Tunnel);
+			TheButton.AddHandler(PointerPressedEvent, TheButton_Click, RoutingStrategies.Tunnel);
 		}
 
-		private void TheButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+		private CancellationTokenSource? AnimationCts;
+		private void TheButton_Click(object? sender, RoutedEventArgs e)
 		{
 			if (ExpandableContent is not null)
+			{
 				IsExpanded = !IsExpanded;
+				var oldMaxHeight = double.IsPositiveInfinity(Resizer.MaxHeight) ? PART_ContentPresenter.DesiredSize.Height : Resizer.MaxHeight;
+				var newMaxHeight = IsExpanded ? PART_ContentPresenter.DesiredSize.Height : 0.0;
+				var finalMaxHeight = IsExpanded ? double.PositiveInfinity : 0.0;
+				var duration = 0.1;
+
+				var anim = new Animation()
+				{
+					Duration = TimeSpan.FromSeconds(duration),
+					IterationCount = new IterationCount(1, IterationType.Many),
+					Children =
+					{
+						new KeyFrame()
+						{
+							Setters = { new Setter{ Property = MaxHeightProperty, Value = oldMaxHeight } },
+							KeyTime = TimeSpan.FromSeconds(0.0),
+						},
+						new KeyFrame()
+						{
+							Setters = { new Setter{ Property = MaxHeightProperty, Value = newMaxHeight } },
+							KeyTime = TimeSpan.FromSeconds(duration),
+						},
+					},
+				};
+
+				AnimationCts?.Cancel();
+				// before starting the animation, the new final value must be set
+				Resizer.MaxHeight = finalMaxHeight;
+				AnimationCts = new CancellationTokenSource();
+				_ = anim.RunAsync(Resizer, AnimationCts.Token);
+			}
 			else
 				SelectedIndex = Index;
 		}
