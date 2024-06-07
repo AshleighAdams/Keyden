@@ -18,7 +18,7 @@ namespace KeyWarden.Views
 
 		public AuthPrompt()
 		{
-			Key = new() { Name = "Primary" };
+			Key = new() { Id = string.Empty, Name = "Primary" };
 			ClientInfo = new()
 			{
 				Processes = [],

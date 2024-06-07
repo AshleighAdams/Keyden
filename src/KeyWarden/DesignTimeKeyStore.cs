@@ -24,11 +24,13 @@ internal class DesignTimeKeyStore : ISshKeyStore
 
 		var publicKey = RandomPublicKey();
 		var pubKeyForHumans = $"ssh-ed25519 {Convert.ToBase64String(publicKey.Span)}";
+		var id = RandomNumberGenerator.GetHexString(256 / 8);
 
 		return new()
 		{
+			Id = id,
 			Name = string.Join(" ", words),
-			Fingerprint = $"SHA256:{RandomNumberGenerator.GetHexString(256/8)}",
+			Fingerprint = $"SHA256:{id}",
 			PublicKey = publicKey,
 			PublicKeyText = pubKeyForHumans,
 			PrivateKey =

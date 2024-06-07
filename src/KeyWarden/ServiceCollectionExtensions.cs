@@ -40,7 +40,9 @@ public static class ServiceCollectionExtensions
 		}
 
 		// runtime only singletons
-		collection.AddSingleton<ISshKeyStore, OnePassCliSshKeyStore>();
+		collection.AddSingleton<OnePassCliSshKeyStore>();
+		collection.AddSingletonAlias<ISshKeyStore, OnePassCliSshKeyStore>();
+		collection.AddSingletonAlias<ISshKeyOptionsStore, OnePassCliSshKeyStore>();
 		collection.AddSingleton<SshAgent>();
 		collection.AddSingleton<SshAgentOptions>();
 	}

@@ -27,17 +27,22 @@ public partial class ObservableSshKey : ObservableObject
 
 	[ObservableProperty]
 	private string _PublicKey = string.Empty;
+
+	[ObservableProperty]
+	private SshKeyOptions _Options;
 }
 
 public class AgentK : ISshAgentHandler
 {
 	private readonly ISshKeyStore KeyStore;
+	private readonly ISshKeyOptionsStore KeyOptionsStore;
 
 	public event Action<ActivityItem>? NewActivity;
 
-	public AgentK(ISshKeyStore keyStore)
+	public AgentK(ISshKeyStore keyStore, ISshKeyOptionsStore keyOptionsStore)
 	{
 		KeyStore = keyStore;
+		KeyOptionsStore = keyOptionsStore;
 	}
 
 	public ObservableCollection<ObservableSshKey> Keys { get; } = new();
@@ -114,6 +119,7 @@ public class AgentK : ISshAgentHandler
 	}
 
 	private SemaphoreSlim PromptQueue { get; } = new SemaphoreSlim(1);
+
 	public struct ScopedLock : IDisposable
 	{
 		private SemaphoreSlim? Semaphore { get; set; }
@@ -132,7 +138,7 @@ public class AgentK : ISshAgentHandler
 	}
 	private readonly Dictionary<string, KeyInfo> KeyInfos = new();
 
-	async ValueTask<SshKey> ISshAgentHandler.GetPrivateKey(SshKey publicKey, ClientInfo info, CancellationToken ct)
+	async ValueTask<SshKey> ISshAgentHandler.GetPrivateKey(ReadOnlyMemory<byte> publicKeyBlob, ClientInfo info, CancellationToken ct)
 	{
 		var mainProcess = info.MainProcess;
 		var processChain = string.Join(", ", info.Processes
@@ -142,9 +148,22 @@ public class AgentK : ISshAgentHandler
 		if (!string.IsNullOrEmpty(processChain))
 			processChain = $" (via {processChain})";
 
-		publicKey = KeyStore.PublicKeys
-			.Where(k => k.PublicKey.Span.SequenceEqual(publicKey.PublicKey.Span))
-			.FirstOrDefault(publicKey);
+		var publicKey = KeyStore.PublicKeys
+			.Where(k => k.PublicKey.Span.SequenceEqual(publicKeyBlob.Span))
+			.FirstOrDefault();
+
+		if (publicKey.IsEmpty)
+		{
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-ban", // maybe gavel
+				Importance = ActivityImportance.Normal,
+				Title = "Auth error",
+				Description = $"{info.ApplicationName}{processChain} requested access to unknown private key",
+			});
+
+			return default;
+		}
 
 		await PromptQueue.WaitAsync(ct);
 		using var @lock = new ScopedLock(PromptQueue);

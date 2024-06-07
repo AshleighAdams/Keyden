@@ -24,28 +24,15 @@ public record SshAgentOptions
 
 public record struct SshKey
 {
-	private string _Name;
-	public string Name
-	{
-		get => _Name ?? string.Empty;
-		set => _Name = value;
-	}
-	private string _Fingerprint;
-	public string Fingerprint
-	{
-		get => _Fingerprint ?? string.Empty;
-		set => _Fingerprint = value;
-	}
-	private string _PublicKeyText;
-	public string PublicKeyText
-	{
-		get => _PublicKeyText ?? string.Empty;
-		set => _PublicKeyText = value;
-	}
+	public SshKey() { }
+	public required string Id { get; init; }
+	public string Name { get; set; } = string.Empty;
+	public string Fingerprint { get; set; } = string.Empty;
+	public ReadOnlyMemory<byte> PublicKey { get; set; } = Array.Empty<byte>();
+	public string PublicKeyText { get; set; } = string.Empty;
+	public ReadOnlyMemory<byte>? PrivateKey { get; set; } = Array.Empty<byte>();
 
-	public ReadOnlyMemory<byte> PublicKey { get; set; }
-	public ReadOnlyMemory<byte>? PrivateKey { get; set; }
-	public bool IsEmpty => _Name is null;
+	public bool IsEmpty => string.IsNullOrEmpty(Id);
 }
 
 public class ClientInfo
@@ -64,7 +51,7 @@ public class ClientInfo
 public interface ISshAgentHandler
 {
 	ValueTask<IReadOnlyList<SshKey>> GetPublicKeys(ClientInfo info, CancellationToken ct);
-	ValueTask<SshKey> GetPrivateKey(SshKey publicKey, ClientInfo info, CancellationToken ct);
+	ValueTask<SshKey> GetPrivateKey(ReadOnlyMemory<byte> publicKeyBlob, ClientInfo info, CancellationToken ct);
 }
 
 public class SshAgent
@@ -193,11 +180,7 @@ public class SshAgent
 						var data = content.ReadBlob();
 						var sigFlags = (SignatureFlags)content.ReadUInt32();
 
-						var publicKey = new SshKey()
-						{
-							PublicKey = publicKeyBlob,
-						};
-						var privateKey = await Handler.GetPrivateKey(publicKey, clientInfo, ct);
+						var privateKey = await Handler.GetPrivateKey(publicKeyBlob, clientInfo, ct);
 						if (privateKey is { IsEmpty: true } or { PrivateKey: null })
 						{
 							await client.SendMessage(FailureMessage);
