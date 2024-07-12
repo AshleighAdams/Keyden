@@ -1,14 +1,41 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace KeyWarden;
+
+file static class JsonExtensionMethods
+{
+	public static JsonValue AsJsonValue(this TimeSpan value)
+	{
+		return JsonValue.Create(value.ToString(null, CultureInfo.InvariantCulture));
+	}
+	public static JsonValue AsJsonValue(this bool value)
+	{
+		return JsonValue.Create(value);
+	}
+	public static bool? GetBool(this JsonNode node)
+	{
+		if (node.AsValue() is not JsonValue value)
+			return null;
+		return value.GetValue<bool>();
+	}
+	public static TimeSpan? GetTimeSpan(this JsonNode node)
+	{
+		if (node.AsValue() is not JsonValue value)
+			return null;
+		var str = value.GetValue<string>();
+		return TimeSpan.Parse(str, CultureInfo.InvariantCulture);
+	}
+}
 
 public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 {
@@ -142,8 +169,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			}
 		})();
 
-		await SyncOptions(ct);
-
 		PrivateKeys.Clear();
 		PublicKeys.Clear();
 		PrivateKeys.AddRange(newKeys);
@@ -152,42 +177,213 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		Debug.WriteLine($"Synced with op in {sw.Elapsed.TotalSeconds} seconds");
 	}
 
-	private async Task SyncOptions(CancellationToken ct)
+	private readonly HashSet<string> DirtyOptions = new();
+	private readonly Dictionary<string, SshKeyOptions> Options = new();
+	SshKeyOptions? ISshKeyOptionsStore.GetKeyOptions(string id)
 	{
+		if (Options.TryGetValue(id, out var options))
+			return options;
+		else
+			return null;
+	}
+	void ISshKeyOptionsStore.SetKeyOptions(string id, SshKeyOptions? options)
+	{
+		if (options is null)
+		{
+			if (Options.Remove(id))
+				DirtyOptions.Add(id);
+		}
+		else
+		{
+
+			if (Options.TryGetValue(id, out var oldOptions) && options.Value != oldOptions)
+				DirtyOptions.Add(id);
+			else if (options.Value != new SshKeyOptions())
+				DirtyOptions.Add(id);
+
+			Options[id] = options.Value;
+		}
+	}
+
+	private const string KewardenOptionsEntryName = "\"KeyWarden Options\"";
+	private static SshKeyOptions ReadOptionsNode(JsonObject obj)
+	{
+		var @default = new SshKeyOptions();
+		return new SshKeyOptions()
+		{
+			RequireAuthorization = obj["RequireAuthorization"]?.GetBool() ?? @default.RequireAuthentication,
+			RemainAuthorized = obj["RemainAuthorized"]?.GetBool() ?? @default.RemainAuthorized,
+			RemainAuthorizedFor = obj["RemainAuthorizedFor"]?.GetTimeSpan() ?? @default.RemainAuthorizedFor,
+			RemainAuthorizedUntilKeyInactivity = obj["RemainAuthorizedUntilKeyInactivity"]?.GetBool() ?? @default.RemainAuthorizedUntilKeyInactivity,
+			RemainAuthorizedUntilKeyInactivityFor = obj["RemainAuthorizedUntilKeyInactivityFor"]?.GetTimeSpan() ?? @default.RemainAuthorizedUntilKeyInactivityFor,
+			RemainAuthorizedUntilUserInactivity = obj["RemainAuthorizedUntilUserInactivity"]?.GetBool() ?? @default.RemainAuthorizedUntilUserInactivity,
+			RemainAuthorizedUntilUserInactivityFor = obj["RemainAuthorizedUntilUserInactivityFor"]?.GetTimeSpan() ?? @default.RemainAuthorizedUntilUserInactivityFor,
+			RemainAuthorizedUntilLocked = obj["RemainAuthorizedUntilLocked"]?.GetBool() ?? @default.RemainAuthorizedUntilLocked,
+			RemainAuthorizedUntilLockedFor = obj["RemainAuthorizedUntilLockedFor"]?.GetTimeSpan() ?? @default.RemainAuthorizedUntilLockedFor,
+			RequireAuthentication = obj["RequireAuthentication"]?.GetBool() ?? @default.RequireAuthentication,
+			RemainAuthenticated = obj["RemainAuthenticated"]?.GetBool() ?? @default.RemainAuthenticated,
+			RemainAuthenticatedFor = obj["RemainAuthenticatedFor"]?.GetTimeSpan() ?? @default.RemainAuthenticatedFor,
+			RemainAuthenticatedUntilKeyInactivity = obj["RemainAuthenticatedUntilKeyInactivity"]?.GetBool() ?? @default.RemainAuthenticatedUntilKeyInactivity,
+			RemainAuthenticatedUntilKeyInactivityFor = obj["RemainAuthenticatedUntilKeyInactivityFor"]?.GetTimeSpan() ?? @default.RemainAuthenticatedUntilKeyInactivityFor,
+			RemainAuthenticatedUntilUserInactivity = obj["RemainAuthenticatedUntilUserInactivity"]?.GetBool() ?? @default.RemainAuthenticatedUntilUserInactivity,
+			RemainAuthenticatedUntilUserInactivityFor = obj["RemainAuthenticatedUntilUserInactivityFor"]?.GetTimeSpan() ?? @default.RemainAuthenticatedUntilUserInactivityFor,
+			RemainAuthenticatedUntilLocked = obj["RemainAuthenticatedUntilLocked"]?.GetBool() ?? @default.RemainAuthenticatedUntilLocked,
+			RemainAuthenticatedUntilLockedFor = obj["RemainAuthenticatedUntilLockedFor"]?.GetTimeSpan() ?? @default.RemainAuthenticatedUntilLockedFor,
+		};
+	}
+
+	private static void WriteOptionsNode(JsonObject obj, SshKeyOptions opts)
+	{
+		obj["RequireAuthorization"] = opts.RequireAuthorization.AsJsonValue();
+		obj["RemainAuthorized"] = opts.RemainAuthorized.AsJsonValue();
+		obj["RemainAuthorizedFor"] = opts.RemainAuthorizedFor.AsJsonValue();
+		obj["RemainAuthorizedUntilKeyInactivity"] = opts.RemainAuthorizedUntilKeyInactivity.AsJsonValue();
+		obj["RemainAuthorizedUntilKeyInactivityFor"] = opts.RemainAuthorizedUntilKeyInactivityFor.AsJsonValue();
+		obj["RemainAuthorizedUntilUserInactivity"] = opts.RemainAuthorizedUntilUserInactivity.AsJsonValue();
+		obj["RemainAuthorizedUntilUserInactivityFor"] = opts.RemainAuthorizedUntilUserInactivityFor.AsJsonValue();
+		obj["RemainAuthorizedUntilLocked"] = opts.RemainAuthorizedUntilLocked.AsJsonValue();
+		obj["RemainAuthorizedUntilLockedFor"] = opts.RemainAuthorizedUntilLockedFor.AsJsonValue();
+		obj["RequireAuthentication"] = opts.RequireAuthentication.AsJsonValue();
+		obj["RemainAuthenticated"] = opts.RemainAuthenticated.AsJsonValue();
+		obj["RemainAuthenticatedFor"] = opts.RemainAuthenticatedFor.AsJsonValue();
+		obj["RemainAuthenticatedUntilKeyInactivity"] = opts.RemainAuthenticatedUntilKeyInactivity.AsJsonValue();
+		obj["RemainAuthenticatedUntilKeyInactivityFor"] = opts.RemainAuthenticatedUntilKeyInactivityFor.AsJsonValue();
+		obj["RemainAuthenticatedUntilUserInactivity"] = opts.RemainAuthenticatedUntilUserInactivity.AsJsonValue();
+		obj["RemainAuthenticatedUntilUserInactivityFor"] = opts.RemainAuthenticatedUntilUserInactivityFor.AsJsonValue();
+		obj["RemainAuthenticatedUntilLocked"] = opts.RemainAuthenticatedUntilLocked.AsJsonValue();
+		obj["RemainAuthenticatedUntilLockedFor"] = opts.RemainAuthenticatedUntilLockedFor.AsJsonValue();
+	}
+
+
+	private readonly UTF8Encoding Utf8 = new(encoderShouldEmitUTF8Identifier: false);
+	async Task ISshKeyOptionsStore.SyncKeyOptions(CancellationToken ct)
+	{
+		var jsonSerializerOptions = new JsonSerializerOptions()
+		{
+			WriteIndented = true,
+		};
+
 		var proc = Process.Start(
-			new ProcessStartInfo("op", "item get \"KeyWarden Options\" --format json")
+			new ProcessStartInfo("op", $"item get {KewardenOptionsEntryName} --format json")
 			{
 				UseShellExecute = false,
-				WindowStyle = ProcessWindowStyle.Hidden,
+				//WindowStyle = ProcessWindowStyle.Hidden,
 				CreateNoWindow = true,
 				RedirectStandardOutput = true,
 			}) ?? throw new SystemException("Failed to start op");
 
-		var optionsDoc = await JsonDocument.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct);
+		
+		var optionsDoc = (await JsonNode.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct))?.AsObject()
+			?? throw new Exception("Couldn't parse json");
 
-		var fields = optionsDoc.RootElement.GetProperty("fields");
-		foreach (var field in fields.EnumerateArray())
+		var fields = optionsDoc["fields"]!.AsArray();
+		JsonNode? optionsJsonField = null;
+		string optionsJson = string.Empty;
+
+		foreach (var field in fields)
 		{
-			if (!field.TryGetProperty("label", out var labelField))
+			if (field is null)
 				continue;
-			if (!field.TryGetProperty("value", out var valueField))
-				continue;
-			if (labelField.GetString() != "json")
+			if (field["label"]?.GetValue<string>() != "json")
 				continue;
 
-			var optionsJson = valueField.GetString();
-			if (string.IsNullOrEmpty(optionsJson))
-				break;
+			var optionsJsonNode = field["value"]?.AsValue()
+				?? throw new Exception("Expected value");
+			optionsJson = optionsJsonNode.GetValue<string>();
+			optionsJsonField = field;
+			break;
 		}
-	}
 
-	Task<SshKeyOptions> ISshKeyOptionsStore.GetKeyOptions(string id)
-	{
-		throw new NotImplementedException();
-	}
+		if (optionsJsonField is null)
+			throw new NotImplementedException();
 
-	Task ISshKeyOptionsStore.SetKeyOptions(string id, SshKeyOptions options)
-	{
-		throw new NotImplementedException();
+		bool changed = DirtyOptions.Count > 0;
+		JsonObject jsonDoc;
+
+		if (string.IsNullOrEmpty(optionsJson))
+			jsonDoc = new JsonObject();
+		else
+			jsonDoc = JsonNode.Parse(optionsJson)?.AsObject()
+				?? throw new Exception($"Failed to parse options json");
+
+		var unprocessedKeys = new HashSet<string>(Options.Keys);
+		var toRemoveKeys = new HashSet<string>();
+
+		foreach (var field in jsonDoc)
+		{
+			if (field.Value?.AsObject() is not JsonObject obj)
+				continue;
+
+			var keyId = field.Key;
+			var upstreamOptions = ReadOptionsNode(obj);
+
+			unprocessedKeys.Remove(keyId);
+
+			if (DirtyOptions.Contains(keyId))
+			{
+				if (Options.TryGetValue(keyId, out var downstreamOptions))
+					WriteOptionsNode(obj, downstreamOptions);
+				else
+					toRemoveKeys.Add(keyId);
+			}
+			else
+				Options[keyId] = upstreamOptions;
+		}
+
+		foreach (var removedKey in toRemoveKeys)
+			jsonDoc.Remove(removedKey);
+		foreach (var unprocessedKey in unprocessedKeys)
+		{
+			changed = true;
+			var obj = new JsonObject();
+			var downstreamOptions = Options[unprocessedKey];
+			WriteOptionsNode(obj, downstreamOptions);
+			jsonDoc[unprocessedKey] = obj;
+		}
+
+		if (changed)
+		{
+			optionsJsonField["value"] = JsonValue.Create(jsonDoc.ToJsonString(jsonSerializerOptions));
+			var fullJson = optionsDoc.ToJsonString();
+
+			DirtyOptions.Clear();
+
+			proc = new Process()
+			{
+				StartInfo = new ProcessStartInfo("op", $"item edit {KewardenOptionsEntryName} --format json --no-color")
+				{
+					WindowStyle = ProcessWindowStyle.Hidden,
+					UseShellExecute = false,
+					CreateNoWindow = true,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					RedirectStandardInput = true,
+					StandardInputEncoding = Utf8,
+					StandardOutputEncoding = Utf8,
+					StandardErrorEncoding = Utf8,
+				} ?? throw new SystemException("Failed to start op"),
+				EnableRaisingEvents = true,
+			};
+			
+			var tcs = new TaskCompletionSource<int>();
+			proc.Exited += (s, e) => tcs.SetResult(proc.ExitCode);
+			proc.Start();
+
+			await proc.StandardInput.WriteAsync(fullJson);
+			await proc.StandardInput.FlushAsync();
+			proc.StandardInput.Close();
+
+			Task<string> stdoutTask = proc.StandardOutput.ReadToEndAsync();
+			Task<string> stderrTask = proc.StandardError.ReadToEndAsync();
+
+			await Task.WhenAll(stdoutTask, stderrTask, tcs.Task);
+
+			int exitCode = await tcs.Task;
+			if (exitCode != 0)
+			{
+				var msg = $"1Password: {await stdoutTask + await stderrTask}";
+				throw new Exception(msg);
+			}
+		}
 	}
 }

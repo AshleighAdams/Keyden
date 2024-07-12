@@ -1,9 +1,10 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace KeyWarden;
 
-public struct SshKeyOptions
+public record struct SshKeyOptions
 {
 	public SshKeyOptions() { }
 	public bool RequireAuthorization { get; set; } = true;
@@ -37,6 +38,7 @@ public struct SshKeyOptions
 
 public interface ISshKeyOptionsStore
 {
-	public Task<SshKeyOptions> GetKeyOptions(string id);
-	public Task SetKeyOptions(string id, SshKeyOptions options);
+	Task SyncKeyOptions(CancellationToken ct = default);
+	SshKeyOptions? GetKeyOptions(string id);
+	void SetKeyOptions(string id, SshKeyOptions? options);
 }

@@ -8,48 +8,27 @@ using KeyWarden.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace KeyWarden;
 
 public partial class ObservableSshKey : ObservableObject
 {
 	public ObservableSshKey(
+		string id,
 		string name,
 		string fingerprint,
-		string publicKey,
-		SshKeyOptions options)
+		string publicKey)
 	{
+		Id = id;
 		_Name = name;
 		_Fingerprint = fingerprint;
 		_PublicKey = publicKey;
-
-		_RequireAuthorization = options.RequireAuthorization;
-		{
-			_RemainAuthorized = options.RemainAuthorized;
-			_RemainAuthorizedFor = options.RemainAuthorizedFor;
-			{
-				_RemainAuthorizedUntilKeyInactivity = options.RemainAuthorizedUntilKeyInactivity;
-				_RemainAuthorizedUntilKeyInactivityFor = options.RemainAuthorizedUntilKeyInactivityFor;
-				_RemainAuthorizedUntilUserInactivity = options.RemainAuthorizedUntilUserInactivity;
-				_RemainAuthorizedUntilUserInactivityFor = options.RemainAuthorizedUntilUserInactivityFor;
-				_RemainAuthorizedUntilLocked = options.RemainAuthorizedUntilLocked;
-			}
-		}
-		_RequireAuthentication = options.RequireAuthentication;
-		{
-			_RemainAuthenticated = options.RemainAuthenticated;
-			_RemainAuthenticatedFor = options.RemainAuthenticatedFor;
-			{
-				_RemainAuthenticatedUntilKeyInactivity = options.RemainAuthenticatedUntilKeyInactivity;
-				_RemainAuthenticatedUntilKeyInactivityFor = options.RemainAuthenticatedUntilKeyInactivityFor;
-				_RemainAuthenticatedUntilUserInactivity = options.RemainAuthenticatedUntilUserInactivity;
-				_RemainAuthenticatedUntilUserInactivityFor = options.RemainAuthenticatedUntilUserInactivityFor;
-				_RemainAuthenticatedUntilLocked = options.RemainAuthenticatedUntilLocked;
-			}
-		}
 	}
 
 	public SshKeyOptions GetOptions()
@@ -83,6 +62,35 @@ public partial class ObservableSshKey : ObservableObject
 		}
 		return ret;
 	}
+	public void SetOptions(SshKeyOptions options)
+	{
+		RequireAuthorization = options.RequireAuthorization;
+		{
+			RemainAuthorized = options.RemainAuthorized;
+			RemainAuthorizedFor = options.RemainAuthorizedFor;
+			{
+				RemainAuthorizedUntilKeyInactivity = options.RemainAuthorizedUntilKeyInactivity;
+				RemainAuthorizedUntilKeyInactivityFor = options.RemainAuthorizedUntilKeyInactivityFor;
+				RemainAuthorizedUntilUserInactivity = options.RemainAuthorizedUntilUserInactivity;
+				RemainAuthorizedUntilUserInactivityFor = options.RemainAuthorizedUntilUserInactivityFor;
+				RemainAuthorizedUntilLocked = options.RemainAuthorizedUntilLocked;
+			}
+		}
+		RequireAuthentication = options.RequireAuthentication;
+		{
+			RemainAuthenticated = options.RemainAuthenticated;
+			RemainAuthenticatedFor = options.RemainAuthenticatedFor;
+			{
+				RemainAuthenticatedUntilKeyInactivity = options.RemainAuthenticatedUntilKeyInactivity;
+				RemainAuthenticatedUntilKeyInactivityFor = options.RemainAuthenticatedUntilKeyInactivityFor;
+				RemainAuthenticatedUntilUserInactivity = options.RemainAuthenticatedUntilUserInactivity;
+				RemainAuthenticatedUntilUserInactivityFor = options.RemainAuthenticatedUntilUserInactivityFor;
+				RemainAuthenticatedUntilLocked = options.RemainAuthenticatedUntilLocked;
+			}
+		}
+	}
+
+	public string Id { get; }
 
 	[ObservableProperty]
 	private string _Name;
@@ -160,27 +168,40 @@ public class AgentK : ISshAgentHandler
 		foreach (var key in Keys)
 		{
 			var matchedKey = KeyStore.PublicKeys
-				.Where(k => k.Name == key.Name || k.Fingerprint == key.Fingerprint)
+				.Where(k => k.Id == key.Id)
 				.FirstOrDefault();
 
 			key.Name = matchedKey.Name;
 			key.Fingerprint = matchedKey.Fingerprint;
 
 			if (matchedKey.IsEmpty)
+			{
 				removedKeys.Add(key);
+				KeyOptionsStore.SetKeyOptions(matchedKey.Id, null);
+			}
 		}
 
+		bool syncedNewOptions = false;
 		// check for new keys
 		var newKeys = new List<ObservableSshKey>();
 		foreach (var key in KeyStore.PublicKeys)
 		{
 			var matchedKey = Keys
-				.Where(k => k.Name == key.Name || k.Fingerprint == key.Fingerprint)
+				.Where(k => k.Id == key.Id)
 				.Any();
 
-			var keyOpts = new SshKeyOptions();
 			if (!matchedKey)
-				newKeys.Add(new(key.Name, key.Fingerprint, key.PublicKeyText, keyOpts));
+			{
+				// may have some some new key options to match
+				if (!syncedNewOptions)
+				{
+					syncedNewOptions = true;
+					await KeyOptionsStore.SyncKeyOptions();
+				}
+
+				var newKey = new ObservableSshKey(key.Id, key.Name, key.Fingerprint, key.PublicKeyText);
+				newKeys.Add(newKey);
+			}
 		}
 
 		NewActivity?.Invoke(new ActivityItem()
@@ -191,8 +212,20 @@ public class AgentK : ISshAgentHandler
 			Description = $"Got {newKeys.Count} new keys and removed {removedKeys.Count} keys",
 		});
 
+		// sync options
+		foreach (var key in Keys)
+		{
+			if (newKeys.Contains(key))
+				continue;
+			KeyOptionsStore.SetKeyOptions(key.Id, key.GetOptions());
+		}
+		await KeyOptionsStore.SyncKeyOptions();
+
 		Keys.RemoveMany(removedKeys);
 		Keys.Add(newKeys);
+
+		foreach (var key in Keys)
+			key.SetOptions(KeyOptionsStore.GetKeyOptions(key.Id) ?? new());
 	}
 
 	ValueTask<IReadOnlyList<SshKey>> ISshAgentHandler.GetPublicKeys(ClientInfo info, CancellationToken ct)

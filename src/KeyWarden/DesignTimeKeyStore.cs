@@ -93,23 +93,29 @@ internal class DesignTimeKeyStore : ISshKeyStore, ISshKeyOptionsStore
 
 	async Task ISshKeyStore.SyncKeys(CancellationToken ct)
 	{
-		await Task.Delay(1000);
+		await Task.Delay(500);
 	}
 
 	private Dictionary<string, SshKeyOptions> KeyOptions { get; } = new();
 
-	async Task<SshKeyOptions> ISshKeyOptionsStore.GetKeyOptions(string id)
+	SshKeyOptions? ISshKeyOptionsStore.GetKeyOptions(string id)
 	{
-		await Task.Delay(500);
 		if (KeyOptions.TryGetValue(id, out var keyOptions))
 			return keyOptions;
-
-		return new SshKeyOptions();
+		else
+			return null;
 	}
 
-	async Task ISshKeyOptionsStore.SetKeyOptions(string id, SshKeyOptions options)
+	void ISshKeyOptionsStore.SetKeyOptions(string id, SshKeyOptions? options)
 	{
-		await Task.Delay(500);
-		KeyOptions[id] = options;
+		if (options is null)
+			KeyOptions.Remove(id);
+		else
+			KeyOptions[id] = options.Value;
+	}
+
+	async Task ISshKeyOptionsStore.SyncKeyOptions(CancellationToken ct)
+	{
+		await Task.Delay(500, ct);
 	}
 }

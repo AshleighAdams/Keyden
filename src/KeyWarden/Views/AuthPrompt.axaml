@@ -14,6 +14,7 @@
         WindowStartupLocation="CenterScreen"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
+        TransparencyLevelHint="AcrylicBlur"
         ExtendClientAreaTitleBarHeightHint="-1"
         Background="{DynamicResource Brush.Auth.Background}"
         Topmost="True">

@@ -290,9 +290,9 @@ public class DesignKeyOptionsViewModel : KeyOptionsViewModel
 	public DesignKeyOptionsViewModel()
 	{
 		Key = new ObservableSshKey(
+			id: "test",
 			name: "Test key",
 			fingerprint: "Fingerdinger",
-			publicKey: "ssh-des NUT5AAAAAB21zDNA",
-			options: new());
+			publicKey: "ssh-des NUT5AAAAAB21zDNA");
 	}
 }
