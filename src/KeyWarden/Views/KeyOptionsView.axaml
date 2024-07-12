@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:views="clr-namespace:KeyWarden.Views"
              xmlns:vm="clr-namespace:KeyWarden.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="800"
              x:Class="KeyWarden.Views.KeyOptionsView"
              x:DataType="vm:KeyOptionsViewModel">
   <Grid>
@@ -43,45 +43,59 @@
 
           <Border Padding="16,0">
             <Grid ColumnDefinitions="32,32,*"
-                  RowDefinitions="*,*,*,*,*,*,*,*"
+                  RowDefinitions="*,*,*,*,*,*,*,*,*,*"
                   Classes="table">
 
-              <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="99">
+              <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="99"
+                        IsChecked="{Binding RequireAuthorization}">
                 Require authorization
               </CheckBox>
               <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
-                <CheckBox>Remain authorized for</CheckBox>
-                <ComboBox ItemsSource="{Binding KeepUnlockedDurations}" />
+                <CheckBox IsChecked="{Binding RemainAuthorized}">Remain authorized for</CheckBox>
+                <ComboBox ItemsSource="{Binding KeepUnlockedDurations}" SelectedItem="{Binding RemainAuthorizedFor}" />
               </StackPanel>
               <StackPanel Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
-                <CheckBox>Until</CheckBox>
-                <ComboBox ItemsSource="{Binding InactivityDurations}"/>
-                <TextBlock VerticalAlignment="Center">of inactivity</TextBlock>
+                <CheckBox IsChecked="{Binding RemainAuthorizedUntilKeyInactivity}">Until</CheckBox>
+                <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthorizedUntilKeyInactivityFor}"/>
+                <TextBlock VerticalAlignment="Center">of key inactivity</TextBlock>
               </StackPanel>
               <StackPanel Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
-                <CheckBox>Until the computer locks</CheckBox>
+                <CheckBox IsChecked="{Binding RemainAuthorizedUntilKeyInactivity}">Until</CheckBox>
+                <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthorizedUntilUserInactivityFor}"/>
+                <TextBlock VerticalAlignment="Center">of user inactivity</TextBlock>
+              </StackPanel>
+              <StackPanel Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthorizedUntilLocked}">Until the computer locks</CheckBox>
               </StackPanel>
 
-              <CheckBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="99">
+              <CheckBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="99"
+                        IsChecked="{Binding RequireAuthentication}">
                 Require authentication
               </CheckBox>
-              <StackPanel Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="99"
+              <StackPanel Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
-                <CheckBox>Remain authenticated for</CheckBox>
-                <ComboBox ItemsSource="{Binding KeepUnlockedDurations}" />
-              </StackPanel>
-              <StackPanel Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="99"
-                          Orientation="Horizontal" Spacing="5">
-                <CheckBox>Until</CheckBox>
-                <ComboBox ItemsSource="{Binding InactivityDurations}"/>
-                <TextBlock VerticalAlignment="Center">of inactivity</TextBlock>
+                <CheckBox IsChecked="{Binding RemainAuthenticated}">Remain authenticated for</CheckBox>
+                <ComboBox ItemsSource="{Binding KeepUnlockedDurations}" SelectedValue="{Binding RemainAuthenticatedFor}" />
               </StackPanel>
               <StackPanel Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
-                <CheckBox>Until the computer locks</CheckBox>
+                <CheckBox IsChecked="{Binding RemainAuthenticatedUntilKeyInactivity}">Until</CheckBox>
+                <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthenticatedUntilKeyInactivityFor}"/>
+                <TextBlock VerticalAlignment="Center">of key inactivity</TextBlock>
+              </StackPanel>
+              <StackPanel Grid.Row="8" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthenticatedUntilUserInactivity}">Until</CheckBox>
+                <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthenticatedUntilUserInactivityFor}"/>
+                <TextBlock VerticalAlignment="Center">of user inactivity</TextBlock>
+              </StackPanel>
+              <StackPanel Grid.Row="9" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthenticatedUntilLocked}">Until the computer locks</CheckBox>
               </StackPanel>
             </Grid>
           </Border>

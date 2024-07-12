@@ -34,8 +34,11 @@ public static class ServiceCollectionExtensions
 		collection.AddSingletonAlias<ISshAgentHandler, AgentK>();
 
 		if (Design.IsDesignMode)
+		//if (true)
 		{
-			collection.AddSingleton<ISshKeyStore, DesignTimeKeyStore>();
+			collection.AddSingleton<DesignTimeKeyStore>();
+			collection.AddSingletonAlias<ISshKeyStore, DesignTimeKeyStore>();
+			collection.AddSingletonAlias<ISshKeyOptionsStore, DesignTimeKeyStore>();
 			return;
 		}
 

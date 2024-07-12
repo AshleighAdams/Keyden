@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 
 namespace KeyWarden;
 
-internal class DesignTimeKeyStore : ISshKeyStore
+internal class DesignTimeKeyStore : ISshKeyStore, ISshKeyOptionsStore
 {
 	private static readonly string[] RandomWords = ["Test", "ECC", "RSA", "Key", "Home", "Work"];
 	private static ReadOnlyMemory<byte> RandomPublicKey()
@@ -94,5 +94,22 @@ internal class DesignTimeKeyStore : ISshKeyStore
 	async Task ISshKeyStore.SyncKeys(CancellationToken ct)
 	{
 		await Task.Delay(1000);
+	}
+
+	private Dictionary<string, SshKeyOptions> KeyOptions { get; } = new();
+
+	async Task<SshKeyOptions> ISshKeyOptionsStore.GetKeyOptions(string id)
+	{
+		await Task.Delay(500);
+		if (KeyOptions.TryGetValue(id, out var keyOptions))
+			return keyOptions;
+
+		return new SshKeyOptions();
+	}
+
+	async Task ISshKeyOptionsStore.SetKeyOptions(string id, SshKeyOptions options)
+	{
+		await Task.Delay(500);
+		KeyOptions[id] = options;
 	}
 }
