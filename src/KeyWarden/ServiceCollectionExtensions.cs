@@ -34,13 +34,18 @@ public static class ServiceCollectionExtensions
 		collection.AddSingletonAlias<ISshAgentHandler, AgentK>();
 
 		if (Design.IsDesignMode)
+		//if (true)
 		{
-			collection.AddSingleton<ISshKeyStore, DesignTimeKeyStore>();
+			collection.AddSingleton<DesignTimeKeyStore>();
+			collection.AddSingletonAlias<ISshKeyStore, DesignTimeKeyStore>();
+			collection.AddSingletonAlias<ISshKeyOptionsStore, DesignTimeKeyStore>();
 			return;
 		}
 
 		// runtime only singletons
-		collection.AddSingleton<ISshKeyStore, OnePassCliSshKeyStore>();
+		collection.AddSingleton<OnePassCliSshKeyStore>();
+		collection.AddSingletonAlias<ISshKeyStore, OnePassCliSshKeyStore>();
+		collection.AddSingletonAlias<ISshKeyOptionsStore, OnePassCliSshKeyStore>();
 		collection.AddSingleton<SshAgent>();
 		collection.AddSingleton<SshAgentOptions>();
 	}

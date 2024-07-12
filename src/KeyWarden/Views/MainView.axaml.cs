@@ -27,6 +27,14 @@ public partial class MainView : UserControl
 		SyncButton.Click += SyncButton_Click;
 		AboutButton.Click += AboutButton_Click;
 		KeysListBox.SelectionChanged += KeysListBox_SelectionChanged;
+		KeysListBox.GotFocus += KeysListBox_GotFocus;
+	}
+
+	private void KeysListBox_GotFocus(object? sender, GotFocusEventArgs e)
+	{
+		if (DataContext is not MainViewModel model)
+			return;
+		model.TabIndexSelected = 0;
 	}
 
 	private void KeysListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)

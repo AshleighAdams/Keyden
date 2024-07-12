@@ -1,17 +1,10 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+using Avalonia;
 
-using DynamicData;
+using KeyWarden.Views;
 
 using Projektanker.Icons.Avalonia;
 
 using ReactiveUI;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace KeyWarden.ViewModels;
 
@@ -46,7 +39,13 @@ public class MainViewModel : ViewModelBase
 		}
 	}
 
-	private int _TabIndexSelected;
+	public readonly static DirectProperty<MainView, int> TabSelectedIndexProperty =
+		AvaloniaProperty.RegisterDirect<MainView, int>(
+			nameof(TabIndexSelected),
+			o => (o.DataContext as MainViewModel)!.TabIndexSelected,
+			(o, v) => (o.DataContext as MainViewModel)!.TabIndexSelected = v,
+			defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+	private int _TabIndexSelected = 0;
 	public int TabIndexSelected
 	{
 		get => _TabIndexSelected;
@@ -55,24 +54,19 @@ public class MainViewModel : ViewModelBase
 			if (value == _TabIndexSelected)
 				return;
 
+			SelectedKey = null;
+
 			this.RaisePropertyChanging(nameof(TabIndexSelected));
 			this.RaisePropertyChanging(nameof(IsKeysTabSelected));
-			this.RaisePropertyChanging(nameof(IsVaultsSelected));
 			this.RaisePropertyChanging(nameof(IsActivitySelected));
-			this.RaisePropertyChanging(nameof(IsMainListVisible));
 			_TabIndexSelected = value;
 			this.RaisePropertyChanged(nameof(TabIndexSelected));
 			this.RaisePropertyChanged(nameof(IsKeysTabSelected));
-			this.RaisePropertyChanged(nameof(IsVaultsSelected));
 			this.RaisePropertyChanged(nameof(IsActivitySelected));
-			this.RaisePropertyChanged(nameof(IsMainListVisible));
-
 		}
 	}
 	public bool IsKeysTabSelected => TabIndexSelected is 0;
-	public bool IsVaultsSelected => TabIndexSelected is 1;
-	public bool IsActivitySelected => TabIndexSelected is 2;
-	public bool IsMainListVisible => TabIndexSelected is 0 or 1;
+	public bool IsActivitySelected => TabIndexSelected is 1;
 
 	public bool IsKeySelected => _SelectedKey is not null;
 
@@ -91,10 +85,13 @@ public class MainViewModel : ViewModelBase
 			_IsSyncing = value;
 			this.RaisePropertyChanged(nameof(IsSyncing));
 			this.RaisePropertyChanged(nameof(SyncingAnimation));
+			this.RaisePropertyChanged(nameof(NoKeysLoaded));
 		}
 	}
 	public string SelectedKeyName => _SelectedKey?.Name ?? "Unknown Key";
 	public string SelectedKeyDescriptor => _SelectedKey?.Fingerprint ?? "Unknown";
+
+	public bool NoKeysLoaded => Kay.Keys.Count == 0;
 
 	public async void SyncKeys()
 	{

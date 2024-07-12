@@ -13,7 +13,7 @@
 
   <ListBox Name="ActivitiesListBox"
            ItemsSource="{Binding Activities}"
-           ScrollViewer.HorizontalScrollBarVisibility="Auto"
+           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
            Background="Transparent">
 
     <ListBox.ItemTemplate>
@@ -42,7 +42,8 @@
                      VerticalAlignment="Center"/>
           <TextBlock Grid.Column="1" Grid.Row="1"
                      Text="{Binding Description}"
-                     VerticalAlignment="Top"/>
+                     VerticalAlignment="Top"
+                     TextWrapping="Wrap"/>
         </Grid>
       </DataTemplate>
     </ListBox.ItemTemplate>

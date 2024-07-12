@@ -3,16 +3,109 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:i="https://github.com/projektanker/icons.avalonia"
-             mc:Ignorable="d"
-             x:Class="KeyWarden.Views.TabItem"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}">
-  <StackPanel Orientation="Horizontal" Spacing="10">
-    <i:Icon Value="{Binding Icon}"
-            FontSize="16"
-            Foreground="{DynamicResource Color.Sidebar.Foreground}" />
-    <TextBlock Text="{Binding Text}"
-               VerticalAlignment="Center"
-               FontSize="13"
-               Foreground="{DynamicResource Color.Sidebar.Foreground}" />
-  </StackPanel>
+             xmlns:views="clr-namespace:KeyWarden.Views"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="100"
+             x:Class="KeyWarden.Views.TabItem">
+
+  <Design.DesignStyle>
+    <Style Selector="views|TabItem">
+      <Setter Property="Background" Value="{DynamicResource Color.Sidebar.Background}"/>
+    </Style>
+  </Design.DesignStyle>
+
+  <Grid RowDefinitions="*,*">
+    <Button Grid.Row="0"
+            Name="TheButton"
+            HorizontalAlignment="Stretch">
+      <Grid ColumnDefinitions="16,12,*">
+
+        <Border Grid.Column="0" Classes="icon">
+          <i:Icon Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:TabItem}}, Path=Icon}"
+                  Foreground="{DynamicResource Color.Sidebar.Foreground}" />
+        </Border>
+
+        <TextBlock Grid.Column="2"
+                   Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:TabItem}}, Path=Text}"
+                   VerticalAlignment="Center"
+                   FontSize="13"/>
+      </Grid>
+
+      <Button.Styles>
+        <Style Selector="views|TabItem Button">
+          <Setter Property="Padding" Value="10"/>
+          <Setter Property="Background" Value="Transparent"/>
+
+          <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Hover}"/>
+          </Style>
+
+          <Style Selector="^:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Selected}"/>
+          </Style>
+        </Style>
+
+        <Style Selector="views|TabItem:not(.subtle):selected Button /template/ ContentPresenter">
+          <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Selected}"/>
+        </Style>
+
+        <Style Selector="views|TabItem i|Icon">
+          <Setter Property="FontSize" Value="16"/>
+          <Setter Property="Foreground" Value="{DynamicResource Color.Sidebar.Foreground}"/>
+        </Style>
+
+        <Style Selector="views|TabItem TextBlock">
+          <Setter Property="Foreground" Value="{DynamicResource Color.Sidebar.Foreground}"/>
+        </Style>
+
+        <Style Selector="views|TabItem.subtle TextBlock">
+          <Setter Property="Foreground" Value="{DynamicResource Color.Button.Foreground}"/>
+        </Style>
+        <Style Selector="views|TabItem.subtle i|Icon">
+          <Setter Property="Opacity" Value="0.6"/>
+          <Setter Property="FontSize" Value="12"/>
+          <Setter Property="Foreground" Value="{DynamicResource Color.Button.Foreground}"/>
+        </Style>
+
+        <Style Selector="views|TabItem.subtle Border.icon">
+          <Setter Property="RenderTransform" Value="rotate(0deg)"/>
+
+          <Setter Property="Transitions">
+            <Transitions>
+              <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+            </Transitions>
+          </Setter>
+        </Style>
+        <Style Selector="views|TabItem.subtle[IsExpanded=True] Border.icon">
+          <Setter Property="RenderTransform" Value="rotate(90deg)"/>
+        </Style>
+
+      </Button.Styles>
+    </Button>
+
+    <StackPanel Grid.Row="1"
+                Name="Resizer"
+                Classes="content"
+                RenderTransformOrigin="0.5 0">
+
+      <ContentPresenter Name="PART_ContentPresenter"
+                        Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views:TabItem}}, Path=ExpandableContent}"/>
+
+      <StackPanel.Styles>
+        <Style Selector="views|TabItem StackPanel.content">
+          <Setter Property="Transitions">
+            <Transitions>
+              <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+              <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+              <!-- note: MaxHeight is animated in code -->
+            </Transitions>
+          </Setter>
+        </Style>
+        <Style Selector="views|TabItem[IsExpanded=False] StackPanel.content">
+          <Setter Property="RenderTransform" Value="scaleY(0.5) translateY(-20px)"/>
+          <Setter Property="Opacity" Value="0"/>
+          <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+      </StackPanel.Styles>
+    </StackPanel>
+  </Grid>
 </UserControl>

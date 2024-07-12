@@ -8,10 +8,7 @@ using KeyWarden.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,25 +16,137 @@ namespace KeyWarden;
 
 public partial class ObservableSshKey : ObservableObject
 {
-	[ObservableProperty]
-	private string _Name = string.Empty;
+	public ObservableSshKey(
+		string name,
+		string fingerprint,
+		string publicKey,
+		SshKeyOptions options)
+	{
+		_Name = name;
+		_Fingerprint = fingerprint;
+		_PublicKey = publicKey;
+
+		_RequireAuthorization = options.RequireAuthorization;
+		{
+			_RemainAuthorized = options.RemainAuthorized;
+			_RemainAuthorizedFor = options.RemainAuthorizedFor;
+			{
+				_RemainAuthorizedUntilKeyInactivity = options.RemainAuthorizedUntilKeyInactivity;
+				_RemainAuthorizedUntilKeyInactivityFor = options.RemainAuthorizedUntilKeyInactivityFor;
+				_RemainAuthorizedUntilUserInactivity = options.RemainAuthorizedUntilUserInactivity;
+				_RemainAuthorizedUntilUserInactivityFor = options.RemainAuthorizedUntilUserInactivityFor;
+				_RemainAuthorizedUntilLocked = options.RemainAuthorizedUntilLocked;
+			}
+		}
+		_RequireAuthentication = options.RequireAuthentication;
+		{
+			_RemainAuthenticated = options.RemainAuthenticated;
+			_RemainAuthenticatedFor = options.RemainAuthenticatedFor;
+			{
+				_RemainAuthenticatedUntilKeyInactivity = options.RemainAuthenticatedUntilKeyInactivity;
+				_RemainAuthenticatedUntilKeyInactivityFor = options.RemainAuthenticatedUntilKeyInactivityFor;
+				_RemainAuthenticatedUntilUserInactivity = options.RemainAuthenticatedUntilUserInactivity;
+				_RemainAuthenticatedUntilUserInactivityFor = options.RemainAuthenticatedUntilUserInactivityFor;
+				_RemainAuthenticatedUntilLocked = options.RemainAuthenticatedUntilLocked;
+			}
+		}
+	}
+
+	public SshKeyOptions GetOptions()
+	{
+		var ret = new SshKeyOptions();
+		{
+			ret.RequireAuthorization = RequireAuthorization;
+			{
+				ret.RemainAuthorized = RemainAuthorized;
+				ret.RemainAuthorizedFor = RemainAuthorizedFor;
+				{
+					ret.RemainAuthorizedUntilKeyInactivity = RemainAuthorizedUntilKeyInactivity;
+					ret.RemainAuthorizedUntilKeyInactivityFor = RemainAuthorizedUntilKeyInactivityFor;
+					ret.RemainAuthorizedUntilUserInactivity = RemainAuthorizedUntilUserInactivity;
+					ret.RemainAuthorizedUntilUserInactivityFor = RemainAuthorizedUntilUserInactivityFor;
+					ret.RemainAuthorizedUntilLocked = RemainAuthorizedUntilLocked;
+				}
+			}
+			ret.RequireAuthentication = RequireAuthentication;
+			{
+				ret.RemainAuthenticated = RemainAuthenticated;
+				ret.RemainAuthenticatedFor = RemainAuthenticatedFor;
+				{
+					ret.RemainAuthenticatedUntilKeyInactivity = RemainAuthenticatedUntilKeyInactivity;
+					ret.RemainAuthenticatedUntilKeyInactivityFor = RemainAuthenticatedUntilKeyInactivityFor;
+					ret.RemainAuthenticatedUntilUserInactivity = RemainAuthenticatedUntilUserInactivity;
+					ret.RemainAuthenticatedUntilUserInactivityFor = RemainAuthenticatedUntilUserInactivityFor;
+					ret.RemainAuthenticatedUntilLocked = RemainAuthenticatedUntilLocked;
+				}
+			}
+		}
+		return ret;
+	}
 
 	[ObservableProperty]
-	private string _Fingerprint = string.Empty;
+	private string _Name;
 
 	[ObservableProperty]
-	private string _PublicKey = string.Empty;
+	private string _Fingerprint;
+
+	[ObservableProperty]
+	private string _PublicKey;
+
+	[ObservableProperty]
+	private bool _RequireAuthorization;
+
+	[ObservableProperty]
+	private bool _RemainAuthorized;
+	[ObservableProperty]
+	private TimeSpan _RemainAuthorizedFor;
+
+	[ObservableProperty]
+	private bool _RemainAuthorizedUntilKeyInactivity;
+	[ObservableProperty]
+	private TimeSpan _RemainAuthorizedUntilKeyInactivityFor;
+
+	[ObservableProperty]
+	private bool _RemainAuthorizedUntilUserInactivity;
+	[ObservableProperty]
+	private TimeSpan _RemainAuthorizedUntilUserInactivityFor;
+
+	[ObservableProperty]
+	private bool _RemainAuthorizedUntilLocked;
+
+	[ObservableProperty]
+	private bool _RequireAuthentication;
+
+	[ObservableProperty]
+	private bool _RemainAuthenticated;
+	[ObservableProperty]
+	private TimeSpan _RemainAuthenticatedFor;
+
+	[ObservableProperty]
+	private bool _RemainAuthenticatedUntilKeyInactivity;
+	[ObservableProperty]
+	private TimeSpan _RemainAuthenticatedUntilKeyInactivityFor;
+
+	[ObservableProperty]
+	private bool _RemainAuthenticatedUntilUserInactivity;
+	[ObservableProperty]
+	private TimeSpan _RemainAuthenticatedUntilUserInactivityFor;
+
+	[ObservableProperty]
+	private bool _RemainAuthenticatedUntilLocked;
 }
 
 public class AgentK : ISshAgentHandler
 {
 	private readonly ISshKeyStore KeyStore;
+	private readonly ISshKeyOptionsStore KeyOptionsStore;
 
 	public event Action<ActivityItem>? NewActivity;
 
-	public AgentK(ISshKeyStore keyStore)
+	public AgentK(ISshKeyStore keyStore, ISshKeyOptionsStore keyOptionsStore)
 	{
 		KeyStore = keyStore;
+		KeyOptionsStore = keyOptionsStore;
 	}
 
 	public ObservableCollection<ObservableSshKey> Keys { get; } = new();
@@ -69,15 +178,9 @@ public class AgentK : ISshAgentHandler
 				.Where(k => k.Name == key.Name || k.Fingerprint == key.Fingerprint)
 				.Any();
 
+			var keyOpts = new SshKeyOptions();
 			if (!matchedKey)
-			{
-				newKeys.Add(new()
-				{
-					Name = key.Name,
-					Fingerprint = key.Fingerprint,
-					PublicKey = key.PublicKeyText,
-				});
-			}
+				newKeys.Add(new(key.Name, key.Fingerprint, key.PublicKeyText, keyOpts));
 		}
 
 		NewActivity?.Invoke(new ActivityItem()
@@ -114,9 +217,10 @@ public class AgentK : ISshAgentHandler
 	}
 
 	private SemaphoreSlim PromptQueue { get; } = new SemaphoreSlim(1);
+
 	public struct ScopedLock : IDisposable
 	{
-		private SemaphoreSlim? Semaphore { get; set; }
+		private SemaphoreSlim? Semaphore;
 		public ScopedLock(SemaphoreSlim semaphore) =>
 			Semaphore = semaphore;
 		public void Dispose()
@@ -128,11 +232,11 @@ public class AgentK : ISshAgentHandler
 
 	private class KeyInfo
 	{
-		public DateTime? LastUsed { get; set; }
+		public DateTime? LastUsed;
 	}
 	private readonly Dictionary<string, KeyInfo> KeyInfos = new();
 
-	async ValueTask<SshKey> ISshAgentHandler.GetPrivateKey(SshKey publicKey, ClientInfo info, CancellationToken ct)
+	async ValueTask<SshKey> ISshAgentHandler.GetPrivateKey(ReadOnlyMemory<byte> publicKeyBlob, ClientInfo info, CancellationToken ct)
 	{
 		var mainProcess = info.MainProcess;
 		var processChain = string.Join(", ", info.Processes
@@ -142,9 +246,22 @@ public class AgentK : ISshAgentHandler
 		if (!string.IsNullOrEmpty(processChain))
 			processChain = $" (via {processChain})";
 
-		publicKey = KeyStore.PublicKeys
-			.Where(k => k.PublicKey.Span.SequenceEqual(publicKey.PublicKey.Span))
-			.FirstOrDefault(publicKey);
+		var publicKey = KeyStore.PublicKeys
+			.Where(k => k.PublicKey.Span.SequenceEqual(publicKeyBlob.Span))
+			.FirstOrDefault();
+
+		if (publicKey.IsEmpty)
+		{
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-ban", // maybe gavel
+				Importance = ActivityImportance.Normal,
+				Title = "Auth error",
+				Description = $"{info.ApplicationName}{processChain} requested access to unknown private key",
+			});
+
+			return default;
+		}
 
 		await PromptQueue.WaitAsync(ct);
 		using var @lock = new ScopedLock(PromptQueue);

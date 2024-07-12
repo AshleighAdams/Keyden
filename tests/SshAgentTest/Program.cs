@@ -45,6 +45,7 @@ file class TestAgent : ISshAgentHandler
 	{
 		new()
 		{
+			Id = "1",
 			Name = "Test ECC key",
 			PublicKey = Convert.FromBase64String("AAAAC3NzaC1lZDI1NTE5AAAAIHlaPQcEaq3nA+zPRW2aoP0d5eHx6nrnUJnLNMPuIlsX"),
 			PrivateKey =
@@ -60,6 +61,7 @@ file class TestAgent : ISshAgentHandler
 		},
 		new()
 		{
+			Id = "2",
 			Name = "Test RSA key",
 			PublicKey = Convert.FromBase64String("AAAAB3NzaC1yc2EAAAADAQABAAABgQC4UEx1RJdbWgBzgoubzNZgE0EmkfM+4Gjva2yzUHQSusfezJLxTOWuGgC1AKtFGZCpTV2sOo5CLV/nu7BkCI4etgpzvEFo7MLVn55GTIxC8StRdmZvoWPkMgOoll58nNF8qRELp1SZ3gReOKZgXJBxUfAwaoKXhud4CMqkU9NTNO6HkRS9btd5Jzvbi0URswGS3eFKJ1IwnL8RvdVdS7rgs304bMaYqJN4eiO/IR7QJXFijkJNKEDUwWdevXpoBBMR19s8GzyJ+a961maLJ6jlGNxYcFZMSDmTZrH32JySQ+tnlKbwZejqyfhN3yHT0RO/Gu3rLn3ZFBs1de20LtxBiBLFDC2VusvPLS0OAXG//j5U/2z36w/RvA4QL85sJaAVNN8AjK+wGBXJ3AdrIKTgjLgYm0bSaixb6MxdoMKOBh+fFGbN5KG905h9G4lop++UYmLoQ/Chr3KZy2JPOqIkDDfpXAv/hHapds2zbZLcZUCaEDobvuyWxhMwoWBYheM="),
 			PrivateKey =
@@ -114,12 +116,12 @@ file class TestAgent : ISshAgentHandler
 		return new(Keys.Select(k => k with { PrivateKey = default }).ToArray());
 	}
 
-	public ValueTask<SshKey> GetPrivateKey(SshKey publicKey, ClientInfo info, CancellationToken ct)
+	public ValueTask<SshKey> GetPrivateKey(ReadOnlyMemory<byte> publicKeyBlob, ClientInfo info, CancellationToken ct)
 	{
 		var procs = string.Join(" via ", info.Processes.Select(p => p.ProcessName));
 
 		var matchingKey = Keys
-			.Where(k => k.PublicKey.Span.SequenceEqual(publicKey.PublicKey.Span))
+			.Where(k => k.PublicKey.Span.SequenceEqual(publicKeyBlob.Span))
 			.FirstOrDefault();
 
 		Console.WriteLine($"{info.Username} is requesting access to key {(matchingKey.IsEmpty ? "unknown" : matchingKey.Name)} via {procs}");

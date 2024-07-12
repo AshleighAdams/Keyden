@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace KeyWarden;
 
-public sealed class OnePassCliSshKeyStore : ISshKeyStore
+public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 {
 	private List<SshKey> PublicKeys { get; } = new();
 	private List<SshKey> PrivateKeys { get; } = new();
-	IReadOnlyList<SshKey> ISshKeyStore.PublicKeys => PublicKeys;
 
-	public ValueTask<SshKey> GetPrivateKey(SshKey publicKey, CancellationToken ct)
+	IReadOnlyList<SshKey> ISshKeyStore.PublicKeys => PublicKeys;
+	ValueTask<SshKey> ISshKeyStore.GetPrivateKey(SshKey publicKey, CancellationToken ct)
 	{
 		var matchingKey = PrivateKeys
 			.Where(k => k.PublicKey.Span.SequenceEqual(publicKey.PublicKey.Span))
@@ -25,24 +25,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 		return new(matchingKey);
 	}
 
-	private async Task<string> Run(string cmd, CancellationToken ct)
-	{
-		var info = new ProcessStartInfo("op", cmd)
-		{
-			UseShellExecute = false,
-			WindowStyle = ProcessWindowStyle.Hidden,
-			CreateNoWindow = true,
-			RedirectStandardOutput = true,
-		};
-
-		var proc = Process.Start(info) ?? throw new SystemException("Failed to start op");
-		var output = await proc!.StandardOutput.ReadToEndAsync();
-		await proc.WaitForExitAsync(ct);
-
-		return output;
-	}
-
-	public async Task SyncKeys(CancellationToken ct = default)
+	async Task ISshKeyStore.SyncKeys(CancellationToken ct = default)
 	{
 		var sw = Stopwatch.StartNew();
 
@@ -56,7 +39,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 			}) ?? throw new SystemException("Failed to start op");
 
 		var keysDoc = await JsonDocument.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct);
-		//await proc.WaitForExitAsync(ct);
 
 		var tasks = new List<Task>();
 
@@ -75,6 +57,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 			newIds.Add(id);
 			newKeys.Add(new()
 			{
+				Id = id,
 				Name = name,
 				Fingerprint = fingerprint,
 			});
@@ -152,12 +135,14 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 
 				newKeys[i] = newKeys[i] with
 				{
-					PublicKeyText = publicKey,
+					PublicKeyText = publicKey, 
 					PublicKey = Convert.FromBase64String(publicKey.Substring(publicKey.IndexOf(' '))),
 					PrivateKey = Encoding.ASCII.GetBytes(privateKey),
 				};
 			}
 		})();
+
+		await SyncOptions(ct);
 
 		PrivateKeys.Clear();
 		PublicKeys.Clear();
@@ -165,5 +150,44 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore
 		PublicKeys.AddRange(newKeys.Select(k => k with { PrivateKey = default }));
 
 		Debug.WriteLine($"Synced with op in {sw.Elapsed.TotalSeconds} seconds");
+	}
+
+	private async Task SyncOptions(CancellationToken ct)
+	{
+		var proc = Process.Start(
+			new ProcessStartInfo("op", "item get \"KeyWarden Options\" --format json")
+			{
+				UseShellExecute = false,
+				WindowStyle = ProcessWindowStyle.Hidden,
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+			}) ?? throw new SystemException("Failed to start op");
+
+		var optionsDoc = await JsonDocument.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct);
+
+		var fields = optionsDoc.RootElement.GetProperty("fields");
+		foreach (var field in fields.EnumerateArray())
+		{
+			if (!field.TryGetProperty("label", out var labelField))
+				continue;
+			if (!field.TryGetProperty("value", out var valueField))
+				continue;
+			if (labelField.GetString() != "json")
+				continue;
+
+			var optionsJson = valueField.GetString();
+			if (string.IsNullOrEmpty(optionsJson))
+				break;
+		}
+	}
+
+	Task<SshKeyOptions> ISshKeyOptionsStore.GetKeyOptions(string id)
+	{
+		throw new NotImplementedException();
+	}
+
+	Task ISshKeyOptionsStore.SetKeyOptions(string id, SshKeyOptions options)
+	{
+		throw new NotImplementedException();
 	}
 }
