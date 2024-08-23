@@ -13,8 +13,8 @@ namespace KeyWarden.Views
 		public ClientInfo ClientInfo { get; private set; }
 		public string AppName { get; private set; }
 
-		private readonly TaskCompletionSource<bool> Tcs = new();
-		public Task<bool> Result => Tcs.Task;
+		private readonly TaskCompletionSource<AuthResult> Tcs = new();
+		public Task<AuthResult> Result => Tcs.Task;
 
 		public AuthPrompt()
 		{
@@ -30,7 +30,7 @@ namespace KeyWarden.Views
 		}
 
 		private readonly CancellationTokenRegistration? CancelRegistration = null;
-		public AuthPrompt(SshKey key, ClientInfo clientInfo, CancellationToken ct)
+		public AuthPrompt(SshKey key, ClientInfo clientInfo, AuthRequired authRequired, CancellationToken ct)
 		{
 			Key = key;
 			ClientInfo = clientInfo;
@@ -51,18 +51,22 @@ namespace KeyWarden.Views
 		private void AuthPrompt_Closed(object? sender, System.EventArgs e)
 		{
 			CancelRegistration?.Unregister();
-			Tcs.TrySetResult(false);
+			Tcs.TrySetResult(new() { Success = false, Rejected = false });
 		}
 
 		private void DenyButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
 		{
-			Tcs.TrySetResult(false);
+			Tcs.TrySetResult(new() { Success = false, Rejected = true });
 			Close();
 		}
 
 		private void AuthButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
 		{
-			Tcs.TrySetResult(true);
+			Tcs.TrySetResult(new()
+			{
+				Success = true,
+				FreshAuthorization = true,
+			});
 			Close();
 		}
 	}

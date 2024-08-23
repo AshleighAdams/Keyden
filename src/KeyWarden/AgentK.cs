@@ -1,19 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Avalonia.Controls;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 
 using DynamicData;
 
 using KeyWarden.ViewModels;
 using KeyWarden.Views;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace KeyWarden;
 
@@ -144,6 +144,21 @@ public partial class ObservableSshKey : ObservableObject
 	private bool _RemainAuthenticatedUntilLocked;
 }
 
+public struct AuthResult
+{
+	public bool Success { get; set; }
+	public bool Rejected { get; set; }
+	public bool FreshAuthorization { get; set; }
+	public bool FreshAuthentication { get; set; }
+}
+
+public enum AuthRequired
+{
+	None,
+	Authorization,
+	Authentication,
+}
+
 public class AgentK : ISshAgentHandler
 {
 	private readonly ISshKeyStore KeyStore;
@@ -269,6 +284,51 @@ public class AgentK : ISshAgentHandler
 	}
 	private readonly Dictionary<string, KeyInfo> KeyInfos = new();
 
+
+	private async ValueTask<AuthRequired> QueryAuth(SshKey key, SshKeyOptions options, ClientInfo info, CancellationToken ct)
+	{
+		return AuthRequired.Authorization;
+	}
+
+	private async ValueTask<SshKey> GotAuthResult(SshKey key, SshKeyOptions options, ClientInfo info, AuthResult result, CancellationToken ct)
+	{
+
+		if (!result.Success)
+		{
+			if (result.Rejected)
+			{
+				NewActivity?.Invoke(new ActivityItem()
+				{
+					Icon = "fa-ban", // maybe gavel
+					Importance = ActivityImportance.Normal,
+					Title = "Auth fail",
+					Description = $"{info.ApplicationName} was denied access to the key {key.Name}",
+				});
+			}
+			return default;
+		}
+
+		NewActivity?.Invoke(new ActivityItem()
+		{
+			Icon = "fa-passport", // authenticated icon
+									//Icon = "fa-id-card", // authenticated icon
+									//Icon = "fa-fingerprint", // another possible authenticated icon, perhaps with biometrics only
+
+			//Icon = "fa-key", // possible authorized icon
+			//Icon = "fa-unlock", // possible authorized icon or based on not timing out
+			//Icon = "fa-lock-open", // possible authorized icon or based on not timing out
+
+			//Icon = "fa-bell-slash", // key does not require authorization nor authentication
+			// Icon = "fa-hourglass", // key authorized based on not timing out
+			//Icon = "fa-hourglass-end", // key timed out?
+			Importance = ActivityImportance.Normal,
+			Title = "Auth success",
+			Description = $"{info.ApplicationName} was granted access to the key {key.Name}",
+		});
+
+		return await KeyStore.GetPrivateKey(key, ct);
+	}
+
 	async ValueTask<SshKey> ISshAgentHandler.GetPrivateKey(ReadOnlyMemory<byte> publicKeyBlob, ClientInfo info, CancellationToken ct)
 	{
 		var mainProcess = info.MainProcess;
@@ -296,45 +356,30 @@ public class AgentK : ISshAgentHandler
 			return default;
 		}
 
+		var keyOptions = KeyOptionsStore.GetKeyOptions(publicKey.Id) ?? new();
+
+		// check for pre-authorization
+		var authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
+		if (authRequired == AuthRequired.None)
+			return await GotAuthResult(publicKey, keyOptions, info, new(){ Success = true }, ct);
+
 		await PromptQueue.WaitAsync(ct);
+
+		// check again for pre-authorization, as a previous auth request may suffice
+		authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
+		if (authRequired is AuthRequired.None)
+			return await GotAuthResult(publicKey, keyOptions, info, new() { Success = true }, ct);
+		
 		using var @lock = new ScopedLock(PromptQueue);
 
-		var window = new AuthPrompt(publicKey, info, ct);
+		var window = new AuthPrompt(publicKey, info, authRequired, ct);
 		window.Show();
-
-		if (!await window.Result)
+		var result = await window.Result;
+		if (result.Success && authRequired == AuthRequired.Authentication)
 		{
-			NewActivity?.Invoke(new ActivityItem()
-			{
-				Icon = "fa-ban", // maybe gavel
-				Importance = ActivityImportance.Normal,
-				Title = "Auth fail",
-				Description = $"{info.ApplicationName}{processChain} was denied access to the key {publicKey.Name}",
-			});
-
-			return default;
+			// test authentication
 		}
-		else
-		{
-			NewActivity?.Invoke(new ActivityItem()
-			{
-				Icon = "fa-passport", // authenticated icon
-				//Icon = "fa-id-card", // authenticated icon
-				//Icon = "fa-fingerprint", // another possible authenticated icon, perhaps with biometrics only
 
-				//Icon = "fa-key", // possible authorized icon
-				//Icon = "fa-unlock", // possible authorized icon or based on not timing out
-				//Icon = "fa-lock-open", // possible authorized icon or based on not timing out
-
-				//Icon = "fa-bell-slash", // key does not require authorization nor authentication
-				// Icon = "fa-hourglass", // key authorized based on not timing out
-				//Icon = "fa-hourglass-end", // key timed out?
-				Importance = ActivityImportance.Normal,
-				Title = "Auth success",
-				Description = $"{info.ApplicationName}{processChain} was granted access to the key {publicKey.Name}",
-			});
-
-			return await KeyStore.GetPrivateKey(publicKey, ct);
-		}
+		return await GotAuthResult(publicKey, keyOptions, info, result, ct);
 	}
 }

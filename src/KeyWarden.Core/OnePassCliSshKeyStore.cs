@@ -272,7 +272,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 				RedirectStandardOutput = true,
 			}) ?? throw new SystemException("Failed to start op");
 
-		
 		var optionsDoc = (await JsonNode.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct))?.AsObject()
 			?? throw new Exception("Couldn't parse json");
 

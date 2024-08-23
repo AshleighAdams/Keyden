@@ -13,10 +13,12 @@
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="230" MinWidth="150" MaxWidth="300"/>
       <ColumnDefinition Width="1"/>
+      <ColumnDefinition Width="1"/>
       <ColumnDefinition/>
     </Grid.ColumnDefinitions>
 
-    <DockPanel Name="Sidebar" Background="{DynamicResource Color.Sidebar.Background}">
+    <DockPanel Name="Sidebar" Background="{DynamicResource Color.Sidebar.Background}" >
+        
         <StackPanel DockPanel.Dock="Top" Orientation="Vertical" HorizontalAlignment="Stretch" Spacing="10">
           <DockPanel Height="50" Name="TitlebarLeft" IsHitTestVisible="True" Background="Transparent" Margin="10,0">
             <Button DockPanel.Dock="Right"
@@ -103,14 +105,19 @@
       
     </DockPanel>
 
+    <Border Grid.Column="1" Grid.ColumnSpan="2"
+            
+            Background="{DynamicResource Color.Sidebar.Background}"
+            BorderThickness="0,0,1,0" BorderBrush="{DynamicResource Color.Border}"
+            />
+    
     <GridSplitter Grid.Column="1"
-                  Margin="-3,0"
                   BorderThickness="3,0"
                   BorderBrush="Transparent"
-                  Background="#000"
+                  Background="Transparent"
                   HorizontalAlignment="Stretch"/>
 
-    <DockPanel Grid.Column="2" Name="MainContent">
+    <DockPanel Grid.Column="3" Name="MainContent">
       <Border DockPanel.Dock="Top" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Color.Border}">
         <DockPanel Name="TitlebarRight" IsHitTestVisible="True" Background="Transparent">
           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="16">
