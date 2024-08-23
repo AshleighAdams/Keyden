@@ -106,10 +106,8 @@
     </DockPanel>
 
     <Border Grid.Column="1" Grid.ColumnSpan="2"
-            
             Background="{DynamicResource Color.Sidebar.Background}"
-            BorderThickness="0,0,1,0" BorderBrush="{DynamicResource Color.Border}"
-            />
+            BorderThickness="0,0,1,0" BorderBrush="{DynamicResource Color.Border}" />
     
     <GridSplitter Grid.Column="1"
                   BorderThickness="3,0"
