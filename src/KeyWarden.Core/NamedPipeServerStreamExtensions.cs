@@ -64,19 +64,20 @@ internal unsafe static partial class ProcessExtensions
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
-			var handle = process.Handle;
-			var pbi = new ProcessBasicInformation();
-			int returnLength;
-			int status = NtQueryInformationProcess(handle, 0, ref pbi, Marshal.SizeOf(pbi), out returnLength);
-			if (status != 0)
-				throw new Win32Exception(status);
-
-			var pid = pbi.InheritedFromUniqueProcessId.ToInt32();
 			try
 			{
+				var handle = process.Handle;
+				var pbi = new ProcessBasicInformation();
+				int returnLength;
+				int status = NtQueryInformationProcess(handle, 0, ref pbi, Marshal.SizeOf(pbi), out returnLength);
+				if (status != 0)
+					throw new Win32Exception(status);
+
+				var pid = pbi.InheritedFromUniqueProcessId.ToInt32();
 				return Process.GetProcessById(pid);
 			}
 			catch (ArgumentException) { }
+			catch (Win32Exception) { }
 		}
 
 		return null;
