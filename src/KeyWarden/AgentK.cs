@@ -290,14 +290,20 @@ public class AgentK : ISshAgentHandler
 	{
 		var ret = AuthRequired.None;
 
-		if (!options.RemainAuthenticated)
+		if (options.RequireAuthorization)
 		{
-			ret |= AuthRequired.Authentication;
+			if (!options.RemainAuthorized)
+			{
+				ret |= AuthRequired.Authorization;
+			}
 		}
 
-		if (!options.RemainAuthorized)
+		if (options.RequireAuthentication)
 		{
-			ret |= AuthRequired.Authorization;
+			if (!options.RemainAuthenticated)
+			{
+				ret |= AuthRequired.Authentication;
+			}
 		}
 
 		return ret;
