@@ -30,6 +30,7 @@ public partial class App : Application
 	}
 
 	private SshAgent? Agent { get; set; }
+	private MainWindow? MainWindow { get; set; }
 	public override void OnFrameworkInitializationCompleted()
 	{
 		var collection = new ServiceCollection();
@@ -40,10 +41,20 @@ public partial class App : Application
 		Agent = Services.GetService<SshAgent>();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-			desktop.MainWindow = new MainWindow();
+			desktop.MainWindow = MainWindow = new MainWindow();
 		else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
 			singleViewPlatform.MainView = new MainView();
 
 		base.OnFrameworkInitializationCompleted();
+	}
+
+	private void MenuShow_Click(object? sender, EventArgs e)
+	{
+		MainWindow?.Show();
+	}
+
+	private void MenuExit_Click(object? sender, EventArgs e)
+	{
+		MainWindow?.Close();
 	}
 }

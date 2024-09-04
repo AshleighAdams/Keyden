@@ -32,7 +32,7 @@ namespace KeyWarden.Views
 			if (HostWindow is null)
 				return;
 
-			HostWindow.Close();
+			HostWindow.Hide();
 		}
 
 		private void MaximizeWindow(object? sender, RoutedEventArgs e)

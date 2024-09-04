@@ -18,4 +18,19 @@
     <FluentTheme />
     <StyleInclude Source="/Resources/Styles.axaml"/>
   </Application.Styles>
+
+  <TrayIcon.Icons>
+    <TrayIcons>
+      <TrayIcon Icon="/Assets/avalonia-logo.ico"
+                ToolTipText="KeyWarden"
+                Clicked="MenuShow_Click">
+        <TrayIcon.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="Show" Click="MenuShow_Click" />
+            <NativeMenuItem Header="Exit" Click="MenuExit_Click" />
+          </NativeMenu>
+        </TrayIcon.Menu>
+      </TrayIcon>
+    </TrayIcons>
+  </TrayIcon.Icons>
 </Application>
