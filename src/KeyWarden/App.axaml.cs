@@ -8,6 +8,7 @@ using System;
 
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
+using System.Linq;
 
 namespace KeyWarden;
 
@@ -41,7 +42,23 @@ public partial class App : Application
 		Agent = Services.GetService<SshAgent>();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+		{
 			desktop.MainWindow = MainWindow = new MainWindow();
+
+			if (desktop.Args?.Contains("--daemon") ?? false)
+				MainWindow.Hide();
+			else
+				MainWindow.Show();
+
+			if (
+				(desktop.Args?.Contains("--sync") ?? false) &&
+				MainWindow.Content is MainView view &&
+				view.DataContext is MainViewModel mainModel)
+			{
+				mainModel.SyncKeys();
+			}
+				
+		}
 		else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
 			singleViewPlatform.MainView = new MainView();
 
