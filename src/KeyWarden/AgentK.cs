@@ -152,6 +152,7 @@ public struct AuthResult
 	public bool FreshAuthentication { get; set; }
 }
 
+[Flags]
 public enum AuthRequired
 {
 	None,
@@ -287,7 +288,19 @@ public class AgentK : ISshAgentHandler
 
 	private async ValueTask<AuthRequired> QueryAuth(SshKey key, SshKeyOptions options, ClientInfo info, CancellationToken ct)
 	{
-		return AuthRequired.Authorization;
+		var ret = AuthRequired.None;
+
+		if (!options.RemainAuthenticated)
+		{
+			ret |= AuthRequired.Authentication;
+		}
+
+		if (!options.RemainAuthorized)
+		{
+			ret |= AuthRequired.Authorization;
+		}
+
+		return ret;
 	}
 
 	private async ValueTask<SshKey> GotAuthResult(SshKey key, SshKeyOptions options, ClientInfo info, AuthResult result, CancellationToken ct)
@@ -372,13 +385,23 @@ public class AgentK : ISshAgentHandler
 		
 		using var @lock = new ScopedLock(PromptQueue);
 
-		var window = new AuthPrompt(publicKey, info, authRequired, ct);
-		window.Show();
-		var result = await window.Result;
-		if (result.Success && authRequired == AuthRequired.Authentication)
+		AuthPrompt? window = null;
+		AuthResult result = new() { Success = true };
+
+		if (authRequired.HasFlag(AuthRequired.Authentication))
 		{
-			// test authentication
+			window = new AuthPrompt(publicKey, info, authRequired, ct);
+			window.Show();
+			result = await window.Result;
 		}
+
+		if (result.Success && authRequired.HasFlag(AuthRequired.Authentication))
+		{
+			// TODO: authentication
+			await Task.Delay(3000);
+			result.FreshAuthentication = true;
+		}
+		window?.Close();
 
 		return await GotAuthResult(publicKey, keyOptions, info, result, ct);
 	}

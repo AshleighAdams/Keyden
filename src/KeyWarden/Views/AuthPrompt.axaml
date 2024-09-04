@@ -49,8 +49,25 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Spacing="5">
-      <Button Name="DenyButton" Classes="deny">Cancel</Button>
-      <Button Name="AuthButton" Classes="confirm">Authorize</Button>
+      <Button Name="DenyButton"
+              Classes="deny"
+              HotKey="Escape">
+        Cancel
+      </Button>
+      <Button Name="AuthButton"
+              Classes="confirm"
+              HotKey="Enter"
+              IsEnabled="{Binding AuthButtonEnabled}">
+        <Button.Content>
+          <StackPanel Orientation="Horizontal">
+            <i:Icon Value="{Binding AuthButtonIcon}"
+                    IsVisible="{Binding AuthButtonIconVisible}"
+                    Animation="{Binding AuthButtonIconAnimation}"
+                    Foreground="{DynamicResource Color.Foreground}" />
+            <TextBlock Text="{Binding AuthButtonText}" />
+          </StackPanel>
+        </Button.Content>
+      </Button>
     </StackPanel>
   </StackPanel>
 
