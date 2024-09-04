@@ -6,7 +6,7 @@
         x:Class="KeyWarden.Views.AboutWindow"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="About KeyWarden"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/keywarden-logo.ico"
         ShowInTaskbar="False"
         CanResize="False"
         Width="300" Height="200"

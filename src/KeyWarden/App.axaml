@@ -21,7 +21,7 @@
 
   <TrayIcon.Icons>
     <TrayIcons>
-      <TrayIcon Icon="/Assets/avalonia-logo.ico"
+      <TrayIcon Icon="/Assets/keywarden-logo.ico"
                 ToolTipText="KeyWarden"
                 Clicked="MenuShow_Click">
         <TrayIcon.Menu>
