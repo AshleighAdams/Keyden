@@ -14,62 +14,75 @@
         WindowStartupLocation="CenterScreen"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
-        TransparencyLevelHint="AcrylicBlur"
         ExtendClientAreaTitleBarHeightHint="-1"
-        Background="{DynamicResource Brush.Auth.Background}"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
         Topmost="True">
-  <StackPanel Spacing="20">
-    <TextBlock Text="Key Access Requested"
-               TextAlignment="Center"
-               FontSize="21"/>
-
-    <TextBlock FontSize="16"
-               FontWeight="Normal"
-               TextAlignment="Center">
-      Allow
-      <Run FontWeight="SemiBold" Text="{Binding AppName}"/>
-      to use the key
-    </TextBlock>
-
-    <Border Background="{DynamicResource Brush.Auth.Key.Background}"
-            CornerRadius="8"
-            BorderBrush="{DynamicResource Brush.Auth.Key.Border}"
-            BorderThickness="1"
-            Padding="12,10">
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <i:Icon Value="fa-chevron-right" FontSize="10" Opacity="0.5" />
-        <views:KeyIcon />
-        <TextBlock Text="{Binding Key.Name}"
-                   FontWeight="SemiBold"
-                   VerticalAlignment="Center"/>
-      </StackPanel>
-    </Border>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-24">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial
+            BackgroundSource="Digger"
+            FallbackColor="{DynamicResource Color.Window.Glass.Background.Fallback}"
+            TintColor="{DynamicResource Color.Window.Glass.Background}"
+            TintOpacity="1"
+            MaterialOpacity="{DynamicResource Color.Window.Glass.Background.Opacity}" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
     
-    <StackPanel Orientation="Horizontal"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Spacing="5">
-      <Button Name="DenyButton"
-              Classes="deny"
-              HotKey="Escape">
-        Cancel
-      </Button>
-      <Button Name="AuthButton"
-              Classes="confirm"
-              HotKey="Enter"
-              IsEnabled="{Binding AuthButtonEnabled}">
-        <Button.Content>
-          <StackPanel Orientation="Horizontal">
-            <i:Icon Value="{Binding AuthButtonIcon}"
-                    IsVisible="{Binding AuthButtonIconVisible}"
-                    Animation="{Binding AuthButtonIconAnimation}"
-                    Foreground="{DynamicResource Color.Foreground}" />
-            <TextBlock Text="{Binding AuthButtonText}" />
-          </StackPanel>
-        </Button.Content>
-      </Button>
+    <StackPanel Spacing="20">
+      <TextBlock Text="Key Access Requested"
+                 TextAlignment="Center"
+                 FontSize="21"/>
+
+      <TextBlock FontSize="16"
+                 FontWeight="Normal"
+                 TextAlignment="Center">
+        Allow
+        <Run FontWeight="SemiBold" Text="{Binding AppName}"/>
+        to use the key
+      </TextBlock>
+
+      <Border Background="{DynamicResource Brush.Auth.Key.Background}"
+              CornerRadius="8"
+              BorderBrush="{DynamicResource Brush.Auth.Key.Border}"
+              BorderThickness="1"
+              Padding="12,10">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <i:Icon Value="fa-chevron-right" FontSize="10" Opacity="0.5" />
+          <views:KeyIcon />
+          <TextBlock Text="{Binding Key.Name}"
+                     FontWeight="SemiBold"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+    
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom"
+                  Spacing="5">
+        <Button Name="DenyButton"
+                Classes="deny"
+                HotKey="Escape">
+          Cancel
+        </Button>
+        <Button Name="AuthButton"
+                Classes="confirm"
+                HotKey="Enter"
+                IsEnabled="{Binding AuthButtonEnabled}">
+          <Button.Content>
+            <StackPanel Orientation="Horizontal">
+              <i:Icon Value="{Binding AuthButtonIcon}"
+                      IsVisible="{Binding AuthButtonIconVisible}"
+                      Animation="{Binding AuthButtonIconAnimation}"
+                      Foreground="{DynamicResource Color.Foreground}" />
+              <TextBlock Text="{Binding AuthButtonText}" />
+            </StackPanel>
+          </Button.Content>
+        </Button>
+      </StackPanel>
     </StackPanel>
-  </StackPanel>
+  </Panel>
 
   <Window.Styles>
 

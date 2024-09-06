@@ -16,8 +16,20 @@
       <ColumnDefinition/>
     </Grid.ColumnDefinitions>
 
-    <DockPanel Name="Sidebar" Background="{DynamicResource Color.Sidebar.Background}" >
-        
+    <Panel>
+      <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-1">
+        <ExperimentalAcrylicBorder.Material>
+          <ExperimentalAcrylicMaterial
+              BackgroundSource="Digger"
+              FallbackColor="#2b2c3a"
+              TintColor="#0a0b20"
+              TintOpacity="1.5"
+              MaterialOpacity="0.65" />
+        </ExperimentalAcrylicBorder.Material>
+      </ExperimentalAcrylicBorder>
+
+      <DockPanel Name="Sidebar">
+
         <StackPanel DockPanel.Dock="Top" Orientation="Vertical" HorizontalAlignment="Stretch" Spacing="10">
           <DockPanel Height="50" Name="TitlebarLeft" IsHitTestVisible="True" Background="Transparent" Margin="10,0">
             <Button Name="ThreeDots"
@@ -72,7 +84,7 @@
                              FontSize="12">
                     No keys loaded
                   </TextBlock>
-                  
+
                   <ListBox Name="KeysListBox"
                            ItemsSource="{Binding Kay.Keys}"
                            SelectedItem="{Binding SelectedKey}"
@@ -103,49 +115,63 @@
                            SelectedIndex="{Binding TabIndexSelected}"/>
           </Grid>
         </ScrollViewer>
-      
-    </DockPanel>
+
+      </DockPanel>
+    </Panel>
 
     <Border Grid.Column="1" Grid.ColumnSpan="2"
             Background="{DynamicResource Color.Sidebar.Background}"
             BorderThickness="0,0,1,0" BorderBrush="{DynamicResource Color.Border}" />
-    
+
     <GridSplitter Grid.Column="1"
                   BorderThickness="3,0"
                   BorderBrush="Transparent"
                   Background="Transparent"
                   HorizontalAlignment="Stretch"/>
 
-    <DockPanel Grid.Column="3" Name="MainContent">
-      <Border DockPanel.Dock="Top" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Color.Border}">
-        <DockPanel Name="TitlebarRight" IsHitTestVisible="True" Background="Transparent">
-          <StackPanel DockPanel.Dock="Right"
-                      Orientation="Horizontal"
-                      HorizontalAlignment="Right"
-                      Spacing="16"
-                      MinHeight="50">
-            <Button Name="SyncButton" Classes="strong" IsEnabled="{Binding !IsSyncing}">
-              <StackPanel Orientation="Horizontal">
-                <i:Icon Value="fa-sync" Animation="{Binding SyncingAnimation}" FontSize="14"/>
-                <TextBlock Text="Sync" VerticalAlignment="Center"/>
-              </StackPanel>
-            </Button>
-            <views:TitleBarButtons />
-          </StackPanel>
-        </DockPanel>
-      </Border>
-      <DockPanel DockPanel.Dock="Bottom">
-        <Grid>
-          <Border IsVisible="{Binding IsActivitySelected}">
-            <views:ActivityView />
-          </Border>
+    <Panel Grid.Column="3" >
+      <ExperimentalAcrylicBorder IsHitTestVisible="False">
+        <ExperimentalAcrylicBorder.Material>
+          <ExperimentalAcrylicMaterial
+              BackgroundSource="Digger"
+              FallbackColor="{DynamicResource Color.Window}"
+              TintColor="{DynamicResource Color.Window.AltGlass}"
+              TintOpacity="{DynamicResource Color.Window.AltGlass.TintOpacity}"
+              MaterialOpacity="{DynamicResource Color.Window.AltGlass.MaterialOpacity}" />
+        </ExperimentalAcrylicBorder.Material>
+      </ExperimentalAcrylicBorder>
 
-          <Border IsVisible="{Binding IsKeysTabSelected}">
-            <views:KeyOptionsView Name="KeyOptions" />
-          </Border>
-        </Grid>
+      <DockPanel Name="MainContent">
+        <Border DockPanel.Dock="Top" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Color.Border}">
+          <DockPanel Name="TitlebarRight" IsHitTestVisible="True" Background="Transparent">
+            <StackPanel DockPanel.Dock="Right"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="16"
+                        MinHeight="50">
+              <Button Name="SyncButton" Classes="strong" IsEnabled="{Binding !IsSyncing}">
+                <StackPanel Orientation="Horizontal">
+                  <i:Icon Value="fa-sync" Animation="{Binding SyncingAnimation}" FontSize="14"/>
+                  <TextBlock Text="Sync" VerticalAlignment="Center"/>
+                </StackPanel>
+              </Button>
+              <views:TitleBarButtons />
+            </StackPanel>
+          </DockPanel>
+        </Border>
+        <DockPanel DockPanel.Dock="Bottom">
+          <Grid>
+            <Border IsVisible="{Binding IsActivitySelected}">
+              <views:ActivityView />
+            </Border>
+
+            <Border IsVisible="{Binding IsKeysTabSelected}">
+              <views:KeyOptionsView Name="KeyOptions" />
+            </Border>
+          </Grid>
+        </DockPanel>
       </DockPanel>
-    </DockPanel>
+    </Panel>
   </Grid>
 
 

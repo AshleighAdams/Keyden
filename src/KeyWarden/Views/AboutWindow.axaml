@@ -12,19 +12,30 @@
         Width="300" Height="200"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        TransparencyLevelHint="AcrylicBlur"
-        Background="{DynamicResource Color.Window.Glass}"
+        TransparencyLevelHint="AcrylicBlur,Mica,Blur"
+        Background="Transparent"
         Padding="20">
-
-  <DockPanel VerticalAlignment="Stretch">
-    <TextBlock DockPanel.Dock="Bottom" Text="Copyright © 2024 Ashleigh Adams" Opacity="0.5" />
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-20">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial
+            BackgroundSource="Digger"
+            FallbackColor="{DynamicResource Color.Window.Glass.Background.Fallback}"
+            TintColor="{DynamicResource Color.Window.Glass.Background}"
+            TintOpacity="1"
+            MaterialOpacity="{DynamicResource Color.Window.Glass.Background.Opacity}" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
     
-    <StackPanel DockPanel.Dock="Top" VerticalAlignment="Center">
-      <TextBlock FontSize="32" FontWeight="SemiBold">KeyWarden</TextBlock>
-      <SelectableTextBlock Text="{Binding Version}" />
-    </StackPanel>
-  </DockPanel>
-
+    <DockPanel VerticalAlignment="Stretch">
+      <TextBlock DockPanel.Dock="Bottom" Text="Copyright © 2024 Ashleigh Adams" Opacity="0.5" />
+    
+      <StackPanel DockPanel.Dock="Top" VerticalAlignment="Center">
+        <TextBlock FontSize="32" FontWeight="SemiBold">KeyWarden</TextBlock>
+        <SelectableTextBlock Text="{Binding Version}" />
+      </StackPanel>
+    </DockPanel>
+  </Panel>
   <Window.Styles>
     <Style Selector="TextBlock">
       <Setter Property="TextAlignment" Value="Center" />
