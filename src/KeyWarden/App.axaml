@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:KeyWarden"
              x:Class="KeyWarden.App"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Default"
+             Name="KeyWarden">
   <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
   <Application.Resources>
@@ -19,6 +20,13 @@
     <StyleInclude Source="/Resources/Styles.axaml"/>
   </Application.Styles>
 
+  <NativeMenu.Menu>
+    <NativeMenu>
+      <NativeMenuItem Header="Settings" Click="MenuSettings_Click" />
+      <NativeMenuItem Header="About" Click="MenuAbout_Click" />
+    </NativeMenu>
+  </NativeMenu.Menu>
+  
   <TrayIcon.Icons>
     <TrayIcons>
       <TrayIcon Icon="/Assets/keywarden-logo.ico"

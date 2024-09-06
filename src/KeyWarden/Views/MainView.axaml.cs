@@ -1,10 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Platform;
 
 using KeyWarden.ViewModels;
 
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,6 +19,17 @@ public partial class MainView : UserControl
 		DataContext = App.GetService<MainViewModel>();
 
 		InitializeComponent();
+
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+		{
+			ThreeDots.IsVisible = false;
+			TitleText.IsVisible = false;
+		}
+
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+		{
+			TitleText.IsVisible = false;
+		}
 
 		//AddHandler(PointerPressedEvent, OnPointerPressed, handledEventsToo: true);
 		//TitlebarRight.AddHandler(PointerPressedEvent, OnPointerPressed, handledEventsToo: true);
@@ -45,7 +58,7 @@ public partial class MainView : UserControl
 		vm.Key = KeysListBox.SelectedItem as ObservableSshKey;
 	}
 
-	private void AboutButton_Click(object? sender, RoutedEventArgs e)
+	internal void AboutButton_Click(object? sender, RoutedEventArgs e)
 	{
 		if (VisualRoot is not Window window)
 			return;

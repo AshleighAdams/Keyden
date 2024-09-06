@@ -15,14 +15,20 @@ namespace KeyWarden.Views
 		{
 			InitializeComponent();
 
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-				IsVisible = false;
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				MinimizeButton.IsVisible = false;
+				MaximizeButton.IsVisible = false;
+				CloseButton.IsVisible = false;
+			}
+			else
+			{
+				MinimizeButton.Click += MinimizeWindow;
+				MaximizeButton.Click += MaximizeWindow;
+				CloseButton.Click += CloseWindow;
 
-			MinimizeButton.Click += MinimizeWindow;
-			MaximizeButton.Click += MaximizeWindow;
-			CloseButton.Click += CloseWindow;
-
-			SubscribeToWindowState();
+				SubscribeToWindowState();
+			}
 		}
 
 

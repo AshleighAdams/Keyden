@@ -107,7 +107,7 @@ internal sealed class AgentClient : IAsyncDisposable
 		buffer[4] = (byte)message.Type;
 
 		if (contentLength > 0)
-			message.Contents.CopyTo(buffer.AsMemory().Slice(headerLength));
+			message.Contents.CopyTo(buffer.AsMemory(headerLength));
 
 		await Stream.WriteAsync(buffer, ct);
 		//await Stream.FlushAsync();

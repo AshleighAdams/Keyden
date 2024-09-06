@@ -7,9 +7,11 @@ using Renci.SshNet.Security.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Channels;
@@ -17,8 +19,51 @@ using System.Threading.Tasks;
 
 namespace KeyWarden;
 
+internal static partial class Unix
+{
+	[LibraryImport("libc", EntryPoint = "getuid", SetLastError = true)]
+	public static partial uint Getuid();
+}
+
 public record SshAgentOptions
 {
+	public static string DefaultPipePath
+	{
+		get
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				return "openssh-ssh-agent";
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				var uid = Unix.Getuid().ToString(CultureInfo.InvariantCulture);
+				var socketDirectory = $"/run/user/{uid}";
+
+				// check for legacy linux systems
+				if (!Directory.Exists(socketDirectory))
+					socketDirectory = Directory.Exists("/run") ? "/run" : "/var/run";
+
+				if (!Directory.Exists(socketDirectory))
+					return "keywarden-ssh-agent";
+
+				socketDirectory += "/keywarden";
+				var socketPath = $"{socketDirectory}/ssh-agent.sock";
+
+				if (!Directory.Exists(socketDirectory))
+					Directory.CreateDirectory(socketDirectory);
+				return socketPath;
+			}
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			{
+				var uid = Unix.Getuid().ToString(CultureInfo.InvariantCulture);
+				return $"/var/run/{uid}-keywarden-ssh-agent.sock";
+			}
+
+			return "keywarden-ssh-agent";
+		}
+	}
+
 	public string PipeName { get; init; } = "openssh-ssh-agent";
 }
 

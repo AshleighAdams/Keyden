@@ -9,7 +9,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Linq;
-
 namespace KeyWarden;
 
 public partial class App : Application
@@ -63,6 +62,21 @@ public partial class App : Application
 			singleViewPlatform.MainView = new MainView();
 
 		base.OnFrameworkInitializationCompleted();
+	}
+
+	private void MenuSettings_Click(object? sender, EventArgs e)
+	{
+		if (MainWindow?.Content is not MainView view)
+			return;
+
+	}
+
+	private void MenuAbout_Click(object? sender, EventArgs e)
+	{
+		if (MainWindow?.Content is not MainView view)
+			return;
+
+		new AboutWindow().ShowDialog(MainWindow);
 	}
 
 	private void MenuShow_Click(object? sender, EventArgs e)

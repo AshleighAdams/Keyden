@@ -1,6 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Diagnostics;
+using Avalonia.Platform;
+
+using System.Runtime.InteropServices;
 
 namespace KeyWarden.Views;
 
@@ -8,6 +11,18 @@ public partial class MainWindow : Window
 {
 	public MainWindow()
 	{
+		ExtendClientAreaToDecorationsHint = true;
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+		{
+			ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.SystemChrome | ExtendClientAreaChromeHints.OSXThickTitleBar;
+			ExtendClientAreaTitleBarHeightHint = 50;
+		}
+		else
+		{
+			ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
+			ExtendClientAreaTitleBarHeightHint = -1;
+		}
+
 		InitializeComponent();
 
 #if DEBUG

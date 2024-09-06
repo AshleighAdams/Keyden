@@ -6,6 +6,13 @@ using System.IO.Pipes;
 using System.Runtime.InteropServices;
 
 namespace KeyWarden;
+
+//internal static partial class Linux
+//{
+//	[LibraryImport("libc", EntryPoint = "get_proc_stats", SetLastError = true)]
+//	public static partial uint GetProcStats(int pid, proc_t processInfo);
+//}
+
 internal unsafe static partial class ProcessExtensions
 {
 	[LibraryImport("kernel32.dll", SetLastError = true)]
@@ -78,6 +85,27 @@ internal unsafe static partial class ProcessExtensions
 			}
 			catch (ArgumentException) { }
 			catch (Win32Exception) { }
+		}
+
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+		{
+			/*
+				#include <sys/sysctl.h>
+
+				#define OPProcessValueUnknown UINT_MAX
+
+				int ProcessIDForParentOfProcessID(int pid)
+				{
+					struct kinfo_proc info;
+					size_t length = sizeof(struct kinfo_proc);
+					int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, pid };
+					if (sysctl(mib, 4, &info, &length, NULL, 0) < 0)
+						return OPProcessValueUnknown;
+					if (length == 0)
+						return OPProcessValueUnknown;
+					return info.kp_eproc.e_ppid;
+				}
+			*/
 		}
 
 		return null;
