@@ -9,14 +9,13 @@
         Icon="/Assets/keywarden-logo.ico"
         ShowInTaskbar="False"
         CanResize="False"
-        Width="300" Height="200"
+        Width="300" SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
         TransparencyLevelHint="Mica,AcrylicBlur,Blur"
-        Background="Transparent"
-        Padding="20">
+        Background="Transparent">
   <Panel>
-    <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-20" Name="Acrylic">
+    <ExperimentalAcrylicBorder IsHitTestVisible="False" Name="Acrylic">
       <ExperimentalAcrylicBorder.Material>
         <ExperimentalAcrylicMaterial
             BackgroundSource="Digger"
@@ -26,16 +25,25 @@
             MaterialOpacity="{DynamicResource Color.Window.AltGlass.MaterialOpacity}" />
       </ExperimentalAcrylicBorder.Material>
     </ExperimentalAcrylicBorder>
-    
-    <DockPanel VerticalAlignment="Stretch">
-      <TextBlock DockPanel.Dock="Bottom" Text="Copyright © 2024 Ashleigh Adams" Opacity="0.5" />
-    
-      <StackPanel DockPanel.Dock="Top" VerticalAlignment="Center">
-        <TextBlock FontSize="32" FontWeight="SemiBold">KeyWarden</TextBlock>
-        <SelectableTextBlock Text="{Binding Version}" />
-      </StackPanel>
-    </DockPanel>
+
+    <StackPanel VerticalAlignment="Center" Margin="20,40,20,20">
+      <TextBlock FontSize="32" FontWeight="SemiBold">KeyWarden</TextBlock>
+      <SelectableTextBlock Text="{Binding Version}" />
+
+      <TextBlock>
+        <LineBreak/>
+        Special thanks to<LineBreak/><LineBreak/>
+        .NET Foundation<LineBreak/>
+        Microsoft<LineBreak/>
+        Avalonia<LineBreak/>
+        CommunityToolkit<LineBreak/>
+        Projektanker<LineBreak/>
+      </TextBlock>
+
+      <TextBlock Text="Copyright © 2024 Ashleigh Adams" Opacity="0.5" />
+    </StackPanel>
   </Panel>
+
   <Window.Styles>
     <Style Selector="TextBlock">
       <Setter Property="TextAlignment" Value="Center" />
