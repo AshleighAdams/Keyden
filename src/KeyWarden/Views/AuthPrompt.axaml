@@ -15,23 +15,23 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
-        TransparencyLevelHint="AcrylicBlur"
+        TransparencyLevelHint="Mica,AcrylicBlur,Blur"
         Background="Transparent"
         Topmost="True">
   <Panel>
-    <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-24">
+    <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-24" Name="Acrylic">
       <ExperimentalAcrylicBorder.Material>
         <ExperimentalAcrylicMaterial
             BackgroundSource="Digger"
-            FallbackColor="{DynamicResource Color.Window.Glass.Background.Fallback}"
-            TintColor="{DynamicResource Color.Window.Glass.Background}"
-            TintOpacity="1"
-            MaterialOpacity="{DynamicResource Color.Window.Glass.Background.Opacity}" />
+            FallbackColor="{DynamicResource Color.Window}"
+            TintColor="{DynamicResource Color.Window.AltGlass}"
+            TintOpacity="{DynamicResource Color.Window.AltGlass.TintOpacity}"
+            MaterialOpacity="{DynamicResource Color.Window.AltGlass.MaterialOpacity}" />
       </ExperimentalAcrylicBorder.Material>
     </ExperimentalAcrylicBorder>
     
     <StackPanel Spacing="20">
-      <TextBlock Text="Key Access Requested"
+      <TextBlock Text="Key access requested"
                  TextAlignment="Center"
                  FontSize="21"/>
 

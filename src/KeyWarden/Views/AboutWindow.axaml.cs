@@ -8,6 +8,12 @@ namespace KeyWarden.Views
 		public AboutWindow()
 		{
 			InitializeComponent();
+
+			if (ActualTransparencyLevel == WindowTransparencyLevel.Mica)
+			{
+				Acrylic.Material.TintOpacity = 0;
+				Acrylic.Material.MaterialOpacity = 0;
+			}
 		}
 	}
 }

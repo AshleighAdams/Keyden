@@ -33,8 +33,8 @@
       <SolidColorBrush x:Key="Brush.Key.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
       <SolidColorBrush x:Key="Brush.Key.Selected" Color="{DynamicResource SystemAccentColor}" Opacity="0.5" />
 
-      <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#efefef" />
-      <SolidColorBrush x:Key="Brush.Auth.Key.Border" Color="#e1e1e1" />
+      <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#efefef" Opacity="0.7" />
+      <SolidColorBrush x:Key="Brush.Auth.Key.Border" Color="#e1e1e1" Opacity="0.7" />
 
       <SolidColorBrush x:Key="Brush.ConfirmButton.Border" Color="Transparent" />
       <SolidColorBrush x:Key="Brush.ConfirmButton.Foreground" Color="#fff" />
@@ -74,9 +74,9 @@
       <system:Double x:Key="Color.Window.AltGlass.TintOpacity">1.5</system:Double>
       <system:Double x:Key="Color.Window.AltGlass.MaterialOpacity">0.65</system:Double>
       
-      <Color x:Key="Color.Window.Glass.Background">#333333</Color>
+      <Color x:Key="Color.Window.Glass.Background">Black</Color>
       <Color x:Key="Color.Window.Glass.Background.Fallback">#333333</Color>
-      <system:Double x:Key="Color.Window.Glass.Background.Opacity">0.25</system:Double>
+      <system:Double x:Key="Color.Window.Glass.Background.Opacity">0.65</system:Double>
 
       <Color x:Key="Color.Button.Foreground">#b1b7bc</Color>
 
@@ -91,8 +91,8 @@
       <SolidColorBrush x:Key="Brush.Key.Hover" Color="{DynamicResource SystemAccentColor}" Opacity="0.25" />
       <SolidColorBrush x:Key="Brush.Key.Selected" Color="{DynamicResource SystemAccentColor}" Opacity="0.5" />
 
-      <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#262626" />
-      <SolidColorBrush x:Key="Brush.Auth.Key.Border" Color="#3c3c3c" />
+      <SolidColorBrush x:Key="Brush.Auth.Key.Background" Color="#161616" Opacity="0.5" />
+      <SolidColorBrush x:Key="Brush.Auth.Key.Border" Color="#3c3c3c" Opacity="0.7" />
 
 
       <SolidColorBrush x:Key="Brush.ConfirmButton.Border" Color="Transparent" />

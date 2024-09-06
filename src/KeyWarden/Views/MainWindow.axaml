@@ -12,7 +12,7 @@
         Icon="/Assets/keywarden-logo.ico"
         Title="KeyWarden"
         ExtendClientAreaToDecorationsHint="True"
-        TransparencyLevelHint="AcrylicBlur"
+        TransparencyLevelHint="Mica,AcrylicBlur,Blur"
         Background="Transparent">
   <!-- TransparencyLevelHint="AcrylicBlur" -->
   <views:MainView Name="MainContent"/>

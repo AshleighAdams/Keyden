@@ -17,7 +17,7 @@
     </Grid.ColumnDefinitions>
 
     <Panel>
-      <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-1">
+      <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-1" Name="Acrylic1">
         <ExperimentalAcrylicBorder.Material>
           <ExperimentalAcrylicMaterial
               BackgroundSource="Digger"
@@ -130,7 +130,7 @@
                   HorizontalAlignment="Stretch"/>
 
     <Panel Grid.Column="3" >
-      <ExperimentalAcrylicBorder IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder IsHitTestVisible="False" Name="Acrylic2">
         <ExperimentalAcrylicBorder.Material>
           <ExperimentalAcrylicMaterial
               BackgroundSource="Digger"

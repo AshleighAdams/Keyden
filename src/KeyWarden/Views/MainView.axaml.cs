@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
+using Avalonia.Styling;
 
 using KeyWarden.ViewModels;
 
@@ -40,6 +41,9 @@ public partial class MainView : UserControl
 		if (e.Root is not Window window)
 			return;
 
+		RefreshAcrylicProperties();
+
+		window.ActualThemeVariantChanged += Window_ActualThemeVariantChanged;
 		window.PropertyChanged += Window_PropertyChanged;
 	}
 
@@ -50,7 +54,36 @@ public partial class MainView : UserControl
 			return;
 
 		TitleText.IsVisible = false;
+		window.ActualThemeVariantChanged -= Window_ActualThemeVariantChanged;
 		window.PropertyChanged -= Window_PropertyChanged;
+	}
+
+	private void Window_ActualThemeVariantChanged(object? sender, EventArgs e)
+	{
+		RefreshAcrylicProperties();
+	}
+
+	private void RefreshAcrylicProperties()
+	{
+		if (VisualRoot is not Window window)
+			return;
+
+		if (window.ActualTransparencyLevel == WindowTransparencyLevel.Mica)
+		{
+			if (window.ActualThemeVariant == ThemeVariant.Light)
+			{
+				Acrylic1.Material.TintOpacity = 1;
+				Acrylic1.Material.MaterialOpacity = 1;
+			}
+			else
+			{
+				Acrylic1.Material.TintOpacity = 1;
+				Acrylic1.Material.MaterialOpacity = 0;
+			}
+
+			Acrylic2.Material.TintOpacity = 0;
+			Acrylic2.Material.MaterialOpacity = 0;
+		}
 	}
 
 	private void Window_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

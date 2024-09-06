@@ -12,18 +12,18 @@
         Width="300" Height="200"
         WindowStartupLocation="CenterOwner"
         ExtendClientAreaToDecorationsHint="True"
-        TransparencyLevelHint="AcrylicBlur,Mica,Blur"
+        TransparencyLevelHint="Mica,AcrylicBlur,Blur"
         Background="Transparent"
         Padding="20">
   <Panel>
-    <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-20">
+    <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-20" Name="Acrylic">
       <ExperimentalAcrylicBorder.Material>
         <ExperimentalAcrylicMaterial
             BackgroundSource="Digger"
-            FallbackColor="{DynamicResource Color.Window.Glass.Background.Fallback}"
-            TintColor="{DynamicResource Color.Window.Glass.Background}"
-            TintOpacity="1"
-            MaterialOpacity="{DynamicResource Color.Window.Glass.Background.Opacity}" />
+            FallbackColor="{DynamicResource Color.Window}"
+            TintColor="{DynamicResource Color.Window.AltGlass}"
+            TintOpacity="{DynamicResource Color.Window.AltGlass.TintOpacity}"
+            MaterialOpacity="{DynamicResource Color.Window.AltGlass.MaterialOpacity}" />
       </ExperimentalAcrylicBorder.Material>
     </ExperimentalAcrylicBorder>
     
