@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -26,21 +27,58 @@ public partial class MainView : UserControl
 			TitleText.IsVisible = false;
 		}
 
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-		{
-			TitleText.IsVisible = false;
-		}
-
-		//AddHandler(PointerPressedEvent, OnPointerPressed, handledEventsToo: true);
-		//TitlebarRight.AddHandler(PointerPressedEvent, OnPointerPressed, handledEventsToo: true);
-		TitlebarLeft.PointerPressed += OnPointerPressed;
-		TitlebarRight.PointerPressed += OnPointerPressed;
-		TitlebarLeft.DoubleTapped += OnDoubleClicked;
-		TitlebarRight.DoubleTapped += OnDoubleClicked;
 		SyncButton.Click += SyncButton_Click;
 		AboutButton.Click += AboutButton_Click;
 		KeysListBox.SelectionChanged += KeysListBox_SelectionChanged;
 		KeysListBox.GotFocus += KeysListBox_GotFocus;
+	}
+
+	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+	{
+		base.OnAttachedToVisualTree(e);
+
+		if (e.Root is not Window window)
+			return;
+
+		window.PropertyChanged += Window_PropertyChanged;
+	}
+
+	protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+	{
+		base.OnDetachedFromVisualTree(e);
+		if (e.Root is not Window window)
+			return;
+
+		TitleText.IsVisible = false;
+		window.PropertyChanged -= Window_PropertyChanged;
+	}
+
+	private void Window_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+	{
+		if (e.Property == Window.IsExtendedIntoWindowDecorationsProperty)
+		{
+			if (e.NewValue is not bool newValue)
+				return;
+
+			if (newValue)
+			{
+				TitlebarLeft.PointerPressed += OnPointerPressed;
+				TitlebarRight.PointerPressed += OnPointerPressed;
+				TitlebarLeft.DoubleTapped += OnDoubleClicked;
+				TitlebarRight.DoubleTapped += OnDoubleClicked;
+
+				TitleText.IsVisible = true;
+			}
+			else
+			{
+				TitlebarLeft.PointerPressed -= OnPointerPressed;
+				TitlebarRight.PointerPressed -= OnPointerPressed;
+				TitlebarLeft.DoubleTapped -= OnDoubleClicked;
+				TitlebarRight.DoubleTapped -= OnDoubleClicked;
+
+				TitleText.IsVisible = false;
+			}
+		}
 	}
 
 	private void KeysListBox_GotFocus(object? sender, GotFocusEventArgs e)

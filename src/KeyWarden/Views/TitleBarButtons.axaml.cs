@@ -15,22 +15,74 @@ namespace KeyWarden.Views
 		{
 			InitializeComponent();
 
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
 				MinimizeButton.IsVisible = false;
 				MaximizeButton.IsVisible = false;
 				CloseButton.IsVisible = false;
+				return;
 			}
-			else
-			{
-				MinimizeButton.Click += MinimizeWindow;
-				MaximizeButton.Click += MaximizeWindow;
-				CloseButton.Click += CloseWindow;
 
-				SubscribeToWindowState();
-			}
+			MinimizeButton.Click += MinimizeWindow;
+			MaximizeButton.Click += MaximizeWindow;
+			CloseButton.Click += CloseWindow;
+
+			SubscribeToWindowState();
 		}
 
+
+		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+		{
+			base.OnAttachedToVisualTree(e);
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return;
+
+			if (e.Root is not Window window)
+				return;
+
+			bool usingClientChrome = window.IsExtendedIntoWindowDecorations;
+			MinimizeButton.IsVisible = usingClientChrome;
+			MaximizeButton.IsVisible = usingClientChrome;
+			CloseButton.IsVisible = usingClientChrome;
+
+			window.PropertyChanged += Window_PropertyChanged;
+		}
+
+		protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+		{
+			base.OnDetachedFromVisualTree(e);
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return;
+
+			if (e.Root is not Window window)
+				return;
+
+			window.PropertyChanged -= Window_PropertyChanged;
+		}
+
+		private void Window_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+		{
+			if (e.Property == Window.IsExtendedIntoWindowDecorationsProperty)
+			{
+				if (e.NewValue is not bool newValue)
+					return;
+
+				if (newValue)
+				{
+					MinimizeButton.IsVisible = true;
+					MaximizeButton.IsVisible = true;
+					CloseButton.IsVisible = true;
+				}
+				else
+				{
+					MinimizeButton.IsVisible = false;
+					MaximizeButton.IsVisible = false;
+					CloseButton.IsVisible = false;
+				}
+			}
+		}
 
 		private void CloseWindow(object? sender, RoutedEventArgs e)
 		{

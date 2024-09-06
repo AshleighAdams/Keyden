@@ -11,13 +11,12 @@ public partial class MainWindow : Window
 {
 	public MainWindow()
 	{
-		ExtendClientAreaToDecorationsHint = true;
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 		{
 			ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.SystemChrome | ExtendClientAreaChromeHints.OSXThickTitleBar;
 			ExtendClientAreaTitleBarHeightHint = 50;
 		}
-		else
+		else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
 			ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
 			ExtendClientAreaTitleBarHeightHint = -1;
@@ -31,4 +30,5 @@ public partial class MainWindow : Window
 		});
 #endif
 	}
+
 }

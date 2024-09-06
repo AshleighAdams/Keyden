@@ -15,5 +15,5 @@
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent">
   <!-- TransparencyLevelHint="AcrylicBlur" -->
-  <views:MainView/>
+  <views:MainView Name="MainContent"/>
 </Window>
