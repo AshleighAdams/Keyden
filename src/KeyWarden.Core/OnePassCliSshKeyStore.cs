@@ -48,7 +48,7 @@ file static class JsonExtensionMethods
 			return null;
 		return array
 			.Select(x => x?.GetValue<string>())
-			.Where(x => string.IsNullOrWhiteSpace(x))
+			.Where(x => !string.IsNullOrWhiteSpace(x))
 			.Select(x => x!)
 			.ToList();
 	}

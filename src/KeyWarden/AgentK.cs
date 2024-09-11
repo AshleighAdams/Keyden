@@ -2,12 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Avalonia;
-using Avalonia.Controls;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -107,7 +103,7 @@ public partial class ObservableSshKey : ObservableObject
 	[ObservableProperty]
 	private string _PublicKey;
 
-	public readonly ObservableCollection<string> EnableForMachines = new();
+	public ObservableCollection<string> EnableForMachines { get; } = new();
 
 	[ObservableProperty]
 	private bool _RequireAuthorization;
@@ -181,7 +177,10 @@ public class AgentK : ISshAgentHandler
 		KeyOptionsStore = keyOptionsStore;
 	}
 
-	public ObservableCollection<ObservableSshKey> Keys { get; } = new();
+	public SortableObservableCollection<ObservableSshKey, string> Keys { get; } = new()
+	{
+		SortingSelector = k => k.Name,
+	};
 
 	public async Task SyncKeys()
 	{
@@ -348,8 +347,8 @@ public class AgentK : ISshAgentHandler
 		NewActivity?.Invoke(new ActivityItem()
 		{
 			Icon = "fa-passport", // authenticated icon
-									//Icon = "fa-id-card", // authenticated icon
-									//Icon = "fa-fingerprint", // another possible authenticated icon, perhaps with biometrics only
+								  //Icon = "fa-id-card", // authenticated icon
+								  //Icon = "fa-fingerprint", // another possible authenticated icon, perhaps with biometrics only
 
 			//Icon = "fa-key", // possible authorized icon
 			//Icon = "fa-unlock", // possible authorized icon or based on not timing out
@@ -395,7 +394,7 @@ public class AgentK : ISshAgentHandler
 
 		var keyOptions = KeyOptionsStore.GetKeyOptions(publicKey.Id) ?? new();
 
-		var keyEnabled = 
+		var keyEnabled =
 			keyOptions.EnableForMachines.Contains(Environment.MachineName) ||
 			keyOptions.EnableForMachines.Contains("*");
 		if (!keyEnabled)
@@ -414,7 +413,7 @@ public class AgentK : ISshAgentHandler
 		// check for pre-authorization
 		var authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
 		if (authRequired == AuthRequired.None)
-			return await GotAuthResult(publicKey, keyOptions, info, new(){ Success = true }, ct);
+			return await GotAuthResult(publicKey, keyOptions, info, new() { Success = true }, ct);
 
 		await PromptQueue.WaitAsync(ct);
 
@@ -422,7 +421,7 @@ public class AgentK : ISshAgentHandler
 		authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
 		if (authRequired is AuthRequired.None)
 			return await GotAuthResult(publicKey, keyOptions, info, new() { Success = true }, ct);
-		
+
 		using var @lock = new ScopedLock(PromptQueue);
 
 		AuthPrompt? window = null;
