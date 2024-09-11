@@ -62,6 +62,32 @@ public class KeyOptionsViewModel : ViewModelBase
 		"8 hours",
 	];
 
+	public string MachineName => Environment.MachineName;
+
+	public bool EnabledOnLocalMachine
+	{
+		get => Key?.EnableForMachines.Contains(MachineName) ?? false;
+		set
+		{
+			if (EnabledOnLocalMachine)
+				Key?.EnableForMachines.Remove(MachineName);
+			else
+				Key?.EnableForMachines.Add(MachineName);
+		}
+	}
+
+	public bool EnabledOnAllMachines
+	{
+		get => Key?.EnableForMachines.Contains("*") ?? false;
+		set
+		{
+			if (EnabledOnAllMachines)
+				Key?.EnableForMachines.Remove("*");
+			else
+				Key?.EnableForMachines.Add("*");
+		}
+	}
+
 	public bool RequireAuthorization
 	{
 		get => Key?.RequireAuthorization ?? true;
@@ -236,6 +262,9 @@ public class KeyOptionsViewModel : ViewModelBase
 	[
 		nameof(Key),
 		nameof(IsKeyNull),
+		nameof(MachineName),
+		nameof(EnabledOnLocalMachine),
+		nameof(EnabledOnAllMachines),
 		nameof(RequireAuthorization),
 		nameof(RemainAuthorized),
 		nameof(RemainAuthorizedFor),
@@ -264,7 +293,10 @@ public class KeyOptionsViewModel : ViewModelBase
 				return;
 
 			if (_Key is not null)
+			{
 				_Key.PropertyChanged -= Key_PropertyChanged;
+				_Key.EnableForMachines.CollectionChanged -= EnableForMachines_CollectionChanged;
+			}
 
 			foreach (var property in Properties)
 				this.RaisePropertyChanging(property);
@@ -273,13 +305,22 @@ public class KeyOptionsViewModel : ViewModelBase
 				this.RaisePropertyChanged(property);
 
 			if (_Key is not null)
+			{
 				_Key.PropertyChanged += Key_PropertyChanged;
+				_Key.EnableForMachines.CollectionChanged += EnableForMachines_CollectionChanged;
+			}
 		}
+	}
+
+	private void EnableForMachines_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+	{
+		this.RaisePropertyChanged(nameof(EnabledOnAllMachines));
+		this.RaisePropertyChanged(nameof(EnabledOnLocalMachine));
 	}
 
 	private void Key_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
 	{
-		this.RaisePropertyChanged(nameof(e.PropertyName));
+		this.RaisePropertyChanged(e.PropertyName);
 	}
 
 	public bool IsKeyNull => Key is null;

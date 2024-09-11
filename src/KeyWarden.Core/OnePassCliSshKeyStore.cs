@@ -22,6 +22,13 @@ file static class JsonExtensionMethods
 	{
 		return JsonValue.Create(value);
 	}
+	public static JsonArray AsJsonValue(this IReadOnlyList<string> value)
+	{
+		var array = new JsonNode[value.Count];
+		for (int i = 0; i < value.Count; i++)
+			array[i] = JsonValue.Create(value[i]);
+		return new JsonArray(array);
+	}
 	public static bool? GetBool(this JsonNode node)
 	{
 		if (node.AsValue() is not JsonValue value)
@@ -34,6 +41,16 @@ file static class JsonExtensionMethods
 			return null;
 		var str = value.GetValue<string>();
 		return TimeSpan.Parse(str, CultureInfo.InvariantCulture);
+	}
+	public static IReadOnlyList<string>? GetStringList(this JsonNode node)
+	{
+		if (node.AsArray() is not JsonArray array)
+			return null;
+		return array
+			.Select(x => x?.GetValue<string>())
+			.Where(x => string.IsNullOrWhiteSpace(x))
+			.Select(x => x!)
+			.ToList();
 	}
 }
 
@@ -211,6 +228,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		var @default = new SshKeyOptions();
 		return new SshKeyOptions()
 		{
+			EnableForMachines = obj["EnableForMachines"]?.GetStringList() ?? @default.EnableForMachines,
 			RequireAuthorization = obj["RequireAuthorization"]?.GetBool() ?? @default.RequireAuthentication,
 			RemainAuthorized = obj["RemainAuthorized"]?.GetBool() ?? @default.RemainAuthorized,
 			RemainAuthorizedFor = obj["RemainAuthorizedFor"]?.GetTimeSpan() ?? @default.RemainAuthorizedFor,
@@ -234,6 +252,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 
 	private static void WriteOptionsNode(JsonObject obj, SshKeyOptions opts)
 	{
+		obj["EnableForMachines"] = opts.EnableForMachines.AsJsonValue();
 		obj["RequireAuthorization"] = opts.RequireAuthorization.AsJsonValue();
 		obj["RemainAuthorized"] = opts.RemainAuthorized.AsJsonValue();
 		obj["RemainAuthorizedFor"] = opts.RemainAuthorizedFor.AsJsonValue();
@@ -253,7 +272,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		obj["RemainAuthenticatedUntilLocked"] = opts.RemainAuthenticatedUntilLocked.AsJsonValue();
 		obj["RemainAuthenticatedUntilLockedFor"] = opts.RemainAuthenticatedUntilLockedFor.AsJsonValue();
 	}
-
 
 	private readonly UTF8Encoding Utf8 = new(encoderShouldEmitUTF8Identifier: false);
 	async Task ISshKeyOptionsStore.SyncKeyOptions(CancellationToken ct)

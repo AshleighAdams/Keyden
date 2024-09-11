@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Avalonia;
 using Avalonia.Controls;
 
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -35,6 +36,8 @@ public partial class ObservableSshKey : ObservableObject
 	{
 		var ret = new SshKeyOptions();
 		{
+			ret.EnableForMachines = EnableForMachines.ToList();
+
 			ret.RequireAuthorization = RequireAuthorization;
 			{
 				ret.RemainAuthorized = RemainAuthorized;
@@ -64,6 +67,9 @@ public partial class ObservableSshKey : ObservableObject
 	}
 	public void SetOptions(SshKeyOptions options)
 	{
+		EnableForMachines.Clear();
+		EnableForMachines.AddRange(options.EnableForMachines);
+
 		RequireAuthorization = options.RequireAuthorization;
 		{
 			RemainAuthorized = options.RemainAuthorized;
@@ -100,6 +106,8 @@ public partial class ObservableSshKey : ObservableObject
 
 	[ObservableProperty]
 	private string _PublicKey;
+
+	public readonly ObservableCollection<string> EnableForMachines = new();
 
 	[ObservableProperty]
 	private bool _RequireAuthorization;
@@ -220,14 +228,6 @@ public class AgentK : ISshAgentHandler
 			}
 		}
 
-		NewActivity?.Invoke(new ActivityItem()
-		{
-			Icon = "fa-sync",
-			Importance = ActivityImportance.Normal,
-			Title = "Synced with password manager",
-			Description = $"Got {newKeys.Count} new keys and removed {removedKeys.Count} keys",
-		});
-
 		// sync options
 		foreach (var key in Keys)
 		{
@@ -242,6 +242,14 @@ public class AgentK : ISshAgentHandler
 
 		foreach (var key in Keys)
 			key.SetOptions(KeyOptionsStore.GetKeyOptions(key.Id) ?? new());
+
+		NewActivity?.Invoke(new ActivityItem()
+		{
+			Icon = "fa-sync",
+			Importance = ActivityImportance.Normal,
+			Title = "Synced with password manager",
+			Description = $"Got {newKeys.Count} new keys and removed {removedKeys.Count} keys",
+		});
 	}
 
 	ValueTask<IReadOnlyList<SshKey>> ISshAgentHandler.GetPublicKeys(ClientInfo info, CancellationToken ct)
@@ -262,7 +270,17 @@ public class AgentK : ISshAgentHandler
 			Description = $"{info.ApplicationName}{processChain} queried the available keys",
 		});
 
-		return new(KeyStore.PublicKeys);
+		var enabledKeys = KeyStore.PublicKeys
+			.Select(k => (key: k, options: KeyOptionsStore.GetKeyOptions(k.Id)))
+			.Where(x => x.options is not null &&
+			(
+				x.options.Value.EnableForMachines.Contains(Environment.MachineName) ||
+				x.options.Value.EnableForMachines.Contains("*")
+			))
+			.Select(x => x.key)
+			.ToList();
+
+		return new(enabledKeys);
 	}
 
 	private SemaphoreSlim PromptQueue { get; } = new SemaphoreSlim(1);
@@ -376,6 +394,22 @@ public class AgentK : ISshAgentHandler
 		}
 
 		var keyOptions = KeyOptionsStore.GetKeyOptions(publicKey.Id) ?? new();
+
+		var keyEnabled = 
+			keyOptions.EnableForMachines.Contains(Environment.MachineName) ||
+			keyOptions.EnableForMachines.Contains("*");
+		if (!keyEnabled)
+		{
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-gavel",
+				Importance = ActivityImportance.Normal,
+				Title = "Key disabled",
+				Description = $"{info.ApplicationName}{processChain} requested access to a disabled private key",
+			});
+
+			return default;
+		}
 
 		// check for pre-authorization
 		var authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
