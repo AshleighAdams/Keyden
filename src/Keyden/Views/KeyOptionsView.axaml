@@ -1,0 +1,142 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:Keyden.Views"
+             xmlns:vm="clr-namespace:Keyden.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="800"
+             x:Class="Keyden.Views.KeyOptionsView"
+             x:DataType="vm:KeyOptionsViewModel">
+  <Grid>
+
+    <ScrollViewer IsVisible="{Binding !IsKeyNull}">
+      <Border Padding="16,22,16,10">
+        <StackPanel Orientation="Vertical"
+                    VerticalAlignment="Top"
+                    Spacing="22">
+          <Border Padding="16,0,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+              <views:KeyIcon Width="64"/>
+              <TextBlock Text="{Binding Key.Name}"
+                         VerticalAlignment="Center"
+                         FontSize="20.5" FontWeight="SemiBold" />
+            </StackPanel>
+          </Border>
+
+          <Border Margin="0,2" BorderThickness="1" CornerRadius="8">
+            <StackPanel>
+              <Border Padding="16,8" >
+                <StackPanel Spacing="1">
+                  <TextBlock FontSize="12" Classes="label">public key</TextBlock>
+                  <SelectableTextBlock Text="{Binding Key.PublicKey}" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+              </Border>
+              <Border BorderThickness="0,1,0,0"/>
+              <Border Padding="16,8" >
+                <StackPanel Spacing="1">
+                  <TextBlock FontSize="12" Classes="label">fingerprint</TextBlock>
+                  <SelectableTextBlock Text="{Binding Key.Fingerprint}" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
+
+          <Border Padding="16,0">
+            <Grid ColumnDefinitions="32,32,*"
+                  RowDefinitions="*,*,*,*,*,*,*,*,*,*,*"
+                  Classes="table">
+
+              <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="99" Margin="0,0,0,16">
+                <CheckBox IsChecked="{Binding EnabledOnLocalMachine}">
+                  <TextBlock>
+                    Enable on <Run Text="{Binding MachineName}" FontWeight="SemiBold" />
+                  </TextBlock>
+                </CheckBox>
+                <CheckBox IsChecked="{Binding EnabledOnAllMachines}">
+                  Enable on all machines
+                </CheckBox>
+              </StackPanel>
+              
+              <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="99"
+                        IsChecked="{Binding RequireAuthorization}">
+                Require authorization
+              </CheckBox>
+              <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthorized}">Remain authorized for</CheckBox>
+                <ComboBox ItemsSource="{Binding KeepUnlockedDurations}" SelectedItem="{Binding RemainAuthorizedFor}" />
+              </StackPanel>
+              <StackPanel Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthorizedUntilKeyInactivity}">Until</CheckBox>
+                <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthorizedUntilKeyInactivityFor}"/>
+                <TextBlock VerticalAlignment="Center">of key inactivity</TextBlock>
+              </StackPanel>
+              <StackPanel Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthorizedUntilKeyInactivity}">Until</CheckBox>
+                <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthorizedUntilUserInactivityFor}"/>
+                <TextBlock VerticalAlignment="Center">of user inactivity</TextBlock>
+              </StackPanel>
+              <StackPanel Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthorizedUntilLocked}">Until the computer locks</CheckBox>
+              </StackPanel>
+
+              <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="99"
+                        IsChecked="{Binding RequireAuthentication}">
+                Require authentication
+              </CheckBox>
+              <StackPanel Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthenticated}">Remain authenticated for</CheckBox>
+                <ComboBox ItemsSource="{Binding KeepUnlockedDurations}" SelectedValue="{Binding RemainAuthenticatedFor}" />
+              </StackPanel>
+              <StackPanel Grid.Row="8" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthenticatedUntilKeyInactivity}">Until</CheckBox>
+                <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthenticatedUntilKeyInactivityFor}"/>
+                <TextBlock VerticalAlignment="Center">of key inactivity</TextBlock>
+              </StackPanel>
+              <StackPanel Grid.Row="9" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthenticatedUntilUserInactivity}">Until</CheckBox>
+                <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthenticatedUntilUserInactivityFor}"/>
+                <TextBlock VerticalAlignment="Center">of user inactivity</TextBlock>
+              </StackPanel>
+              <StackPanel Grid.Row="10" Grid.Column="2" Grid.ColumnSpan="99"
+                          Orientation="Horizontal" Spacing="5">
+                <CheckBox IsChecked="{Binding RemainAuthenticatedUntilLocked}">Until the computer locks</CheckBox>
+              </StackPanel>
+            </Grid>
+          </Border>
+
+        </StackPanel>
+      </Border>
+    </ScrollViewer>
+
+    <TextBlock IsVisible="{Binding IsKeyNull}" Text="Hello Avalonia" HorizontalAlignment="Center" VerticalAlignment="Center" />
+  </Grid>
+
+  <UserControl.Styles>
+    <Style Selector="Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Light}"/>
+    </Style>
+
+    <Style Selector="TextBlock.label">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Label}"/>
+    </Style>
+
+    <Style Selector="ComboBox">
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="CheckBox">
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="TextBlock">
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    
+  </UserControl.Styles>
+
+</UserControl>

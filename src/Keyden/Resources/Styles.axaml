@@ -1,0 +1,165 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:Keyden.Views">
+  <Design.PreviewWith>
+    <Border Padding="0" Width="600" Height="400">
+      <views:MainView/>
+      <!--<views:ActivityView/>-->
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource Color.Window}" />
+  </Style>
+
+  <Style Selector="TextBlock">
+    <Setter Property="FontWeight" Value="{DynamicResource Text.Weight}"/>
+  </Style>
+
+  <Style Selector="SelectableTextBlock">
+    <Setter Property="FontWeight" Value="{DynamicResource Text.Weight}"/>
+  </Style>
+
+  <Style Selector="Button">
+    <Setter Property="FontWeight" Value="{DynamicResource Text.Weight}"/>
+  </Style>
+  
+  <Style Selector="Button:pressed">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+
+
+  <Style Selector="CheckBox">
+    <Setter Property="FontWeight" Value="{DynamicResource Text.Weight}"/>
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="FontWeight" Value="{DynamicResource Text.Weight}"/>
+    <Setter Property="CornerRadius" Value="8"/>
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="Padding" Value="6"/>
+  </Style>
+
+  <Style Selector="ListBox > ListBoxItem">
+
+    <Style Selector="^:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Hover}"/>
+    </Style>
+
+    <Style Selector="^:selected">
+
+      <Style Selector="^ /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Selected}"/>
+      </Style>
+
+      <Style Selector="^:not(:focus) /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}"/>
+      </Style>
+
+    </Style>
+  </Style>
+
+  <Style Selector="ListBox.keys > ListBoxItem">
+    <Setter Property="CornerRadius" Value="8"/>
+    <Setter Property="Padding" Value="10"/>
+    
+    <Style Selector="^:selected">
+      <Style Selector="^:not(:focus) /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Selected}"/>
+      </Style>
+    </Style>
+  </Style>
+
+  <Style Selector="Button.strong">
+    <Setter Property="CornerRadius" Value="8"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+
+    <Style Selector="^ > StackPanel">
+      <Setter Property="Spacing" Value="5"/>
+    </Style>
+  </Style>
+
+  <Style Selector="Window[IsActive=True]">
+    <Style Selector="^ Button.strong">
+      <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+
+      <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Hover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Press}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+      </Style>
+    </Style>
+  </Style>
+
+  <Style Selector="Window[IsActive=False]">
+    <Style Selector="^ Button.strong">
+      <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Brush.StrongButton.Border.Inactive}"/>
+
+      <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive.Hover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive.Press}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+      </Style>
+    </Style>
+  </Style>
+
+  
+
+  <Style Selector="Button">
+    <Setter Property="CornerRadius" Value="8"/>
+
+    <Style Selector="^ > StackPanel">
+      <Setter Property="Spacing" Value="5"/>
+    </Style>
+  </Style>
+
+
+  <Style Selector="Button.square">
+    <Setter Property="CornerRadius" Value="0"/>
+  </Style>
+  
+  <Style Selector="Window[IsActive=True]">
+    <Style Selector="^ Button.strong">
+      <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+
+      <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Hover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Press}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground}"/>
+      </Style>
+    </Style>
+  </Style>
+
+  <Style Selector="Window[IsActive=False]">
+    <Style Selector="^ Button.strong">
+      <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Brush.StrongButton.Border.Inactive}"/>
+
+      <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive.Hover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.StrongButton.Background.Inactive.Press}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.StrongButton.Foreground.Inactive}"/>
+      </Style>
+    </Style>
+  </Style>
+
+</Styles>

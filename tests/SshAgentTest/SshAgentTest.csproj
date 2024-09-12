@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\KeyWarden.Core\KeyWarden.Core.csproj" />
+    <ProjectReference Include="..\..\src\Keyden.Core\Keyden.Core.csproj" />
   </ItemGroup>
 
 </Project>
