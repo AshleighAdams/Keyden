@@ -28,14 +28,14 @@
               <Border Padding="16,8" >
                 <StackPanel Spacing="1">
                   <TextBlock FontSize="12" Classes="label">public key</TextBlock>
-                  <TextBlock Text="{Binding Key.PublicKey}" TextTrimming="CharacterEllipsis"/>
+                  <SelectableTextBlock Text="{Binding Key.PublicKey}" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
               </Border>
               <Border BorderThickness="0,1,0,0"/>
               <Border Padding="16,8" >
                 <StackPanel Spacing="1">
                   <TextBlock FontSize="12" Classes="label">fingerprint</TextBlock>
-                  <TextBlock Text="{Binding Key.Fingerprint}" TextTrimming="CharacterEllipsis"/>
+                  <SelectableTextBlock Text="{Binding Key.Fingerprint}" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
               </Border>
             </StackPanel>
