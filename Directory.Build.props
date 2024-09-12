@@ -51,7 +51,7 @@
     <VerliteEnableShadowRepo>true</VerliteEnableShadowRepo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Verlite.MsBuild" Version="2.5.0" PrivateAssets="All" />
+    <PackageReference Condition="'$(DisableVerlite)'!='true'" Include="Verlite.MsBuild" Version="2.5.0" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Reproducible builds  -->

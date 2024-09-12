@@ -4,11 +4,17 @@
     <TargetFramework>net8.0</TargetFramework>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <PublishSingleFile>true</PublishSingleFile>
+    <Platforms>AnyCPU;x64;ARM32;ARM64;x86</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
     <ApplicationIcon>..\Keyden\Assets\keyden-logo.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Avalonia">
+    <AvaloniaUseCompiledBindingsByDefault>True</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>
