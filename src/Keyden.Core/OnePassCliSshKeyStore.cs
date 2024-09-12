@@ -69,7 +69,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		return new(matchingKey);
 	}
 
-	async Task ISshKeyStore.SyncKeys(CancellationToken ct = default)
+	async Task ISshKeyStore.SyncKeys(CancellationToken ct)
 	{
 		var sw = Stopwatch.StartNew();
 
@@ -92,7 +92,10 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		{
 			var id = item.GetProperty("id").GetString();
 			var name = item.GetProperty("title").GetString();
-			var fingerprint = item.GetProperty("additional_information").GetString();
+
+			if (!item.TryGetProperty("additional_information", out var additionalInfoElm))
+				continue;
+			var fingerprint = additionalInfoElm.GetString();
 
 			ArgumentException.ThrowIfNullOrEmpty(id);
 			ArgumentException.ThrowIfNullOrEmpty(name);
