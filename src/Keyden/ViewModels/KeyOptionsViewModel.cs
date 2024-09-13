@@ -1,6 +1,3 @@
-
-using CommunityToolkit.Mvvm.ComponentModel;
-
 using ReactiveUI;
 
 using System;
@@ -335,5 +332,6 @@ public class DesignKeyOptionsViewModel : KeyOptionsViewModel
 			name: "Test key",
 			fingerprint: "Fingerdinger",
 			publicKey: "ssh-des NUT5AAAAAB21zDNA");
+		Key.SetOptions(new());
 	}
 }

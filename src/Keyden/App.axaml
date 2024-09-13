@@ -34,7 +34,9 @@
                 Clicked="MenuShow_Click">
         <TrayIcon.Menu>
           <NativeMenu>
-            <NativeMenuItem Header="Show" Click="MenuShow_Click" />
+            <NativeMenuItem Header="Open Keyden" Click="MenuShow_Click" />
+            <NativeMenuItemSeparator/>
+            <NativeMenuItem Header="Settings" Click="MenuSettings_Click" />
             <NativeMenuItem Header="Exit" Click="MenuExit_Click" />
           </NativeMenu>
         </TrayIcon.Menu>

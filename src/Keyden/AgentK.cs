@@ -175,6 +175,15 @@ public class AgentK : ISshAgentHandler
 	{
 		KeyStore = keyStore;
 		KeyOptionsStore = keyOptionsStore;
+
+		foreach (var key in KeyStore.PublicKeys)
+		{
+			var newKey = new ObservableSshKey(key.Id, key.Name, key.Fingerprint, key.PublicKeyText);
+			var options = KeyOptionsStore.GetKeyOptions(key.Id);
+
+			newKey.SetOptions(options ?? new());
+			Keys.Add(newKey);
+		}
 	}
 
 	public SortableObservableCollection<ObservableSshKey, string> Keys { get; } = new()

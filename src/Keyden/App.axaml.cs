@@ -1,14 +1,15 @@
+using System;
+using System.Linq;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
 using Keyden.ViewModels;
 using Keyden.Views;
-using System;
 
-using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
-using System.Linq;
 namespace Keyden;
 
 public partial class App : Application
@@ -28,9 +29,20 @@ public partial class App : Application
 		return app.Services?.GetRequiredService<T>()
 			?? throw new Exception("Service provider not yet created");
 	}
+	public static T GetKeyedService<T>(object? key) where
+		T : class
+	{
+		if (Current is not App app)
+			throw new Exception($"{nameof(Current)} is not an {nameof(App)}");
+
+		return app.Services?.GetRequiredKeyedService<T>(key)
+			?? throw new Exception("Service provider not yet created");
+	}
 
 	private SshAgent? Agent { get; set; }
 	private MainWindow? MainWindow { get; set; }
+	public static SettingsWindow? SettingsWindow { get; private set; }
+
 	public override void OnFrameworkInitializationCompleted()
 	{
 		var collection = new ServiceCollection();
@@ -43,8 +55,9 @@ public partial class App : Application
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			desktop.MainWindow = MainWindow = new MainWindow();
+			SettingsWindow = new SettingsWindow();
 
-			if (desktop.Args?.Contains("--daemon") ?? false)
+			if (desktop.Args?.Contains("--hide") ?? false)
 				MainWindow.Hide();
 			else
 				MainWindow.Show();
@@ -69,6 +82,7 @@ public partial class App : Application
 		if (MainWindow?.Content is not MainView view)
 			return;
 
+		SettingsWindow?.Show();
 	}
 
 	private void MenuAbout_Click(object? sender, EventArgs e)

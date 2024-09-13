@@ -1,0 +1,124 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Keyden.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:Keyden.Views"
+        Width="630" Height="555"
+        MinWidth="630" MinHeight="200"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        x:Class="Keyden.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Icon="/Assets/keyden-logo.ico"
+        Title="Keyden Settings"
+        ExtendClientAreaToDecorationsHint="False"
+        TransparencyLevelHint="Mica,AcrylicBlur,Blur"
+        Background="Transparent">
+  <!-- TransparencyLevelHint="AcrylicBlur" -->
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="230" MaxWidth="300" MinWidth="200"/>
+      <ColumnDefinition Width="1"/>
+      <ColumnDefinition Width="1"/>
+      <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+
+    <ExperimentalAcrylicBorder Grid.Column="0"
+                               IsHitTestVisible="False"
+                               Margin="-1"
+                               Name="Acrylic1">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial
+            BackgroundSource="Digger"
+            FallbackColor="#2b2c3a"
+            TintColor="#0a0b20"
+            TintOpacity="1.5"
+            MaterialOpacity="0.65" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+
+    <ExperimentalAcrylicBorder Grid.Column="3"
+                               IsHitTestVisible="False"
+                               Name="Acrylic2">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial
+            BackgroundSource="Digger"
+            FallbackColor="{DynamicResource Color.Window}"
+            TintColor="{DynamicResource Color.Window.AltGlass}"
+            TintOpacity="{DynamicResource Color.Window.AltGlass.TintOpacity}"
+            MaterialOpacity="{DynamicResource Color.Window.AltGlass.MaterialOpacity}" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+
+    <Border Grid.Column="1" Grid.ColumnSpan="2"
+            Background="{DynamicResource Color.Sidebar.Background}"
+            BorderThickness="0,0,1,0" BorderBrush="{DynamicResource Color.Border}" />
+
+    <GridSplitter Grid.Column="1"
+                  BorderThickness="3,0"
+                  BorderBrush="Transparent"
+                  Background="Transparent"
+                  HorizontalAlignment="Stretch"/>
+
+    <ScrollViewer Grid.Column="0" Padding="8">
+      <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto">
+        <views:TabItem Grid.Row="0"
+                       Icon="fa-cog"
+                       Text="General"
+                       Index="0"
+                       SelectedIndex="{Binding TabIndexSelected}"/>
+        <views:TabItem Grid.Row="1"
+                       Icon="fa-code"
+                       Text="Advanced"
+                       Index="1"
+                       SelectedIndex="{Binding TabIndexSelected}"/>
+      </Grid>
+    </ScrollViewer>
+    
+    <ScrollViewer Grid.Column="3">
+      <Panel Margin="16">
+        <StackPanel IsVisible="{Binding IsGeneralTabSelected}" Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBlock>Key storage backend:</TextBlock>
+            <ComboBox ItemsSource="{Binding KeystoreBackends}"
+                      SelectedItem="{Binding KeystoreBackend}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Converter={StaticResource EnumConverter}}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+        </StackPanel>
+      </Panel>
+    </ScrollViewer>
+    
+  </Grid>
+
+  <Window.Resources>
+    <views:EnumDescriptionConverter x:Key="EnumConverter" />
+  </Window.Resources>
+  
+  <Window.Styles>
+    <Style Selector="Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Light}"/>
+    </Style>
+
+    <Style Selector="TextBlock.label">
+      <Setter Property="Foreground" Value="{DynamicResource Color.Label}"/>
+    </Style>
+
+    <Style Selector="ComboBox">
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="CheckBox">
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="TextBlock">
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+  </Window.Styles>
+</Window>

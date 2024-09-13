@@ -2,15 +2,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Platform;
 using Avalonia.Styling;
 
 using Keyden.ViewModels;
 
 using System;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Keyden.Views;
 
@@ -29,6 +26,7 @@ public partial class MainView : UserControl
 		}
 
 		SyncButton.Click += SyncButton_Click;
+		SettingsButton.Click += SettingsButton_Click;
 		AboutButton.Click += AboutButton_Click;
 		KeysListBox.SelectionChanged += KeysListBox_SelectionChanged;
 		KeysListBox.GotFocus += KeysListBox_GotFocus;
@@ -127,6 +125,11 @@ public partial class MainView : UserControl
 			throw new InvalidCastException($"MainView: KeyOptions view model is not a KeyOptionsViewModel");
 		
 		vm.Key = KeysListBox.SelectedItem as ObservableSshKey;
+	}
+
+	private void SettingsButton_Click(object? sender, RoutedEventArgs e)
+	{
+		App.SettingsWindow?.Show();
 	}
 
 	internal void AboutButton_Click(object? sender, RoutedEventArgs e)

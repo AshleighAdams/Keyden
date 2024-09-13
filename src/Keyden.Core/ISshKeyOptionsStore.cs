@@ -72,8 +72,6 @@ public struct SshKeyOptions
 
 	public IReadOnlyList<string> EnableForMachines { get; set; } = Array.Empty<string>();
 
-	
-
 	public bool RequireAuthorization { get; set; } = true;
 
 	public bool RemainAuthorized { get; set; } = false;
