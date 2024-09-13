@@ -74,7 +74,10 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 			return default;
 
 		if (!HasSynced)
+		{
 			await SyncKeys(ct);
+			await SyncKeyOptions(ct);
+		}
 
 		return await BaseKeyStore.GetPrivateKey(publicKey, ct);
 	}
@@ -110,12 +113,13 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 			Data,
 			SourceGenerationContext.Default.KeyStoreControllerData);
 		await FileSystem.TryWriteBytesAsync(DataLocation, Encoding.UTF8.GetBytes(jsonString));
-
 	}
 
 	public async Task SyncKeys(CancellationToken ct)
 	{
 		if (BaseKeyStore is null)
+			return;
+		if (BaseOptionsStore is null)
 			return;
 
 		await BaseKeyStore.SyncKeys(ct);

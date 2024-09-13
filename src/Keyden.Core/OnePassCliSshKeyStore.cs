@@ -56,8 +56,8 @@ file static class JsonExtensionMethods
 
 public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 {
-	private List<SshKey> PublicKeys { get; } = new();
-	private List<SshKey> PrivateKeys { get; } = new();
+	private List<SshKey> PublicKeys { get; } = [];
+	private List<SshKey> PrivateKeys { get; } = [];
 
 	IReadOnlyList<SshKey> ISshKeyStore.PublicKeys => PublicKeys;
 	ValueTask<SshKey> ISshKeyStore.GetPrivateKey(SshKey publicKey, CancellationToken ct)
@@ -197,8 +197,8 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		Debug.WriteLine($"Synced with op in {sw.Elapsed.TotalSeconds} seconds");
 	}
 
-	private readonly HashSet<string> DirtyOptions = new();
-	private readonly Dictionary<string, SshKeyOptions> Options = new();
+	private readonly HashSet<string> DirtyOptions = [];
+	private readonly Dictionary<string, SshKeyOptions> Options = [];
 	SshKeyOptions? ISshKeyOptionsStore.GetKeyOptions(string id)
 	{
 		if (Options.TryGetValue(id, out var options))

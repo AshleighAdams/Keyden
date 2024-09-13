@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml;
 
 using Keyden.ViewModels;
 using Keyden.Views;
+using Avalonia.Controls;
 
 namespace Keyden;
 
@@ -54,12 +55,11 @@ public partial class App : Application
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
-			desktop.MainWindow = MainWindow = new MainWindow();
+			desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
+			MainWindow = new MainWindow();
 			SettingsWindow = new SettingsWindow();
-
-			if (desktop.Args?.Contains("--hide") ?? false)
-				MainWindow.Hide();
-			else
+			
+			if (desktop.Args?.Contains("--hide") is false or null)
 				MainWindow.Show();
 
 			if (
@@ -79,15 +79,12 @@ public partial class App : Application
 
 	private void MenuSettings_Click(object? sender, EventArgs e)
 	{
-		if (MainWindow?.Content is not MainView view)
-			return;
-
 		SettingsWindow?.Show();
 	}
 
 	private void MenuAbout_Click(object? sender, EventArgs e)
 	{
-		if (MainWindow?.Content is not MainView view)
+		if (MainWindow is null)
 			return;
 
 		new AboutWindow().ShowDialog(MainWindow);
@@ -100,6 +97,7 @@ public partial class App : Application
 
 	private void MenuExit_Click(object? sender, EventArgs e)
 	{
-		MainWindow?.Close();
+		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+			desktop.Shutdown();
 	}
 }

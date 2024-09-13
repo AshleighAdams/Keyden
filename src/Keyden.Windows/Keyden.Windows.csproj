@@ -11,6 +11,7 @@
     <ApplicationIcon>..\Keyden\Assets\keyden-logo.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
+    <AssemblyName>Keyden</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Label="Avalonia">

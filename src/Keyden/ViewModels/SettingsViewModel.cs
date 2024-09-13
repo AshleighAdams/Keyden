@@ -1,8 +1,14 @@
 using Avalonia;
 using Keyden.Views;
+
+using Microsoft.Win32;
+
 using ReactiveUI;
 
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Security.Permissions;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -93,7 +99,8 @@ public class SettingsViewModel : ViewModelBase
 			this.RaisePropertyChanged(nameof(IsGeneralTabSelected));
 		}
 	}
-	public bool IsGeneralTabSelected => TabIndexSelected is 0;
+	public bool IsGeneralTabSelected => TabIndexSelected == 0;
+	public bool IsAdvancedTabSelected => TabIndexSelected == 1;
 
 	public KeystoreBackend KeystoreBackend
 	{
@@ -102,7 +109,6 @@ public class SettingsViewModel : ViewModelBase
 		{
 			if (value == Settings.KeystoreBackend)
 				return;
-
 
 			this.RaisePropertyChanging(nameof(KeystoreBackend));
 			Settings.KeystoreBackend = value;
@@ -119,24 +125,60 @@ public class SettingsViewModel : ViewModelBase
 		if (KeyStoreController is null)
 			return;
 
-		if (Settings.KeystoreBackend == KeystoreBackend.None)
+		switch (Settings.KeystoreBackend)
 		{
-			KeyStoreController.BaseKeyStore = null;
-			KeyStoreController.BaseOptionsStore = null;
+			case KeystoreBackend.OnePassCLI:
+				KeyStoreController.BaseKeyStore = OnePassCliSshKeyStore;
+				KeyStoreController.BaseOptionsStore = OnePassCliSshKeyStore;
+				break;
+			case KeystoreBackend.DeveloperTest:
+				KeyStoreController.BaseKeyStore = DevTestKeyStore;
+				KeyStoreController.BaseOptionsStore = DevTestKeyStore;
+				break;
+			case KeystoreBackend.None:
+			default:
+				KeyStoreController.BaseKeyStore = null;
+				KeyStoreController.BaseOptionsStore = null;
+				break;
 		}
-		else if (Settings.KeystoreBackend == KeystoreBackend.DeveloperTest)
+	}
+
+	public bool AutomaticallyStartup
+	{
+		get
 		{
-			KeyStoreController.BaseKeyStore = DevTestKeyStore;
-			KeyStoreController.BaseOptionsStore = DevTestKeyStore;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				using RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", false)!;
+
+				var path = Environment.ProcessPath;
+				if (string.IsNullOrEmpty(path))
+					return false;
+
+				return key.GetValue("Keyden") as string == $"\"{path}\" --hide";
+			}
+			return false;
 		}
-		else if (Settings.KeystoreBackend == KeystoreBackend.OnePassCLI)
+		set
 		{
-			KeyStoreController.BaseKeyStore = OnePassCliSshKeyStore;
-			KeyStoreController.BaseOptionsStore = OnePassCliSshKeyStore;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				using RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true)!;
+
+				var path = Environment.ProcessPath;
+				if (string.IsNullOrEmpty(path))
+					return;
+
+				this.RaisePropertyChanging(nameof(AutomaticallyStartup));
+				if (value)
+					key.SetValue("Keyden", $"\"{path}\" --hide");
+				else
+					key.DeleteValue("Keyden");
+				this.RaisePropertyChanged(nameof(AutomaticallyStartup));
+			}
 		}
 	}
 }
-
 
 public class DesignSettingsViewModel : SettingsViewModel
 {
