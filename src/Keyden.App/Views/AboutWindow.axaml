@@ -26,19 +26,171 @@
       </ExperimentalAcrylicBorder.Material>
     </ExperimentalAcrylicBorder>
 
-    <StackPanel VerticalAlignment="Center" Margin="20,40,20,20">
+    <StackPanel VerticalAlignment="Center" Margin="0,30,0,10">
       <TextBlock FontSize="32" FontWeight="SemiBold">Keyden</TextBlock>
       <SelectableTextBlock Text="{Binding Version}" />
 
-      <TextBlock>
-        <LineBreak/>
-        Special thanks to<LineBreak/><LineBreak/>
-        .NET Foundation<LineBreak/>
-        Microsoft<LineBreak/>
-        Avalonia<LineBreak/>
-        CommunityToolkit<LineBreak/>
-        Projektanker<LineBreak/>
-      </TextBlock>
+      <Panel Height="20"/>
+
+      <TextBlock Text="Special thanks to the following open source projects making this application possible:" TextWrapping="Wrap" MaxWidth="300"/>
+      <Panel Height="10"/>
+      
+      <ScrollViewer Width="450" Height="300">
+        <StackPanel Orientation="Vertical" Spacing="10">
+          <SelectableTextBlock FontSize="10">
+            
+            <Run Text=".NET Runtime - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) .NET Foundation and Contributors"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="Avalonia - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) AvaloniaUI OÜ All Rights Reserved"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="SSH.NET - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) Renci, Oleg Kapeljushnik, Gert Driesen and contributors"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="All rights reserved."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="Projektanker.Icons.Avalonia - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright 2024 Fonticons, Inc."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Font Awesome Free 6.6.0 by @fontawesome"/>
+            <LineBreak/>
+            <Run Text="https://fontawesome.com"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="Projektanker.Icons.Avalonia - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) 2020 Projektanker"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="FontAwesome - CC BY 4.0" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright 2024 Fonticons, Inc."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Font Awesome Free 6.6.0 by @fontawesome"/>
+            <LineBreak/>
+            <Run Text="https://fontawesome.com"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="MaterialDesign - Apache 2.0" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) Google"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding Apache2License}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text=".NET Community Toolkit - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright © .NET Foundation and Contributors"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="All rights reserved."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="DynamicData - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) Roland Pheasant 2011-2022"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="MicroCom.Runtime - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) 2021 Nikita Tsukanov"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="ReactiveUI - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) .NET Foundation and Contributors"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="All rights reserved."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="Splat - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) .NET Foundation and Contributors"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="All rights reserved."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="System.Reactive - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) .NET Foundation and Contributors"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="All rights reserved."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+          </SelectableTextBlock>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <Panel Height="10"/>
 
       <TextBlock Text="Copyright © 2024 Ashleigh Adams" Opacity="0.5" />
     </StackPanel>
@@ -50,6 +202,7 @@
     </Style>
     <Style Selector="SelectableTextBlock">
       <Setter Property="TextAlignment" Value="Center" />
+      <Setter Property="FontWeight" Value="Normal" />
     </Style>
   </Window.Styles>
 </Window>
