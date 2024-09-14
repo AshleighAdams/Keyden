@@ -90,7 +90,7 @@ namespace Keyden.Views
 			if (HostWindow is null)
 				return;
 
-			HostWindow.Hide();
+			HostWindow.Close();
 		}
 
 		private void MaximizeWindow(object? sender, RoutedEventArgs e)
