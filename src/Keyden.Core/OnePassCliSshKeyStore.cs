@@ -80,9 +80,18 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 				WindowStyle = ProcessWindowStyle.Hidden,
 				CreateNoWindow = true,
 				RedirectStandardOutput = true,
+				RedirectStandardError = true,
 			}) ?? throw new SystemException("Failed to start op");
 
-		var keysDoc = await JsonDocument.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct);
+		var procOutput = await proc.StandardOutput.ReadToEndAsync(ct);
+
+		if (proc.ExitCode != 0)
+		{
+			var errorOutput = await proc.StandardError.ReadToEndAsync(ct);
+			throw new BackendException($"Process `op` returned exit code {proc.ExitCode}:\n{errorOutput}");
+		}
+
+		var keysDoc = JsonDocument.Parse(procOutput);
 
 		var tasks = new List<Task>();
 

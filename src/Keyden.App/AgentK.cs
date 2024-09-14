@@ -211,6 +211,7 @@ public class AgentK : ISshAgentHandler
 
 			if (await ExceptionWindow.Prompt(ex.Message) == ExceptionWindowResult.Abort)
 				throw;
+			return;
 		}
 		catch (Exception ex)
 		{
@@ -224,6 +225,7 @@ public class AgentK : ISshAgentHandler
 
 			if (await ExceptionWindow.Prompt(ex.ToString()) == ExceptionWindowResult.Abort)
 				throw;
+			return;
 		}
 
 		// check for removed keys
@@ -274,7 +276,39 @@ public class AgentK : ISshAgentHandler
 				continue;
 			KeyOptionsStore.SetKeyOptions(key.Id, key.GetOptions());
 		}
-		await KeyOptionsStore.SyncKeyOptions();
+
+		try
+		{
+			await KeyOptionsStore.SyncKeyOptions();
+		}
+		catch (BackendException ex)
+		{
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-circle-exclamation",
+				Importance = ActivityImportance.Critical,
+				Title = "Backend error",
+				Description = ex.Message,
+			});
+
+			if (await ExceptionWindow.Prompt(ex.Message) == ExceptionWindowResult.Abort)
+				throw;
+			return;
+		}
+		catch (Exception ex)
+		{
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-circle-exclamation",
+				Importance = ActivityImportance.Critical,
+				Title = "Backend exception",
+				Description = ex.Message.ToString(),
+			});
+
+			if (await ExceptionWindow.Prompt(ex.ToString()) == ExceptionWindowResult.Abort)
+				throw;
+			return;
+		}
 
 		Keys.RemoveMany(removedKeys);
 		Keys.Add(newKeys);
