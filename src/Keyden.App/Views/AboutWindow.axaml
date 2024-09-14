@@ -7,7 +7,6 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="About Keyden"
         Icon="/Assets/keyden-logo.ico"
-        ShowInTaskbar="False"
         CanResize="False"
         Width="300" SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
