@@ -13,6 +13,8 @@
         <ResourceInclude Source="/Resources/Themes.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
+    
+    <FontFamily x:Key="Inconsolata">avares://Keyden.App/Assets#Inconsolata</FontFamily>
   </Application.Resources>
 
   <Application.Styles>

@@ -184,6 +184,46 @@
             <LineBreak/>
             <LineBreak/>
             <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="Inconsolata - OFL" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright 2006 The Inconsolata Project Authors"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="This Font Software is licensed under the SIL Open Font License, Version 1.1."/>
+            <LineBreak/>
+            <Run Text="This license is available with a FAQ at:"/>
+            <Run Text="https://openfontlicense.org"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="HarfBuzzSharp - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) 2015-2016 Xamarin, Inc."/>
+            <LineBreak/>
+            <Run Text="Copyright (c) 2017-2018 Microsoft Corporation."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+
+            <Run Text="SkiaSharp - MIT" FontSize="14"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) 2015-2016 Xamarin, Inc."/>
+            <LineBreak/>
+            <Run Text="Copyright (c) 2017-2018 Microsoft Corporation."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding MitLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding SkiaThirdPartyLicenses}" FontSize="8" FontFamily="{StaticResource Inconsolata}"/>
           </SelectableTextBlock>
 
         </StackPanel>
