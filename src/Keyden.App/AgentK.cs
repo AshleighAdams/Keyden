@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,19 @@ public partial class ObservableSshKey : ObservableObject
 		_Name = name;
 		_Fingerprint = fingerprint;
 		_PublicKey = publicKey;
+
+		PropertyChanged += OnPropertyChanged;
+		EnableForMachines.CollectionChanged += EnableForMachines_CollectionChanged;
+	}
+
+	private void EnableForMachines_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+	{
+		Modified = true;
+	}
+
+	private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+	{
+		Modified = true;
 	}
 
 	public SshKeyOptions GetOptions()
@@ -92,7 +106,10 @@ public partial class ObservableSshKey : ObservableObject
 				RemainAuthenticatedUntilLocked = options.RemainAuthenticatedUntilLocked;
 			}
 		}
+
+		Modified = false;
 	}
+	public bool Modified { get; set; } = false;
 
 	public string Id { get; }
 
@@ -275,7 +292,7 @@ public class AgentK : ISshAgentHandler
 		// sync options
 		foreach (var key in Keys)
 		{
-			if (newKeys.Contains(key))
+			if (!key.Modified)
 				continue;
 			KeyOptionsStore.SetKeyOptions(key.Id, key.GetOptions());
 		}

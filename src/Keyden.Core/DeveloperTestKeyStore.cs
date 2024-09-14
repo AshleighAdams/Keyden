@@ -128,6 +128,14 @@ public sealed class DeveloperTestKeyStore : ISshKeyStore, ISshKeyOptionsStore
 				"""),
 	];
 
+	private readonly Dictionary<string, SshKeyOptions> Options = new()
+	{
+		["qhhvy45adllqzjal5w3luvl7lm"] = new() { EnableForMachines = ["*"] },
+		["u5utdrdxlqu5qv556ewil425xi"] = new() { EnableForMachines = ["*"] },
+		["kqb42mkf5c3maeprgkg6clb3jm"] = new() { EnableForMachines = ["*"] },
+		["rgatdoo4zobwyhtsivnod636hu"] = new() { EnableForMachines = [] },
+	};
+
 	private Dictionary<string, SshKey> PrivateKeys = new();
 	public IReadOnlyList<SshKey> PublicKeys { get; private set; } = Array.Empty<SshKey>();
 
@@ -151,7 +159,6 @@ public sealed class DeveloperTestKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			.ToList();
 	}
 
-	private readonly Dictionary<string, SshKeyOptions> Options = new();
 	SshKeyOptions? ISshKeyOptionsStore.GetKeyOptions(string id)
 	{
 		if (Options.TryGetValue(id, out var options))
