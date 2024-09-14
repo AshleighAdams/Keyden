@@ -72,7 +72,12 @@ namespace Keyden.Views
 		}
 
 		private readonly CancellationTokenRegistration? CancelRegistration = null;
-		public AuthPrompt(SshKey key, ClientInfo clientInfo, AuthRequired authRequired, CancellationToken ct)
+		public AuthPrompt(
+			KeydenSettings settings,
+			SshKey key,
+			ClientInfo clientInfo,
+			AuthRequired authRequired,
+			CancellationToken ct)
 		{
 			Key = key;
 			ClientInfo = clientInfo;
@@ -93,11 +98,15 @@ namespace Keyden.Views
 				Dispatcher.UIThread.Post(() => Close());
 			});
 
-			_ = Task.Run(async () =>
-			{
-				await Task.Delay(1000, ct);
-				Dispatcher.UIThread.Post(() => AuthButtonEnabled = true);
-			}, ct);
+			if (settings.AuthButtonEnableDelay == 0)
+				AuthButtonEnabled = true;
+			else
+				_ = Task.Run(async () =>
+				{
+					var ms = (int)(settings.AuthButtonEnableDelay * 1000);
+					await Task.Delay(ms, ct);
+					Dispatcher.UIThread.Post(() => AuthButtonEnabled = true);
+				}, ct);
 
 			if (authRequired.HasFlag(AuthRequired.Authorization))
 			{

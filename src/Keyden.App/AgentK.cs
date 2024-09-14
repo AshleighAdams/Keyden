@@ -185,6 +185,7 @@ public enum AuthRequired
 
 public class AgentK : ISshAgentHandler
 {
+	private KeydenSettings Settings { get; }
 	private readonly ISshKeyStore KeyStore;
 	private readonly ISshKeyOptionsStore KeyOptionsStore;
 
@@ -195,6 +196,7 @@ public class AgentK : ISshAgentHandler
 		ISshKeyStore keyStore,
 		ISshKeyOptionsStore keyOptionsStore)
 	{
+		Settings = settings;
 		KeyStore = keyStore;
 		KeyOptionsStore = keyOptionsStore;
 
@@ -525,7 +527,7 @@ public class AgentK : ISshAgentHandler
 		{
 			if (authRequired.HasFlag(AuthRequired.Authentication))
 			{
-				window = new AuthPrompt(publicKey, info, authRequired, ct);
+				window = new AuthPrompt(Settings, publicKey, info, authRequired, ct);
 				window.Show();
 				result = await window.Result;
 				window.Topmost = false;

@@ -13,6 +13,13 @@ public partial class KeydenSettings : ObservableObject
 		set => SetProperty(ref _KeystoreBackend, value);
 	}
 
+	private float _AuthButtonEnableDelay = 0.5f;
+	public float AuthButtonEnableDelay
+	{
+		get => _AuthButtonEnableDelay;
+		set => SetProperty(ref _AuthButtonEnableDelay, value);
+	}
+
 	private bool _DeveloperMode;
 	public bool DeveloperMode
 	{

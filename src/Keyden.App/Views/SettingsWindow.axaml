@@ -97,6 +97,15 @@
           <CheckBox IsChecked="{Binding AutomaticallyStartup}">
             Automatically start
           </CheckBox>
+
+          <StackPanel Orientation="Vertical" Spacing="-10">
+            <TextBlock>
+              Enable auth button after
+              <Run Text="{Binding Settings.AuthButtonEnableDelay}"/>
+              seconds
+            </TextBlock>
+            <Slider Minimum="0" Maximum="2" IsSnapToTickEnabled="True" TickFrequency="0.1" TickPlacement="BottomRight" Value="{Binding Settings.AuthButtonEnableDelay}"/>
+          </StackPanel>
           
         </StackPanel>
 
