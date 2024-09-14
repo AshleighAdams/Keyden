@@ -20,8 +20,10 @@ public static class ServiceCollectionExtensions
 	{
 		bool isDesigner = Design.IsDesignMode;
 
-		// transient view models
-		collection.AddTransient<MainViewModel>();
+		collection.AddSingleton((provider) => App.CreateSettings(provider.GetRequiredService<IFileSystem>()));
+
+		//  view models, singletons = preserve their view state
+		collection.AddSingleton<MainViewModel>(); // singleton to preserve state
 		if (isDesigner)
 		{
 			collection.AddTransient<ActivityViewModel, DesignActivityViewModel>();
@@ -30,9 +32,9 @@ public static class ServiceCollectionExtensions
 		}
 		else
 		{
-			collection.AddTransient<ActivityViewModel>();
+			collection.AddSingleton<ActivityViewModel>();
 			collection.AddTransient<KeyOptionsViewModel>();
-			collection.AddTransient<SettingsViewModel>();
+			collection.AddSingleton<SettingsViewModel>();
 		}
 
 		// singletons, both design and runtime

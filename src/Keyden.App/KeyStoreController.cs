@@ -1,3 +1,5 @@
+using Keyden.ViewModels;
+
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -9,7 +11,7 @@ namespace Keyden;
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(KeyStoreControllerData))]
-internal partial class SourceGenerationContext : JsonSerializerContext
+internal partial class KeyStoreGenerationContext : JsonSerializerContext
 {
 }
 
@@ -25,14 +27,24 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 	public ISshKeyOptionsStore? BaseOptionsStore { get; set; }
 
 	private bool HasSynced { get; set; }
+	private KeydenSettings Settings { get; }
 	private IFileSystem FileSystem { get; }
+
+	private readonly DeveloperTestKeyStore DevTestStore;
+	private readonly OnePassCliSshKeyStore OnePassCliStore;
 
 	private KeyStoreControllerData Data { get; }
 	private const string DataLocation = "keystore-controller-data.json";
 
-	public KeyStoreController(IFileSystem fileSystem)
+	public KeyStoreController(
+		KeydenSettings settings,
+		IFileSystem fileSystem)
 	{
+		Settings = settings;
 		FileSystem = fileSystem;
+
+		DevTestStore = App.GetKeyedService<DeveloperTestKeyStore>("devtest");
+		OnePassCliStore = App.GetKeyedService<OnePassCliSshKeyStore>("op");
 
 		if (FileSystem.TryReadBytes(DataLocation, out var contents))
 		{
@@ -40,7 +52,7 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 			{
 				Data = JsonSerializer.Deserialize(
 					contents.Span,
-					SourceGenerationContext.Default.KeyStoreControllerData) ?? new();
+					KeyStoreGenerationContext.Default.KeyStoreControllerData) ?? new();
 			}
 			catch
 			{
@@ -49,6 +61,31 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 		}
 		else
 			Data = new();
+
+		Settings.PropertyChanged += Settings_PropertyChanged;
+	}
+
+	private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+	{
+		if (e.PropertyName == nameof(Settings.KeystoreBackend))
+		{
+			switch (Settings.KeystoreBackend)
+			{
+				case KeystoreBackend.OnePassCLI:
+					BaseKeyStore = OnePassCliStore;
+					BaseOptionsStore = OnePassCliStore;
+					break;
+				case KeystoreBackend.DeveloperTest:
+					BaseKeyStore = DevTestStore;
+					BaseOptionsStore = DevTestStore;
+					break;
+				case KeystoreBackend.None:
+				default:
+					BaseKeyStore = null;
+					BaseOptionsStore = null;
+					break;
+			}
+		}
 	}
 
 	public IReadOnlyList<SshKey> PublicKeys =>
@@ -111,7 +148,7 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 
 		var jsonString = JsonSerializer.Serialize(
 			Data,
-			SourceGenerationContext.Default.KeyStoreControllerData);
+			KeyStoreGenerationContext.Default.KeyStoreControllerData);
 		await FileSystem.TryWriteBytesAsync(DataLocation, Encoding.UTF8.GetBytes(jsonString));
 	}
 
@@ -129,7 +166,7 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 
 		var jsonString = JsonSerializer.Serialize(
 			Data,
-			SourceGenerationContext.Default.KeyStoreControllerData);
+			KeyStoreGenerationContext.Default.KeyStoreControllerData);
 		await FileSystem.TryWriteBytesAsync(DataLocation, Encoding.UTF8.GetBytes(jsonString));
 
 		HasSynced = true;

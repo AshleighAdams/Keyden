@@ -85,7 +85,7 @@
           <StackPanel Orientation="Horizontal" Spacing="5">
             <TextBlock>Key storage backend:</TextBlock>
             <ComboBox ItemsSource="{Binding KeystoreBackends}"
-                      SelectedItem="{Binding KeystoreBackend}">
+                      SelectedItem="{Binding Settings.KeystoreBackend}">
               <ComboBox.ItemTemplate>
                 <DataTemplate>
                   <TextBlock Text="{Binding Converter={StaticResource EnumConverter}}"/>
@@ -94,13 +94,21 @@
             </ComboBox>
           </StackPanel>
 
-          <StackPanel Orientation="Horizontal" Spacing="5">
-            <CheckBox IsChecked="{Binding AutomaticallyStartup}">
-              Automatically start
-            </CheckBox>
-          </StackPanel>
+          <CheckBox IsChecked="{Binding AutomaticallyStartup}">
+            Automatically start
+          </CheckBox>
           
         </StackPanel>
+
+
+        <StackPanel IsVisible="{Binding IsAdvancedTabSelected}" Spacing="8">
+
+          <CheckBox IsChecked="{Binding Settings.DeveloperMode}">
+            Enable developer mode
+          </CheckBox>
+          
+        </StackPanel>
+
       </Panel>
     </ScrollViewer>
     

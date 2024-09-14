@@ -104,7 +104,9 @@ public class SshAgent
 	private readonly SshAgentOptions Options;
 	private readonly ISshAgentHandler Handler;
 
-	public SshAgent(ISshAgentHandler handler, SshAgentOptions? options = default)
+	public SshAgent(
+		ISshAgentHandler handler,
+		SshAgentOptions? options = default)
 	{
 		Handler = handler;
 		Options = options ?? new();

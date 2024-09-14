@@ -10,6 +10,8 @@ using Avalonia.Markup.Xaml;
 using Keyden.ViewModels;
 using Keyden.Views;
 using Avalonia.Controls;
+using System.Text.Json;
+using System.Text;
 
 namespace Keyden;
 
@@ -41,8 +43,7 @@ public partial class App : Application
 	}
 
 	private SshAgent? Agent { get; set; }
-	private MainWindow? MainWindow { get; set; }
-	public static SettingsWindow? SettingsWindow { get; private set; }
+	private KeydenSettings? Settings { get; set; }
 
 	public override void OnFrameworkInitializationCompleted()
 	{
@@ -52,24 +53,14 @@ public partial class App : Application
 		Services = collection.BuildServiceProvider();
 
 		Agent = Services.GetService<SshAgent>();
+		Settings = Services.GetService<KeydenSettings>();
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
-			desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
-			MainWindow = new MainWindow();
-			SettingsWindow = new SettingsWindow();
+			desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 			
 			if (desktop.Args?.Contains("--hide") is false or null)
-				MainWindow.Show();
-
-			if (
-				(desktop.Args?.Contains("--sync") ?? false) &&
-				MainWindow.Content is MainView view &&
-				view.DataContext is MainViewModel mainModel)
-			{
-				mainModel.SyncKeys();
-			}
-				
+				ShowMainWindow();
 		}
 		else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
 			singleViewPlatform.MainView = new MainView();
@@ -77,27 +68,77 @@ public partial class App : Application
 		base.OnFrameworkInitializationCompleted();
 	}
 
-	private void MenuSettings_Click(object? sender, EventArgs e)
+	private static SettingsWindow? SettingsWindow { get; set; }
+	public static void ShowSettingsWindow()
 	{
-		SettingsWindow?.Show();
+		if (SettingsWindow is null)
+		{
+			SettingsWindow = new SettingsWindow();
+			SettingsWindow.Closed += (s, e) => SettingsWindow = null;
+		}
+		SettingsWindow.Show();
 	}
 
-	private void MenuAbout_Click(object? sender, EventArgs e)
+	private static AboutWindow? AboutWindow { get; set; }
+	public static void ShowAboutWindow()
+	{
+		if (AboutWindow is null)
+		{
+			AboutWindow = new AboutWindow();
+			AboutWindow.Closed += (s, e) => AboutWindow = null;
+		}
+		AboutWindow.Show();
+	}
+	private static MainWindow? MainWindow { get; set; }
+	public static void ShowMainWindow()
 	{
 		if (MainWindow is null)
-			return;
-
-		new AboutWindow().ShowDialog(MainWindow);
+		{
+			MainWindow = new MainWindow();
+			MainWindow.Closed += (s, e) => MainWindow = null;
+		}
+		MainWindow.Show();
 	}
 
-	private void MenuShow_Click(object? sender, EventArgs e)
-	{
-		MainWindow?.Show();
-	}
+	private void MenuSettings_Click(object? sender, EventArgs e) => ShowSettingsWindow();
+	private void MenuAbout_Click(object? sender, EventArgs e) => ShowAboutWindow();
+	private void MenuShow_Click(object? sender, EventArgs e) => ShowMainWindow();
 
 	private void MenuExit_Click(object? sender, EventArgs e)
 	{
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 			desktop.Shutdown();
+	}
+
+	public static KeydenSettings CreateSettings(IFileSystem fileSystem)
+	{
+		const string settingsLocation = "settings.json";
+		KeydenSettings settings;
+
+		if (fileSystem.TryReadBytes(settingsLocation, out var contents))
+		{
+			try
+			{
+				settings = JsonSerializer.Deserialize(
+					contents.Span,
+					SettingsGenerationContext.Default.KeydenSettings) ?? new();
+			}
+			catch
+			{
+				settings = new();
+			}
+		}
+		else
+			settings = new();
+
+		settings.PropertyChanged += (s, e) =>
+		{
+			var jsonString = JsonSerializer.Serialize(
+				settings,
+				SettingsGenerationContext.Default.KeydenSettings);
+			fileSystem.TryWriteBytes(settingsLocation, Encoding.UTF8.GetBytes(jsonString));
+		};
+
+		return settings;
 	}
 }

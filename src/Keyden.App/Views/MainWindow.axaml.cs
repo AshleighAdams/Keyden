@@ -30,16 +30,4 @@ public partial class MainWindow : Window
 		});
 #endif
 	}
-
-	protected override void OnClosing(WindowClosingEventArgs e)
-	{
-		if (e.CloseReason == WindowCloseReason.WindowClosing)
-		{
-			e.Cancel = true;
-			IsVisible = false;
-			return;
-		}
-
-		base.OnClosing(e);
-	}
 }

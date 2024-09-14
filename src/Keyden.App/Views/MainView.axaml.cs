@@ -129,15 +129,12 @@ public partial class MainView : UserControl
 
 	private void SettingsButton_Click(object? sender, RoutedEventArgs e)
 	{
-		App.SettingsWindow?.Show();
+		App.ShowSettingsWindow();
 	}
 
 	internal void AboutButton_Click(object? sender, RoutedEventArgs e)
 	{
-		if (VisualRoot is not Window window)
-			return;
-
-		new AboutWindow().ShowDialog(window);
+		App.ShowAboutWindow();
 	}
 
 	private void SyncButton_Click(object? sender, RoutedEventArgs e)

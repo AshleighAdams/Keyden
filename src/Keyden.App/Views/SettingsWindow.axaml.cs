@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Platform;
@@ -7,9 +6,7 @@ using Avalonia.Styling;
 using Keyden.ViewModels;
 
 using System;
-using System.ComponentModel;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Keyden.Views;
@@ -41,18 +38,6 @@ public partial class SettingsWindow : Window
 	private void Window_ActualThemeVariantChanged(object? sender, EventArgs e)
 	{
 		RefreshAcrylicProperties();
-	}
-
-	protected override void OnClosing(WindowClosingEventArgs e)
-	{
-		if (e.CloseReason != WindowCloseReason.WindowClosing)
-		{
-			base.OnClosing(e);
-			return;
-		}
-
-		e.Cancel = true;
-		Hide();
 	}
 
 	private void RefreshAcrylicProperties()

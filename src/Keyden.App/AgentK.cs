@@ -173,7 +173,10 @@ public class AgentK : ISshAgentHandler
 
 	public event Action<ActivityItem>? NewActivity;
 
-	public AgentK(ISshKeyStore keyStore, ISshKeyOptionsStore keyOptionsStore)
+	public AgentK(
+		KeydenSettings settings,
+		ISshKeyStore keyStore,
+		ISshKeyOptionsStore keyOptionsStore)
 	{
 		KeyStore = keyStore;
 		KeyOptionsStore = keyOptionsStore;
