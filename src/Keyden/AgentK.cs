@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Avalonia.Controls;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 
 using DynamicData;
@@ -193,7 +195,36 @@ public class AgentK : ISshAgentHandler
 
 	public async Task SyncKeys()
 	{
-		await KeyStore.SyncKeys();
+		try
+		{
+			await KeyStore.SyncKeys();
+		}
+		catch (BackendException ex)
+		{
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-circle-exclamation",
+				Importance = ActivityImportance.Critical,
+				Title = "Backend error",
+				Description = ex.Message,
+			});
+
+			if (await ExceptionWindow.Prompt(ex.Message) == ExceptionWindowResult.Abort)
+				throw;
+		}
+		catch (Exception ex)
+		{
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-circle-exclamation",
+				Importance = ActivityImportance.Critical,
+				Title = "Backend exception",
+				Description = ex.Message.ToString(),
+			});
+
+			if (await ExceptionWindow.Prompt(ex.ToString()) == ExceptionWindowResult.Abort)
+				throw;
+		}
 
 		// check for removed keys
 		var removedKeys = new List<ObservableSshKey>();
@@ -436,21 +467,58 @@ public class AgentK : ISshAgentHandler
 		AuthPrompt? window = null;
 		AuthResult result = new() { Success = true };
 
-		if (authRequired.HasFlag(AuthRequired.Authentication))
+		try
 		{
-			window = new AuthPrompt(publicKey, info, authRequired, ct);
-			window.Show();
-			result = await window.Result;
-		}
+			if (authRequired.HasFlag(AuthRequired.Authentication))
+			{
+				window = new AuthPrompt(publicKey, info, authRequired, ct);
+				window.Show();
+				result = await window.Result;
+				window.Topmost = false;
+			}
 
-		if (result.Success && authRequired.HasFlag(AuthRequired.Authentication))
+			if (result.Success && authRequired.HasFlag(AuthRequired.Authentication))
+			{
+				// TODO: authentication
+				await Task.Delay(1000);
+				result.FreshAuthentication = true;
+			}
+
+			return await GotAuthResult(publicKey, keyOptions, info, result, ct);
+		}
+		catch (BackendException ex)
 		{
-			// TODO: authentication
-			await Task.Delay(3000);
-			result.FreshAuthentication = true;
-		}
-		window?.Close();
+			window?.Close();
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-circle-exclamation",
+				Importance = ActivityImportance.Critical,
+				Title = "Backend error",
+				Description = ex.Message,
+			});
 
-		return await GotAuthResult(publicKey, keyOptions, info, result, ct);
+			if (await ExceptionWindow.Prompt(ex.Message, ct) == ExceptionWindowResult.Abort)
+				throw;
+			return default;
+		}
+		catch (Exception ex)
+		{
+			window?.Close();
+			NewActivity?.Invoke(new ActivityItem()
+			{
+				Icon = "fa-circle-exclamation",
+				Importance = ActivityImportance.Critical,
+				Title = "Backend exception",
+				Description = ex.Message.ToString(),
+			});
+
+			if (await ExceptionWindow.Prompt(ex.ToString(), ct) == ExceptionWindowResult.Abort)
+				throw;
+			return default;
+		}
+		finally
+		{
+			window?.Close();
+		}
 	}
 }

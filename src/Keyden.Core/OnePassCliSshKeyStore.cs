@@ -291,10 +291,10 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 				//WindowStyle = ProcessWindowStyle.Hidden,
 				CreateNoWindow = true,
 				RedirectStandardOutput = true,
-			}) ?? throw new SystemException("Failed to start op");
+			}) ?? throw new BackendException("Failed to launch `op`, is 1Password CLI installed?");
 
 		var optionsDoc = (await JsonNode.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct))?.AsObject()
-			?? throw new Exception("Couldn't parse json");
+			?? throw new BackendException("Couldn't parse json");
 
 		var fields = optionsDoc["fields"]!.AsArray();
 		JsonNode? optionsJsonField = null;
@@ -308,14 +308,14 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 				continue;
 
 			var optionsJsonNode = field["value"]?.AsValue()
-				?? throw new Exception("Expected value");
+				?? throw new BackendException("Couldn't parse json: expected value");
 			optionsJson = optionsJsonNode.GetValue<string>();
 			optionsJsonField = field;
 			break;
 		}
 
 		if (optionsJsonField is null)
-			throw new NotImplementedException();
+			throw new BackendException("Options \"Keyden Options\" -> \"json\" does not exist, automatic creation not yet supported. Please create manually");
 
 		bool changed = DirtyOptions.Count > 0;
 		JsonObject jsonDoc;
@@ -324,7 +324,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			jsonDoc = new JsonObject();
 		else
 			jsonDoc = JsonNode.Parse(optionsJson)?.AsObject()
-				?? throw new Exception($"Failed to parse options json");
+				?? throw new BackendException($"Failed to parse options json");
 
 		var unprocessedKeys = new HashSet<string>(Options.Keys);
 		var toRemoveKeys = new HashSet<string>();
@@ -402,7 +402,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			if (exitCode != 0)
 			{
 				var msg = $"1Password: {await stdoutTask + await stderrTask}";
-				throw new Exception(msg);
+				throw new BackendException(msg);
 			}
 		}
 	}

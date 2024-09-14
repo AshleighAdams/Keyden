@@ -25,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Keyden\Keyden.csproj" />
+    <ProjectReference Include="..\Keyden\Keyden.App.csproj" />
   </ItemGroup>
 </Project>
