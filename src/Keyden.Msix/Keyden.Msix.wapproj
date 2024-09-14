@@ -59,7 +59,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
-    <EntryPointProjectUniqueName>..\Keyden.Windows\Keyden.Windows.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\Keyden.Desktop\Keyden.Desktop.csproj</EntryPointProjectUniqueName>
     <PackageCertificateThumbprint>6B091B430BDC09D038A528FBA0D08BA699AB3F5D</PackageCertificateThumbprint>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
@@ -137,9 +137,9 @@
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Keyden.Windows\Keyden.Windows.csproj" />
+    <ProjectReference Include="..\Keyden.Desktop\Keyden.Desktop.csproj" />
   </ItemGroup>
 </Project>

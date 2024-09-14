@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ApplicationIcon>..\Keyden\Assets\keyden-logo.ico</ApplicationIcon>
+    <ApplicationIcon>..\Keyden.App\Assets\keyden-logo.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
     <AssemblyName>Keyden</AssemblyName>
@@ -25,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Keyden\Keyden.App.csproj" />
+    <ProjectReference Include="..\Keyden.App\Keyden.App.csproj" />
   </ItemGroup>
 </Project>
