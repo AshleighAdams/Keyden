@@ -1,6 +1,7 @@
 using Keyden.ViewModels;
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -62,30 +63,34 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 		else
 			Data = new();
 
+		UpdateBackend();
 		Settings.PropertyChanged += Settings_PropertyChanged;
 	}
 
-	private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+	private void UpdateBackend()
+	{
+		switch (Settings.KeystoreBackend)
+		{
+			case KeystoreBackend.OnePassCLI:
+				BaseKeyStore = OnePassCliStore;
+				BaseOptionsStore = OnePassCliStore;
+				break;
+			case KeystoreBackend.DeveloperTest:
+				BaseKeyStore = DevTestStore;
+				BaseOptionsStore = DevTestStore;
+				break;
+			case KeystoreBackend.None:
+			default:
+				BaseKeyStore = null;
+				BaseOptionsStore = null;
+				break;
+		}
+	}
+
+	private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 	{
 		if (e.PropertyName == nameof(Settings.KeystoreBackend))
-		{
-			switch (Settings.KeystoreBackend)
-			{
-				case KeystoreBackend.OnePassCLI:
-					BaseKeyStore = OnePassCliStore;
-					BaseOptionsStore = OnePassCliStore;
-					break;
-				case KeystoreBackend.DeveloperTest:
-					BaseKeyStore = DevTestStore;
-					BaseOptionsStore = DevTestStore;
-					break;
-				case KeystoreBackend.None:
-				default:
-					BaseKeyStore = null;
-					BaseOptionsStore = null;
-					break;
-			}
-		}
+			UpdateBackend();
 	}
 
 	public IReadOnlyList<SshKey> PublicKeys =>
@@ -132,7 +137,12 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 	public async Task SyncKeyOptions(CancellationToken ct)
 	{
 		if (BaseOptionsStore is null)
-			return;
+			throw new BackendException(
+				"""
+				No backend has been selected.
+
+				Open settings, and select a backend, then try again.
+				""");
 
 		await BaseOptionsStore.SyncKeyOptions(ct);
 
@@ -154,10 +164,13 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 
 	public async Task SyncKeys(CancellationToken ct)
 	{
-		if (BaseKeyStore is null)
-			return;
-		if (BaseOptionsStore is null)
-			return;
+		if (BaseKeyStore is null || BaseOptionsStore is null)
+			throw new BackendException(
+				"""
+				No backend has been selected.
+
+				Open settings, and select a backend, then try again.
+				""");
 
 		await BaseKeyStore.SyncKeys(ct);
 

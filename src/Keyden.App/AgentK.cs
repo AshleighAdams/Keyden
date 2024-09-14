@@ -245,7 +245,7 @@ public class AgentK : ISshAgentHandler
 			if (matchedKey.IsEmpty)
 			{
 				removedKeys.Add(key);
-				KeyOptionsStore.SetKeyOptions(matchedKey.Id, null);
+				KeyOptionsStore.SetKeyOptions(key.Id, null);
 			}
 		}
 
