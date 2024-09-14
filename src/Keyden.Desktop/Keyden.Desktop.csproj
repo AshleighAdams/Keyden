@@ -27,4 +27,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Keyden.App\Keyden.App.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="third-party-notices.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

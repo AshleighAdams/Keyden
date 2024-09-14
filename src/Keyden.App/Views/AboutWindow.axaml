@@ -36,9 +36,9 @@
       
       <ScrollViewer Width="450" Height="300">
         <StackPanel Orientation="Vertical" Spacing="10">
-          <SelectableTextBlock FontSize="10">
+          <SelectableTextBlock FontSize="10" FontFamily="{StaticResource Inconsolata}">
             
-            <Run Text=".NET Runtime - MIT" FontSize="14"/>
+            <Run Text=".NET Runtime - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) .NET Foundation and Contributors"/>
@@ -48,7 +48,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="Avalonia - MIT" FontSize="14"/>
+            <Run Text="Avalonia - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) AvaloniaUI OÜ All Rights Reserved"/>
@@ -58,7 +58,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="SSH.NET - MIT" FontSize="14"/>
+            <Run Text="SSH.NET - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) Renci, Oleg Kapeljushnik, Gert Driesen and contributors"/>
@@ -71,7 +71,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="Projektanker.Icons.Avalonia - MIT" FontSize="14"/>
+            <Run Text="Projektanker.Icons.Avalonia - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright 2024 Fonticons, Inc."/>
@@ -83,7 +83,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="Projektanker.Icons.Avalonia - MIT" FontSize="14"/>
+            <Run Text="Projektanker.Icons.Avalonia - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) 2020 Projektanker"/>
@@ -93,7 +93,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="FontAwesome - CC BY 4.0" FontSize="14"/>
+            <Run Text="FontAwesome - CC BY 4.0" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright 2024 Fonticons, Inc."/>
@@ -105,7 +105,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="MaterialDesign - Apache 2.0" FontSize="14"/>
+            <Run Text="MaterialDesign - Apache 2.0" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) Google"/>
@@ -115,7 +115,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text=".NET Community Toolkit - MIT" FontSize="14"/>
+            <Run Text=".NET Community Toolkit - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright © .NET Foundation and Contributors"/>
@@ -128,7 +128,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="DynamicData - MIT" FontSize="14"/>
+            <Run Text="DynamicData - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) Roland Pheasant 2011-2022"/>
@@ -138,7 +138,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="MicroCom.Runtime - MIT" FontSize="14"/>
+            <Run Text="MicroCom.Runtime - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) 2021 Nikita Tsukanov"/>
@@ -148,7 +148,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="ReactiveUI - MIT" FontSize="14"/>
+            <Run Text="ReactiveUI - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) .NET Foundation and Contributors"/>
@@ -161,7 +161,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="Splat - MIT" FontSize="14"/>
+            <Run Text="Splat - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) .NET Foundation and Contributors"/>
@@ -174,7 +174,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="System.Reactive - MIT" FontSize="14"/>
+            <Run Text="System.Reactive - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) .NET Foundation and Contributors"/>
@@ -187,7 +187,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="Inconsolata - OFL" FontSize="14"/>
+            <Run Text="Inconsolata - OFL" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright 2006 The Inconsolata Project Authors"/>
@@ -200,7 +200,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="HarfBuzzSharp - MIT" FontSize="14"/>
+            <Run Text="HarfBuzzSharp - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) 2015-2016 Xamarin, Inc."/>
@@ -212,7 +212,7 @@
             <LineBreak/>
             <LineBreak/>
 
-            <Run Text="SkiaSharp - MIT" FontSize="14"/>
+            <Run Text="SkiaSharp - MIT" FontSize="14" FontFamily="Inter"/>
             <LineBreak/>
             <LineBreak/>
             <Run Text="Copyright (c) 2015-2016 Xamarin, Inc."/>
@@ -223,7 +223,25 @@
             <Run Text="{Binding MitLicense}"/>
             <LineBreak/>
             <LineBreak/>
-            <Run Text="{Binding SkiaThirdPartyLicenses}" FontSize="8" FontFamily="{StaticResource Inconsolata}"/>
+
+            <Run Text="Skia - BSD-3" FontSize="14" FontFamily="Inter"/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="Copyright (c) 2011 Google Inc. All rights reserved."/>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Text="{Binding BsdLicense}"/>
+            <LineBreak/>
+            <LineBreak/>
+            
+            <Run Text="See"/>
+            <InlineUIContainer>
+              <TextBlock Name="AdditionalNotices"
+                         Text="third-party-notices.md"
+                         Foreground="{DynamicResource Color.Label}"
+                         Cursor="Hand"/>
+            </InlineUIContainer>
+            <Run Text="for additional notices"/>
           </SelectableTextBlock>
 
         </StackPanel>
