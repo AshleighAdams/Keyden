@@ -395,27 +395,69 @@ public class AgentK : ISshAgentHandler
 	private class KeyInfo
 	{
 		public DateTime? LastUsed;
+		public DateTime? AuthorizedAt;
+		public DateTime? AuthenticatedAt;
 	}
 	private readonly Dictionary<string, KeyInfo> KeyInfos = new();
 
 
-	private async ValueTask<AuthRequired> QueryAuth(SshKey key, SshKeyOptions options, ClientInfo info, CancellationToken ct)
+	private async ValueTask<AuthRequired> QueryAuth(SshKey key, SshKeyOptions options, ClientInfo clientInfo, CancellationToken ct)
 	{
 		var ret = AuthRequired.None;
+
+		if (!KeyInfos.TryGetValue(key.Id, out var keyInfo))
+			KeyInfos[key.Id]=  keyInfo = new KeyInfo();
+
+		var now = DateTime.UtcNow;
+		TimeSpan? lastUsedAgo = null;
+		if (keyInfo.LastUsed.HasValue)
+			lastUsedAgo = (now - keyInfo.LastUsed.Value);
 
 		if (options.RequireAuthorization)
 		{
 			if (!options.RemainAuthorized)
-			{
 				ret |= AuthRequired.Authorization;
+			else
+			{
+				bool expired =
+					keyInfo.AuthorizedAt is null ||
+					lastUsedAgo is null ||
+					(DateTime.UtcNow - keyInfo.AuthorizedAt) > options.RemainAuthorizedFor;
+
+				if (options.RemainAuthorizedUntilKeyInactivity)
+				{
+					expired |=
+						keyInfo.AuthorizedAt is null ||
+						lastUsedAgo is null ||
+						lastUsedAgo.Value > options.RemainAuthorizedUntilKeyInactivityFor;
+				}
+
+				if (expired)
+					ret |= AuthRequired.Authorization;
 			}
 		}
 
 		if (options.RequireAuthentication)
 		{
 			if (!options.RemainAuthenticated)
-			{
 				ret |= AuthRequired.Authentication;
+			else
+			{
+				bool expired =
+					keyInfo.AuthorizedAt is null ||
+					lastUsedAgo is null ||
+					(DateTime.UtcNow - keyInfo.AuthenticatedAt) > options.RemainAuthenticatedFor;
+
+				if (options.RemainAuthorizedUntilKeyInactivity)
+				{
+					expired |=
+						keyInfo.AuthenticatedAt is null ||
+						lastUsedAgo is null ||
+						lastUsedAgo.Value > options.RemainAuthenticatedUntilKeyInactivityFor;
+				}
+
+				if (expired)
+					ret |= AuthRequired.Authentication;
 			}
 		}
 
@@ -424,6 +466,8 @@ public class AgentK : ISshAgentHandler
 
 	private async ValueTask<SshKey> GotAuthResult(SshKey key, SshKeyOptions options, ClientInfo info, AuthResult result, CancellationToken ct)
 	{
+		if (!KeyInfos.TryGetValue(key.Id, out var keyInfo))
+			KeyInfos[key.Id] = keyInfo = new KeyInfo();
 
 		if (!result.Success)
 		{
@@ -436,6 +480,9 @@ public class AgentK : ISshAgentHandler
 					Title = "Auth fail",
 					Description = $"{info.ApplicationName} was denied access to the key {key.Name}",
 				});
+
+				keyInfo.AuthorizedAt = null;
+				keyInfo.AuthenticatedAt = null;
 			}
 			return default;
 		}
@@ -457,6 +504,12 @@ public class AgentK : ISshAgentHandler
 			Title = "Auth success",
 			Description = $"{info.ApplicationName} was granted access to the key {key.Name}",
 		});
+
+		keyInfo.LastUsed = DateTime.UtcNow;
+		if (result.FreshAuthorization)
+			keyInfo.AuthorizedAt = DateTime.UtcNow;
+		if (result.FreshAuthentication)
+			keyInfo.AuthenticatedAt = DateTime.UtcNow;
 
 		return await KeyStore.GetPrivateKey(key, ct);
 	}
