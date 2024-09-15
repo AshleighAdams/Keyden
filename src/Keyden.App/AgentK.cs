@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Avalonia.Controls;
-
-using CommunityToolkit.Mvvm.ComponentModel;
+using Avalonia.Threading;
 
 using DynamicData;
 
@@ -17,154 +13,10 @@ using Keyden.Views;
 
 namespace Keyden;
 
-public partial class ObservableSshKey : ObservableObject
+public interface IUserActivityTracker
 {
-	public ObservableSshKey(
-		string id,
-		string name,
-		string fingerprint,
-		string publicKey)
-	{
-		Id = id;
-		_Name = name;
-		_Fingerprint = fingerprint;
-		_PublicKey = publicKey;
-
-		PropertyChanged += OnPropertyChanged;
-		EnableForMachines.CollectionChanged += EnableForMachines_CollectionChanged;
-	}
-
-	private void EnableForMachines_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-	{
-		Modified = true;
-	}
-
-	private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
-	{
-		Modified = true;
-	}
-
-	public SshKeyOptions GetOptions()
-	{
-		var ret = new SshKeyOptions();
-		{
-			ret.EnableForMachines = EnableForMachines.ToList();
-
-			ret.RequireAuthorization = RequireAuthorization;
-			{
-				ret.RemainAuthorized = RemainAuthorized;
-				ret.RemainAuthorizedFor = RemainAuthorizedFor;
-				{
-					ret.RemainAuthorizedUntilKeyInactivity = RemainAuthorizedUntilKeyInactivity;
-					ret.RemainAuthorizedUntilKeyInactivityFor = RemainAuthorizedUntilKeyInactivityFor;
-					ret.RemainAuthorizedUntilUserInactivity = RemainAuthorizedUntilUserInactivity;
-					ret.RemainAuthorizedUntilUserInactivityFor = RemainAuthorizedUntilUserInactivityFor;
-					ret.RemainAuthorizedUntilLocked = RemainAuthorizedUntilLocked;
-				}
-			}
-			ret.RequireAuthentication = RequireAuthentication;
-			{
-				ret.RemainAuthenticated = RemainAuthenticated;
-				ret.RemainAuthenticatedFor = RemainAuthenticatedFor;
-				{
-					ret.RemainAuthenticatedUntilKeyInactivity = RemainAuthenticatedUntilKeyInactivity;
-					ret.RemainAuthenticatedUntilKeyInactivityFor = RemainAuthenticatedUntilKeyInactivityFor;
-					ret.RemainAuthenticatedUntilUserInactivity = RemainAuthenticatedUntilUserInactivity;
-					ret.RemainAuthenticatedUntilUserInactivityFor = RemainAuthenticatedUntilUserInactivityFor;
-					ret.RemainAuthenticatedUntilLocked = RemainAuthenticatedUntilLocked;
-				}
-			}
-		}
-		return ret;
-	}
-	public void SetOptions(SshKeyOptions options)
-	{
-		EnableForMachines.Clear();
-		EnableForMachines.AddRange(options.EnableForMachines);
-
-		RequireAuthorization = options.RequireAuthorization;
-		{
-			RemainAuthorized = options.RemainAuthorized;
-			RemainAuthorizedFor = options.RemainAuthorizedFor;
-			{
-				RemainAuthorizedUntilKeyInactivity = options.RemainAuthorizedUntilKeyInactivity;
-				RemainAuthorizedUntilKeyInactivityFor = options.RemainAuthorizedUntilKeyInactivityFor;
-				RemainAuthorizedUntilUserInactivity = options.RemainAuthorizedUntilUserInactivity;
-				RemainAuthorizedUntilUserInactivityFor = options.RemainAuthorizedUntilUserInactivityFor;
-				RemainAuthorizedUntilLocked = options.RemainAuthorizedUntilLocked;
-			}
-		}
-		RequireAuthentication = options.RequireAuthentication;
-		{
-			RemainAuthenticated = options.RemainAuthenticated;
-			RemainAuthenticatedFor = options.RemainAuthenticatedFor;
-			{
-				RemainAuthenticatedUntilKeyInactivity = options.RemainAuthenticatedUntilKeyInactivity;
-				RemainAuthenticatedUntilKeyInactivityFor = options.RemainAuthenticatedUntilKeyInactivityFor;
-				RemainAuthenticatedUntilUserInactivity = options.RemainAuthenticatedUntilUserInactivity;
-				RemainAuthenticatedUntilUserInactivityFor = options.RemainAuthenticatedUntilUserInactivityFor;
-				RemainAuthenticatedUntilLocked = options.RemainAuthenticatedUntilLocked;
-			}
-		}
-
-		Modified = false;
-	}
-	public bool Modified { get; set; } = false;
-
-	public string Id { get; }
-
-	[ObservableProperty]
-	private string _Name;
-
-	[ObservableProperty]
-	private string _Fingerprint;
-
-	[ObservableProperty]
-	private string _PublicKey;
-
-	public ObservableCollection<string> EnableForMachines { get; } = new();
-
-	[ObservableProperty]
-	private bool _RequireAuthorization;
-
-	[ObservableProperty]
-	private bool _RemainAuthorized;
-	[ObservableProperty]
-	private TimeSpan _RemainAuthorizedFor;
-
-	[ObservableProperty]
-	private bool _RemainAuthorizedUntilKeyInactivity;
-	[ObservableProperty]
-	private TimeSpan _RemainAuthorizedUntilKeyInactivityFor;
-
-	[ObservableProperty]
-	private bool _RemainAuthorizedUntilUserInactivity;
-	[ObservableProperty]
-	private TimeSpan _RemainAuthorizedUntilUserInactivityFor;
-
-	[ObservableProperty]
-	private bool _RemainAuthorizedUntilLocked;
-
-	[ObservableProperty]
-	private bool _RequireAuthentication;
-
-	[ObservableProperty]
-	private bool _RemainAuthenticated;
-	[ObservableProperty]
-	private TimeSpan _RemainAuthenticatedFor;
-
-	[ObservableProperty]
-	private bool _RemainAuthenticatedUntilKeyInactivity;
-	[ObservableProperty]
-	private TimeSpan _RemainAuthenticatedUntilKeyInactivityFor;
-
-	[ObservableProperty]
-	private bool _RemainAuthenticatedUntilUserInactivity;
-	[ObservableProperty]
-	private TimeSpan _RemainAuthenticatedUntilUserInactivityFor;
-
-	[ObservableProperty]
-	private bool _RemainAuthenticatedUntilLocked;
+	event EventHandler<EventArgs> MachineLocked;
+	TimeSpan IdleDuration { get; }
 }
 
 public struct AuthResult
@@ -186,19 +38,23 @@ public enum AuthRequired
 public class AgentK : ISshAgentHandler
 {
 	private KeydenSettings Settings { get; }
+
 	private readonly ISshKeyStore KeyStore;
 	private readonly ISshKeyOptionsStore KeyOptionsStore;
+	private readonly IUserActivityTracker UserActivityTracker;
 
 	public event Action<ActivityItem>? NewActivity;
 
 	public AgentK(
 		KeydenSettings settings,
 		ISshKeyStore keyStore,
-		ISshKeyOptionsStore keyOptionsStore)
+		ISshKeyOptionsStore keyOptionsStore,
+		IUserActivityTracker userActivityTracker)
 	{
 		Settings = settings;
 		KeyStore = keyStore;
 		KeyOptionsStore = keyOptionsStore;
+		UserActivityTracker = userActivityTracker;
 
 		foreach (var key in KeyStore.PublicKeys)
 		{
@@ -208,6 +64,100 @@ public class AgentK : ISshAgentHandler
 			newKey.SetOptions(options ?? new());
 			Keys.Add(newKey);
 		}
+
+		UserActivityTracker.MachineLocked += UserActivityTracker_MachineLocked;
+		MonitorIdleThread();
+	}
+
+	private void UserActivityTracker_MachineLocked(object? sender, EventArgs e)
+	{
+		foreach (var (id, keyInfo) in KeyInfos)
+		{
+			var opts = KeyOptionsStore.GetKeyOptions(id);
+
+			if (opts?.RemainAuthorizedUntilLocked ?? true && keyInfo.AuthorizedAt is not null)
+			{
+				keyInfo.AuthorizedAt = null;
+
+				NewActivity?.Invoke(new ActivityItem()
+				{
+					Icon = "fa-lock",
+					Importance = ActivityImportance.Critical,
+					Title = "Key deauthorized",
+					Description = $"{keyInfo.Name} deauthorized due to the session being locked",
+				});
+			}
+
+			if (opts?.RemainAuthenticatedUntilLocked ?? true && keyInfo.AuthenticatedAt is not null)
+			{
+				keyInfo.AuthenticatedAt = null;
+
+				NewActivity?.Invoke(new ActivityItem()
+				{
+					Icon = "fa-lock",
+					Importance = ActivityImportance.Critical,
+					Title = "Key deauthenticated",
+					Description = $"{keyInfo.Name} deauthenticated due to the session being locked",
+				});
+			}
+		}
+	}
+
+	private async void MonitorIdleThread()
+	{
+		var cts = new CancellationTokenSource();
+		Dispatcher.UIThread.ShutdownStarted += shuttingDown;
+		void shuttingDown(object? sender, EventArgs e)
+		{
+			cts.Cancel();
+		}
+
+		try
+		{
+			while (!cts.IsCancellationRequested)
+			{
+				await Dispatcher.UIThread.AwaitWithPriority(Task.Delay(60_000, cts.Token), DispatcherPriority.Background);
+				var idleFor = UserActivityTracker.IdleDuration;
+
+				foreach (var (id, keyInfo) in KeyInfos)
+				{
+					var opts = KeyOptionsStore.GetKeyOptions(id);
+
+					if (opts?.RemainAuthorizedUntilUserInactivity ?? true && keyInfo.AuthorizedAt is not null)
+					{
+						var maxIdleDuration = opts?.RemainAuthorizedUntilUserInactivityFor ?? TimeSpan.Zero;
+						if (idleFor > maxIdleDuration)
+						{
+							keyInfo.AuthorizedAt = null;
+
+							NewActivity?.Invoke(new ActivityItem()
+							{
+								Icon = "fa-lock",
+								Importance = ActivityImportance.Critical,
+								Title = "Key deauthorized",
+								Description = $"{keyInfo.Name} deauthorized due to user inactivity",
+							});
+						}
+					}
+
+					if (opts?.RemainAuthenticatedUntilUserInactivity ?? true && keyInfo.AuthenticatedAt is not null)
+					{
+						var maxIdleDuration = opts?.RemainAuthenticatedUntilUserInactivityFor ?? TimeSpan.Zero;
+						if (idleFor > maxIdleDuration)
+							keyInfo.AuthenticatedAt = null;
+
+						NewActivity?.Invoke(new ActivityItem()
+						{
+							Icon = "fa-lock",
+							Importance = ActivityImportance.Critical,
+							Title = "Key deauthenticated",
+							Description = $"{keyInfo.Name} deauthenticated due to user inactivity",
+						});
+					}
+				}
+			}
+		}
+		catch (OperationCanceledException) { }
 	}
 
 	public SortableObservableCollection<ObservableSshKey, string> Keys { get; } = new()
@@ -394,6 +344,7 @@ public class AgentK : ISshAgentHandler
 
 	private class KeyInfo
 	{
+		public required string Name;
 		public DateTime? LastUsed;
 		public DateTime? AuthorizedAt;
 		public DateTime? AuthenticatedAt;
@@ -406,7 +357,7 @@ public class AgentK : ISshAgentHandler
 		var ret = AuthRequired.None;
 
 		if (!KeyInfos.TryGetValue(key.Id, out var keyInfo))
-			KeyInfos[key.Id]=  keyInfo = new KeyInfo();
+			KeyInfos[key.Id]=  keyInfo = new KeyInfo() { Name = key.Name };
 
 		var now = DateTime.UtcNow;
 		TimeSpan? lastUsedAgo = null;
@@ -420,19 +371,43 @@ public class AgentK : ISshAgentHandler
 			else
 			{
 				bool expired =
-					keyInfo.AuthorizedAt is null ||
 					lastUsedAgo is null ||
 					(DateTime.UtcNow - keyInfo.AuthorizedAt) > options.RemainAuthorizedFor;
 
-				if (options.RemainAuthorizedUntilKeyInactivity)
+				if (expired && keyInfo.AuthorizedAt is not null)
 				{
-					expired |=
-						keyInfo.AuthorizedAt is null ||
-						lastUsedAgo is null ||
-						lastUsedAgo.Value > options.RemainAuthorizedUntilKeyInactivityFor;
+					keyInfo.AuthorizedAt = null;
+
+					NewActivity?.Invoke(new ActivityItem()
+					{
+						Icon = "fa-lock",
+						Importance = ActivityImportance.Critical,
+						Title = "Key deauthorized",
+						Description = $"{keyInfo.Name} deauthorized due to timeout",
+					});
 				}
 
-				if (expired)
+				if (options.RemainAuthorizedUntilKeyInactivity && keyInfo.AuthorizedAt is not null)
+				{
+					expired |=
+						lastUsedAgo is null ||
+						lastUsedAgo.Value > options.RemainAuthorizedUntilKeyInactivityFor;
+
+					if (expired && keyInfo.AuthorizedAt is not null)
+					{
+						keyInfo.AuthorizedAt = null;
+
+						NewActivity?.Invoke(new ActivityItem()
+						{
+							Icon = "fa-lock",
+							Importance = ActivityImportance.Critical,
+							Title = "Key deauthorized",
+							Description = $"{keyInfo.Name} deauthorized due to key inactivity",
+						});
+					}
+				}
+
+				if (expired || keyInfo.AuthorizedAt is null)
 					ret |= AuthRequired.Authorization;
 			}
 		}
@@ -444,19 +419,43 @@ public class AgentK : ISshAgentHandler
 			else
 			{
 				bool expired =
-					keyInfo.AuthorizedAt is null ||
 					lastUsedAgo is null ||
 					(DateTime.UtcNow - keyInfo.AuthenticatedAt) > options.RemainAuthenticatedFor;
 
-				if (options.RemainAuthorizedUntilKeyInactivity)
+				if (expired && keyInfo.AuthenticatedAt is not null)
 				{
-					expired |=
-						keyInfo.AuthenticatedAt is null ||
-						lastUsedAgo is null ||
-						lastUsedAgo.Value > options.RemainAuthenticatedUntilKeyInactivityFor;
+					keyInfo.AuthenticatedAt = null;
+
+					NewActivity?.Invoke(new ActivityItem()
+					{
+						Icon = "fa-lock",
+						Importance = ActivityImportance.Critical,
+						Title = "Key deauthenticated",
+						Description = $"{keyInfo.Name} deauthenticated due to timeout",
+					});
 				}
 
-				if (expired)
+				if (options.RemainAuthenticatedUntilKeyInactivity && keyInfo.AuthenticatedAt is not null)
+				{
+					expired |=
+						lastUsedAgo is null ||
+						lastUsedAgo.Value > options.RemainAuthenticatedUntilKeyInactivityFor;
+
+					if (expired && keyInfo.AuthenticatedAt is not null)
+					{
+						keyInfo.AuthenticatedAt = null;
+
+						NewActivity?.Invoke(new ActivityItem()
+						{
+							Icon = "fa-lock",
+							Importance = ActivityImportance.Critical,
+							Title = "Key deauthenticated",
+							Description = $"{keyInfo.Name} deauthenticated due to key inactivity",
+						});
+					}
+				}
+
+				if (expired || keyInfo.AuthenticatedAt is null)
 					ret |= AuthRequired.Authentication;
 			}
 		}
@@ -467,7 +466,7 @@ public class AgentK : ISshAgentHandler
 	private async ValueTask<SshKey> GotAuthResult(SshKey key, SshKeyOptions options, ClientInfo info, AuthResult result, CancellationToken ct)
 	{
 		if (!KeyInfos.TryGetValue(key.Id, out var keyInfo))
-			KeyInfos[key.Id] = keyInfo = new KeyInfo();
+			KeyInfos[key.Id] = keyInfo = new KeyInfo() { Name = key.Name };
 
 		if (!result.Success)
 		{

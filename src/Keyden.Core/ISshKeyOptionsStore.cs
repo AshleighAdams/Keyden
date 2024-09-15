@@ -21,7 +21,6 @@ public struct SshKeyOptions
 		left.RemainAuthorizedUntilUserInactivity == right.RemainAuthorizedUntilUserInactivity &&
 		left.RemainAuthorizedUntilUserInactivityFor == right.RemainAuthorizedUntilUserInactivityFor &&
 		left.RemainAuthorizedUntilLocked == right.RemainAuthorizedUntilLocked &&
-		left.RemainAuthorizedUntilLockedFor == right.RemainAuthorizedUntilLockedFor &&
 		left.RequireAuthentication == right.RequireAuthentication &&
 		left.RemainAuthenticated == right.RemainAuthenticated &&
 		left.RemainAuthenticatedFor == right.RemainAuthenticatedFor &&
@@ -29,8 +28,7 @@ public struct SshKeyOptions
 		left.RemainAuthenticatedUntilKeyInactivityFor == right.RemainAuthenticatedUntilKeyInactivityFor &&
 		left.RemainAuthenticatedUntilUserInactivity == right.RemainAuthenticatedUntilUserInactivity &&
 		left.RemainAuthenticatedUntilUserInactivityFor == right.RemainAuthenticatedUntilUserInactivityFor &&
-		left.RemainAuthenticatedUntilLocked == right.RemainAuthenticatedUntilLocked &&
-		left.RemainAuthenticatedUntilLockedFor == right.RemainAuthenticatedUntilLockedFor;
+		left.RemainAuthenticatedUntilLocked == right.RemainAuthenticatedUntilLocked;
 
 	public static bool operator !=(in SshKeyOptions left, in SshKeyOptions right) => !(left == right);
 	public override bool Equals([NotNullWhen(true)] object? obj) => obj is SshKeyOptions right && this == right;
@@ -49,8 +47,7 @@ public struct SshKeyOptions
 					RemainAuthorizedUntilKeyInactivityFor,
 					RemainAuthorizedUntilUserInactivity,
 					RemainAuthorizedUntilUserInactivityFor,
-					RemainAuthorizedUntilLocked,
-					RemainAuthorizedUntilLockedFor
+					RemainAuthorizedUntilLocked
 				)
 			),
 			HashCode.Combine(
@@ -64,8 +61,7 @@ public struct SshKeyOptions
 					RemainAuthenticatedUntilKeyInactivityFor,
 					RemainAuthenticatedUntilUserInactivity,
 					RemainAuthenticatedUntilUserInactivityFor,
-					RemainAuthenticatedUntilLocked,
-					RemainAuthenticatedUntilLockedFor
+					RemainAuthenticatedUntilLocked
 				)
 			)
 		);
@@ -84,7 +80,6 @@ public struct SshKeyOptions
 	public TimeSpan RemainAuthorizedUntilUserInactivityFor { get; set; } = TimeSpan.FromMinutes(10);
 
 	public bool RemainAuthorizedUntilLocked { get; set; }
-	public TimeSpan RemainAuthorizedUntilLockedFor { get; set; } = TimeSpan.FromMinutes(10);
 
 	public bool RequireAuthentication { get; set; } = true;
 
@@ -98,7 +93,6 @@ public struct SshKeyOptions
 	public TimeSpan RemainAuthenticatedUntilUserInactivityFor { get; set; } = TimeSpan.FromMinutes(10);
 
 	public bool RemainAuthenticatedUntilLocked { get; set; }
-	public TimeSpan RemainAuthenticatedUntilLockedFor { get; set; } = TimeSpan.FromMinutes(10);
 }
 
 public interface ISshKeyOptionsStore

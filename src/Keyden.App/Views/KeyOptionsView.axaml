@@ -74,7 +74,7 @@
               </StackPanel>
               <StackPanel Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
-                <CheckBox IsChecked="{Binding RemainAuthorizedUntilKeyInactivity}">Until</CheckBox>
+                <CheckBox IsChecked="{Binding RemainAuthorizedUntilUserInactivity}">Until</CheckBox>
                 <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthorizedUntilUserInactivityFor}"/>
                 <TextBlock VerticalAlignment="Center">of user inactivity</TextBlock>
               </StackPanel>

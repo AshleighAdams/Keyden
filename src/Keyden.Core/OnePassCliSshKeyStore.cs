@@ -249,7 +249,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			RemainAuthorizedUntilUserInactivity = obj["RemainAuthorizedUntilUserInactivity"]?.GetBool() ?? @default.RemainAuthorizedUntilUserInactivity,
 			RemainAuthorizedUntilUserInactivityFor = obj["RemainAuthorizedUntilUserInactivityFor"]?.GetTimeSpan() ?? @default.RemainAuthorizedUntilUserInactivityFor,
 			RemainAuthorizedUntilLocked = obj["RemainAuthorizedUntilLocked"]?.GetBool() ?? @default.RemainAuthorizedUntilLocked,
-			RemainAuthorizedUntilLockedFor = obj["RemainAuthorizedUntilLockedFor"]?.GetTimeSpan() ?? @default.RemainAuthorizedUntilLockedFor,
 			RequireAuthentication = obj["RequireAuthentication"]?.GetBool() ?? @default.RequireAuthentication,
 			RemainAuthenticated = obj["RemainAuthenticated"]?.GetBool() ?? @default.RemainAuthenticated,
 			RemainAuthenticatedFor = obj["RemainAuthenticatedFor"]?.GetTimeSpan() ?? @default.RemainAuthenticatedFor,
@@ -258,7 +257,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			RemainAuthenticatedUntilUserInactivity = obj["RemainAuthenticatedUntilUserInactivity"]?.GetBool() ?? @default.RemainAuthenticatedUntilUserInactivity,
 			RemainAuthenticatedUntilUserInactivityFor = obj["RemainAuthenticatedUntilUserInactivityFor"]?.GetTimeSpan() ?? @default.RemainAuthenticatedUntilUserInactivityFor,
 			RemainAuthenticatedUntilLocked = obj["RemainAuthenticatedUntilLocked"]?.GetBool() ?? @default.RemainAuthenticatedUntilLocked,
-			RemainAuthenticatedUntilLockedFor = obj["RemainAuthenticatedUntilLockedFor"]?.GetTimeSpan() ?? @default.RemainAuthenticatedUntilLockedFor,
 		};
 	}
 
@@ -273,7 +271,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		obj["RemainAuthorizedUntilUserInactivity"] = opts.RemainAuthorizedUntilUserInactivity.AsJsonValue();
 		obj["RemainAuthorizedUntilUserInactivityFor"] = opts.RemainAuthorizedUntilUserInactivityFor.AsJsonValue();
 		obj["RemainAuthorizedUntilLocked"] = opts.RemainAuthorizedUntilLocked.AsJsonValue();
-		obj["RemainAuthorizedUntilLockedFor"] = opts.RemainAuthorizedUntilLockedFor.AsJsonValue();
 		obj["RequireAuthentication"] = opts.RequireAuthentication.AsJsonValue();
 		obj["RemainAuthenticated"] = opts.RemainAuthenticated.AsJsonValue();
 		obj["RemainAuthenticatedFor"] = opts.RemainAuthenticatedFor.AsJsonValue();
@@ -282,7 +279,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		obj["RemainAuthenticatedUntilUserInactivity"] = opts.RemainAuthenticatedUntilUserInactivity.AsJsonValue();
 		obj["RemainAuthenticatedUntilUserInactivityFor"] = opts.RemainAuthenticatedUntilUserInactivityFor.AsJsonValue();
 		obj["RemainAuthenticatedUntilLocked"] = opts.RemainAuthenticatedUntilLocked.AsJsonValue();
-		obj["RemainAuthenticatedUntilLockedFor"] = opts.RemainAuthenticatedUntilLockedFor.AsJsonValue();
 	}
 
 	private readonly UTF8Encoding Utf8 = new(encoderShouldEmitUTF8Identifier: false);

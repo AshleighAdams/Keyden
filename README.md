@@ -30,3 +30,8 @@ git config --global gpg.format ssh
 git config --global user.signingkey "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPECHV7YlDaqAEcbh+6TKaUE27RrylwlGjR5AwoAkBcW"
 git config --global commit.gpgsign true
 ```
+
+## TODO:
+
+- Authentication backends
+- Key auth info details box
