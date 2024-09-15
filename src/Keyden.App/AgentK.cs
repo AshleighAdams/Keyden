@@ -144,15 +144,17 @@ public class AgentK : ISshAgentHandler
 					{
 						var maxIdleDuration = opts?.RemainAuthenticatedUntilUserInactivityFor ?? TimeSpan.Zero;
 						if (idleFor > maxIdleDuration)
+						{
 							keyInfo.AuthenticatedAt = null;
 
-						NewActivity?.Invoke(new ActivityItem()
-						{
-							Icon = "fa-lock",
-							Importance = ActivityImportance.Critical,
-							Title = "Key deauthenticated",
-							Description = $"{keyInfo.Name} deauthenticated due to user inactivity",
-						});
+							NewActivity?.Invoke(new ActivityItem()
+							{
+								Icon = "fa-lock",
+								Importance = ActivityImportance.Critical,
+								Title = "Key deauthenticated",
+								Description = $"{keyInfo.Name} deauthenticated due to user inactivity",
+							});
+						}
 					}
 				}
 			}

@@ -35,3 +35,5 @@ git config --global commit.gpgsign true
 
 - Authentication backends
 - Key auth info details box
+- Add ability to automatically configure Git's configure SSH agent
+- Add ability to configure Git's signing keys
