@@ -59,7 +59,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
-    <EntryPointProjectUniqueName>..\Keyden.Desktop\Keyden.Desktop.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\Keyden.Desktop.WinRT\Keyden.Desktop.WinRT.csproj</EntryPointProjectUniqueName>
     <PackageCertificateThumbprint>6B091B430BDC09D038A528FBA0D08BA699AB3F5D</PackageCertificateThumbprint>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
@@ -140,6 +140,6 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Keyden.Desktop\Keyden.Desktop.csproj" />
+    <ProjectReference Include="..\Keyden.Desktop.WinRT\Keyden.Desktop.WinRT.csproj" />
   </ItemGroup>
 </Project>

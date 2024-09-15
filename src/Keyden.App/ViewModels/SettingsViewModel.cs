@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using Microsoft.Win32;
@@ -11,15 +11,14 @@ namespace Keyden.ViewModels;
 
 public class SettingsViewModel : ViewModelBase
 {
-	private KeyStoreController? KeyStoreController { get; } = null;
-	private DeveloperTestKeyStore? DevTestKeyStore { get; } = null;
-	private OnePassCliSshKeyStore? OnePassCliSshKeyStore { get; } = null;
-
+	private ISystemServices SystemServices { get; }
 	public KeydenSettings Settings { get; }
-	private const string SettingsLocation = "settings.json";
 
-	public SettingsViewModel(KeydenSettings settings)
+	public SettingsViewModel(
+		ISystemServices systemServices,
+		KeydenSettings settings)
 	{
+		SystemServices = systemServices;
 		Settings = settings;
 	}
 
@@ -49,48 +48,22 @@ public class SettingsViewModel : ViewModelBase
 			? [KeystoreBackend.None, KeystoreBackend.OnePassCLI, KeystoreBackend.DeveloperTest]
 			: [KeystoreBackend.None, KeystoreBackend.OnePassCLI];
 
-	public virtual bool AutomaticallyStartup
+	public bool AutomaticallyStartup
 	{
-		get
-		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				using RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", false)!;
 
-				var path = Environment.ProcessPath;
-				if (string.IsNullOrEmpty(path))
-					return false;
-
-				return key.GetValue("Keyden") as string == $"\"{path}\" --hide";
-			}
-			return false;
-		}
+		get => SystemServices.AutomaticallyStartApp;
 		set
 		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				using RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true)!;
-
-				var path = Environment.ProcessPath;
-				if (string.IsNullOrEmpty(path))
-					return;
-
-				this.RaisePropertyChanging(nameof(AutomaticallyStartup));
-				if (value)
-					key.SetValue("Keyden", $"\"{path}\" --hide");
-				else
-					key.DeleteValue("Keyden");
-				this.RaisePropertyChanged(nameof(AutomaticallyStartup));
-			}
+			this.RaisePropertyChanging(nameof(AutomaticallyStartup));
+			SystemServices.AutomaticallyStartApp = value;
+			this.RaisePropertyChanged(nameof(AutomaticallyStartup));
 		}
 	}
 }
 
 public class DesignSettingsViewModel : SettingsViewModel
 {
-	public DesignSettingsViewModel() : base(new())
+	public DesignSettingsViewModel() : base(new NullSystemServices(), new())
 	{
 	}
-
-	public override bool AutomaticallyStartup { get; set; }
 }

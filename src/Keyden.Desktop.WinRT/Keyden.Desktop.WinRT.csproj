@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.20348.0</TargetFramework>
+
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <PublishSingleFile>true</PublishSingleFile>
     <Platforms>AnyCPU;x64;ARM32;ARM64;x86</Platforms>
@@ -26,11 +28,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Keyden.App\Keyden.App.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="third-party-notices.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>

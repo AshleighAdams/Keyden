@@ -17,6 +17,16 @@ namespace Keyden;
 
 public partial class App : Application
 {
+	public ISystemServices SystemServices { get; }
+	public App()
+	{
+		SystemServices = new NullSystemServices();
+	}
+	public App(ISystemServices systemServices)
+	{
+		SystemServices = systemServices;
+	}
+
 	public override void Initialize()
 	{
 		AvaloniaXamlLoader.Load(this);
@@ -48,6 +58,8 @@ public partial class App : Application
 	public override void OnFrameworkInitializationCompleted()
 	{
 		var collection = new ServiceCollection();
+
+		collection.AddSingleton(SystemServices);
 		collection.AddKeydenServices();
 
 		Services = collection.BuildServiceProvider();
@@ -59,6 +71,11 @@ public partial class App : Application
 		{
 			desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 			
+//if (Windows.ApplicationModel.AppInstance.GetActivatedEventArgs().Kind == Windows.ApplicationModel.Activation.ActivationKind.StartupTask)
+//{
+    // App was launched automatically from a StartupTask
+//}
+
 			if (desktop.Args?.Contains("--hide") is false or null)
 				ShowMainWindow();
 		}

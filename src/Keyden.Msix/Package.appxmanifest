@@ -1,15 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<Package
-  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap rescap">
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         xmlns:desktop="https://schemas.microsoft.com/appx/manifest/desktop/windows10"
+         IgnorableNamespaces="uap rescap desktop">
 
-  <Identity
-    Name="Keyden"
-    Publisher="CN=Ashleigh Adams"
-    Version="0.0.5.0" />
+  <Identity Name="Keyden"
+            Publisher="CN=Ashleigh Adams"
+            Version="0.0.7.0" />
 
   <Properties>
     <DisplayName>Keyden</DisplayName>
@@ -30,12 +29,11 @@
     <Application Id="App"
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
-      <uap:VisualElements
-        DisplayName="Keyden"
-        Description="SSH key agent for your password manager"
-        BackgroundColor="transparent"
-        Square150x150Logo="Images\Square150x150Logo.png"
-        Square44x44Logo="Images\Square44x44Logo.png">
+      <uap:VisualElements DisplayName="Keyden"
+                          Description="SSH key agent for your password manager"
+                          BackgroundColor="transparent"
+                          Square150x150Logo="Images\Square150x150Logo.png"
+                          Square44x44Logo="Images\Square44x44Logo.png">
         <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png" >
         </uap:DefaultTile >
         <uap:SplashScreen Image="Images\SplashScreen.png" />
@@ -50,4 +48,20 @@
     <rescap:Capability Name="runFullTrust" />
     <Capability Name="codeGeneration"/>
   </Capabilities>
+
+  <Extensions>
+    <desktop:Extension Category="windows.startupTask"
+                       Executable="$targetnametoken$.exe"
+                       Parameters="--hide"
+                       EntryPoint="Windows.FullTrustApplication">
+      <desktop:StartupTask TaskId="KeydenStartup" Enabled="true" DisplayName="Keyden"/>
+    </desktop:Extension>
+
+    <!-- xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5" -->
+    <!--<uap5:Extension Category="windows.appExecutionAlias">
+      <uap5:AppExecutionAlias>
+        <uap5:ExecutionAlias Alias="Keyden.exe"/>
+      </uap5:AppExecutionAlias>
+    </uap5:Extension>-->
+  </Extensions>
 </Package>

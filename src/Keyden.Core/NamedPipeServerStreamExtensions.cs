@@ -7,24 +7,14 @@ using System.Runtime.InteropServices;
 
 namespace Keyden;
 
-//internal static partial class Linux
-//{
-//	[LibraryImport("libc", EntryPoint = "get_proc_stats", SetLastError = true)]
-//	public static partial uint GetProcStats(int pid, proc_t processInfo);
-//}
-
 internal unsafe static partial class ProcessExtensions
 {
-	[LibraryImport("kernel32.dll", SetLastError = true)]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	private static partial bool GetNamedPipeClientProcessId(nint pipe, out int clientProcessId);
-
 	public static Process? GetProcess(this NamedPipeServerStream pipeServer)
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
 			IntPtr pipeHandle = pipeServer.SafePipeHandle.DangerousGetHandle();
-			if (!GetNamedPipeClientProcessId(pipeHandle, out int processId))
+			if (!Win32.GetNamedPipeClientProcessId(pipeHandle, out int processId))
 				return null;
 
 			try
@@ -36,6 +26,7 @@ internal unsafe static partial class ProcessExtensions
 
 		return null;
 	}
+
 	public static IReadOnlyList<Process> GetParentProcesses(this NamedPipeServerStream pipeServer)
 	{
 		var set = new HashSet<Process>();
@@ -53,20 +44,6 @@ internal unsafe static partial class ProcessExtensions
 		return processes;
 	}
 
-	[LibraryImport("ntdll.dll")]
-	private static partial int NtQueryInformationProcess(IntPtr processHandle, int processInformationClass, ref ProcessBasicInformation processInformation, int processInformationLength, out int returnLength);
-
-	[StructLayout(LayoutKind.Sequential)]
-	private struct ProcessBasicInformation
-	{
-		public IntPtr Reserved1;
-		public IntPtr PebBaseAddress;
-		public IntPtr Reserved2_0;
-		public IntPtr Reserved2_1;
-		public IntPtr UniqueProcessId;
-		public IntPtr InheritedFromUniqueProcessId;
-	}
-
 	public static Process? GetParent(this Process process)
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -74,9 +51,9 @@ internal unsafe static partial class ProcessExtensions
 			try
 			{
 				var handle = process.Handle;
-				var pbi = new ProcessBasicInformation();
+				var pbi = new Win32.ProcessBasicInformation();
 				int returnLength;
-				int status = NtQueryInformationProcess(handle, 0, ref pbi, Marshal.SizeOf(pbi), out returnLength);
+				int status = Win32.NtQueryInformationProcess(handle, 0, ref pbi, Marshal.SizeOf(pbi), out returnLength);
 				if (status != 0)
 					throw new Win32Exception(status);
 

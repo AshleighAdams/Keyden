@@ -19,12 +19,6 @@ using System.Threading.Tasks;
 
 namespace Keyden;
 
-internal static partial class Unix
-{
-	[LibraryImport("libc", EntryPoint = "getuid", SetLastError = true)]
-	public static partial uint Getuid();
-}
-
 public record SshAgentOptions
 {
 	public static string DefaultPipePath

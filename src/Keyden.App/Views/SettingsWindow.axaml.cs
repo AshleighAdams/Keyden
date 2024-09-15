@@ -66,7 +66,7 @@ public partial class SettingsWindow : Window
 
 public class EnumDescriptionConverter : IValueConverter
 {
-	object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
+	object IValueConverter.Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
 		return value switch
 		{
@@ -81,7 +81,7 @@ public class EnumDescriptionConverter : IValueConverter
 		};
 	}
 
-	object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+	object IValueConverter.ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
 		return string.Empty;
 	}

@@ -7,7 +7,7 @@ using Projektanker.Icons.Avalonia.MaterialDesign;
 
 using System;
 
-namespace Keyden.Desktop;
+namespace Keyden.Desktop.WinRT;
 
 internal sealed class Program
 {
@@ -25,10 +25,10 @@ internal sealed class Program
 			.Register<FontAwesomeIconProvider>()
 			.Register<MaterialDesignIconProvider>();
 
-		return AppBuilder.Configure<App>()
-				.UsePlatformDetect()
-				.WithInterFont()
-				.LogToTrace()
-				.UseReactiveUI();
+		return AppBuilder.Configure(() => new App(new WinRTSystemServices()))
+			.UsePlatformDetect()
+			.WithInterFont()
+			.LogToTrace()
+			.UseReactiveUI();
 	}
 }

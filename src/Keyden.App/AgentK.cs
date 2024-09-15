@@ -13,12 +13,6 @@ using Keyden.Views;
 
 namespace Keyden;
 
-public interface IUserActivityTracker
-{
-	event EventHandler<EventArgs> MachineLocked;
-	TimeSpan IdleDuration { get; }
-}
-
 public struct AuthResult
 {
 	public bool Success { get; set; }
@@ -41,7 +35,7 @@ public class AgentK : ISshAgentHandler
 
 	private readonly ISshKeyStore KeyStore;
 	private readonly ISshKeyOptionsStore KeyOptionsStore;
-	private readonly IUserActivityTracker UserActivityTracker;
+	private readonly ISystemServices SystemServices;
 
 	public event Action<ActivityItem>? NewActivity;
 
@@ -49,12 +43,12 @@ public class AgentK : ISshAgentHandler
 		KeydenSettings settings,
 		ISshKeyStore keyStore,
 		ISshKeyOptionsStore keyOptionsStore,
-		IUserActivityTracker userActivityTracker)
+		ISystemServices systemServices)
 	{
 		Settings = settings;
 		KeyStore = keyStore;
 		KeyOptionsStore = keyOptionsStore;
-		UserActivityTracker = userActivityTracker;
+		SystemServices = systemServices;
 
 		foreach (var key in KeyStore.PublicKeys)
 		{
@@ -65,7 +59,7 @@ public class AgentK : ISshAgentHandler
 			Keys.Add(newKey);
 		}
 
-		UserActivityTracker.MachineLocked += UserActivityTracker_MachineLocked;
+		SystemServices.MachineLocked += UserActivityTracker_MachineLocked;
 		MonitorIdleThread();
 	}
 
@@ -117,7 +111,7 @@ public class AgentK : ISshAgentHandler
 			while (!cts.IsCancellationRequested)
 			{
 				await Dispatcher.UIThread.AwaitWithPriority(Task.Delay(60_000, cts.Token), DispatcherPriority.Background);
-				var idleFor = UserActivityTracker.IdleDuration;
+				var idleFor = SystemServices.UserIdleDuration;
 
 				foreach (var (id, keyInfo) in KeyInfos)
 				{

@@ -45,7 +45,6 @@ public static class ServiceCollectionExtensions
 		if (isDesigner)
 		{
 			collection.AddSingleton<IFileSystem, NullFileSystem>();
-			collection.AddSingleton<IUserActivityTracker, NullUserActivityTracker>();
 			collection.AddSingleton<DesignTimeKeyStore>();
 			collection.AddSingletonAlias<ISshKeyStore, DesignTimeKeyStore>();
 			collection.AddSingletonAlias<ISshKeyOptionsStore, DesignTimeKeyStore>();
@@ -65,11 +64,6 @@ public static class ServiceCollectionExtensions
 
 				return new SystemFileSystem(basePath);
 			});
-
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				collection.AddSingleton<IUserActivityTracker, Win32UserActivityTracker>();
-			else
-				collection.AddSingleton<IUserActivityTracker, NullUserActivityTracker>();
 
 			collection.AddKeyedSingleton<DeveloperTestKeyStore>("devtest");
 			collection.AddKeyedSingleton<OnePassCliSshKeyStore>("op");

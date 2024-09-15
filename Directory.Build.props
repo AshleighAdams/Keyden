@@ -3,7 +3,7 @@
 
   <!-- project global settings -->
   <PropertyGroup>
-    <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''">net8.0</TargetFramework>
+    <WindowsSdkPackageVersion>10.0.20348.41</WindowsSdkPackageVersion>
     <!-- Enable the new nullability syntax and analyzing -->
     <Nullable>enable</Nullable>
     <!-- Allow using `init` and records in .NET Core versions prior to .NET 5 -->
@@ -39,9 +39,9 @@
     <None Include="$(MSBuildThisFileDirectory)/.meta/packageicon.png" Pack="true" PackagePath="/images/" Visible="false" />
   </ItemGroup>-->
 
-  <PropertyGroup>
+  <!--<PropertyGroup>
     <AvaloniaVersion>11.0.10</AvaloniaVersion>
-  </PropertyGroup>
+  </PropertyGroup>-->
 
   <!-- Automatic versioning -->
   <PropertyGroup Condition="'$(CI)' == ''">
