@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "tests\UnitTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Keyden.App", "src\Keyden.App\Keyden.App.csproj", "{EB4248AF-F29F-49B0-96F3-6757A762A073}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Keyden.Desktop.WinRT", "src\Keyden.Desktop.WinRT\Keyden.Desktop.WinRT.csproj", "{CC879A46-2815-42B6-84DA-395299F5663D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Keyden.Desktop.Windows", "src\Keyden.Desktop.Windows\Keyden.Desktop.Windows.csproj", "{CC879A46-2815-42B6-84DA-395299F5663D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Keyden.Core", "src\Keyden.Core\Keyden.Core.csproj", "{D2D4664C-0A6C-40CD-9915-D6C6814664C6}"
 EndProject
@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SshAgentTest", "tests\SshAg
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "Keyden.Msix", "src\Keyden.Msix\Keyden.Msix.wapproj", "{CC196154-E2A8-4F83-A963-BD26B2C8578A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keyden.Desktop.Any", "src\Keyden.Desktop.Any\Keyden.Desktop.Any.csproj", "{9D7AA409-A924-484E-9E25-85795D1D013F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keyden.Desktop.Unix", "src\Keyden.Desktop.Unix\Keyden.Desktop.Unix.csproj", "{9D7AA409-A924-484E-9E25-85795D1D013F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

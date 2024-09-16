@@ -44,14 +44,14 @@
 
       <Extensions>
         <!--<desktop:Extension Category="windows.startupTask"
-                           Executable="Keyden.Desktop.WinRT\Keyden.exe"
+                           Executable="Keyden.Desktop.Windows\Keyden.exe"
                            EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask TaskId="KeydenStartup" Enabled="true" DisplayName="Keyden"/>
         </desktop:Extension>-->
 
         <uap5:Extension Category="windows.startupTask"
-                        Executable="Keyden.Desktop.WinRT\Keyden.exe"
-                        EntryPoint="Keyden.Desktop.WinRT">
+                        Executable="Keyden.Desktop.Windows\Keyden.exe"
+                        EntryPoint="Keyden.Desktop.Windows">
           <uap5:StartupTask TaskId="KeydenStartup"
                             Enabled="true"
                             DisplayName="Keyden" />

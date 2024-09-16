@@ -6,9 +6,8 @@ using Projektanker.Icons.Avalonia.FontAwesome;
 using Projektanker.Icons.Avalonia.MaterialDesign;
 
 using System;
-using System.Runtime.InteropServices;
 
-namespace Keyden.Desktop.Any;
+namespace Keyden.Desktop.WinRT;
 
 internal sealed class Program
 {
@@ -26,17 +25,10 @@ internal sealed class Program
 			.Register<FontAwesomeIconProvider>()
 			.Register<MaterialDesignIconProvider>();
 
-		return AppBuilder.Configure(() => new App(CreateSystemServices()))
+		return AppBuilder.Configure(() => new App(new WindowsSystemServices()))
 			.UsePlatformDetect()
 			.WithInterFont()
 			.LogToTrace()
 			.UseReactiveUI();
-	}
-
-	public static ISystemServices CreateSystemServices()
-	{
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			return new Win32SystemServices();
-		return new NullSystemServices();
 	}
 }

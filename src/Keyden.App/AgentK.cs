@@ -583,9 +583,11 @@ public class AgentK : ISshAgentHandler
 
 			if (result.Success && authRequired.HasFlag(AuthRequired.Authentication))
 			{
-				// TODO: authentication
-				await Task.Delay(1000);
-				result.FreshAuthentication = true;
+				var systemAuthResult = await SystemServices.TryAuthenticateUser();
+				if (systemAuthResult.Success)
+					result.FreshAuthentication = true;
+				else
+					result.Success = false;
 			}
 
 			return await GotAuthResult(publicKey, keyOptions, info, result, ct);
