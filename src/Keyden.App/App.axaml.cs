@@ -70,13 +70,12 @@ public partial class App : Application
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-			
-//if (Windows.ApplicationModel.AppInstance.GetActivatedEventArgs().Kind == Windows.ApplicationModel.Activation.ActivationKind.StartupTask)
-//{
-    // App was launched automatically from a StartupTask
-//}
 
-			if (desktop.Args?.Contains("--hide") is false or null)
+			bool isAutomaticStart =
+				SystemServices.IsAutomaticStart ||
+				desktop.Args?.Contains("--hide") == true;
+
+			if (!isAutomaticStart)
 				ShowMainWindow();
 		}
 		else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)

@@ -53,6 +53,8 @@ internal sealed class Win32SystemServices : ISystemServices
 		}
 	}
 
+	public bool IsAutomaticStart => false;
+
 	public event EventHandler<EventArgs>? MachineLocked;
 
 	public TimeSpan UserIdleDuration

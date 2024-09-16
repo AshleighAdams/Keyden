@@ -5,6 +5,7 @@ using System.Runtime.Versioning;
 using Microsoft.Win32;
 
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
 
 namespace Keyden.Desktop.WinRT;
 
@@ -46,6 +47,8 @@ internal sealed class WinRTSystemServices : ISystemServices
 			}
 		}
 	}
+
+	public bool IsAutomaticStart => AppInstance.GetActivatedEventArgs().Kind == ActivationKind.StartupTask;
 
 	public event EventHandler<EventArgs>? MachineLocked;
 
