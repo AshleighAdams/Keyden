@@ -30,6 +30,7 @@
     <IsAotCompatible Condition="'$(IsAotCompatible)'==''">true</IsAotCompatible>
     <!-- Meta info -->
     <Authors>Ashleigh Adams</Authors>
+    <Copyright>Copyright $([System.DateTime]::Now.Year) $(Authors)</Copyright>
   </PropertyGroup>
 
   <!--<PropertyGroup>

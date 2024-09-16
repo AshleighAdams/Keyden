@@ -5,7 +5,13 @@
 
     <OutputType>WinExe</OutputType>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <PublishSingleFile>true</PublishSingleFile>
+
+    <PublishSingleFile Condition="'$(Configuration)' == 'Debug'">true</PublishSingleFile>
+    <PublishAot Condition="'$(Configuration)' != 'Debug'">true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <XmlResolverIsNetworkingEnabledByDefault>false</XmlResolverIsNetworkingEnabledByDefault>
+    <TrimMode>link</TrimMode>
+
     <Platforms>AnyCPU;x64;ARM32;ARM64;x86</Platforms>
   </PropertyGroup>
 
