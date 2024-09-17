@@ -7,9 +7,9 @@
          xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
          IgnorableNamespaces="uap rescap desktop uap5">
 
-  <Identity Name="Keyden"
+  <Identity Name="AshleighAdams.Keyden"
             Publisher="CN=Ashleigh Adams"
-            Version="0.0.16.0" />
+            Version="0.0.18.0" />
 
   <Properties>
     <DisplayName>Keyden</DisplayName>
