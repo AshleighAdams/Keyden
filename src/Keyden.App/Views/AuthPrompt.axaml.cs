@@ -3,8 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 
-using CommunityToolkit.Mvvm.ComponentModel;
-
 using Projektanker.Icons.Avalonia;
 
 using System;
@@ -47,7 +45,12 @@ namespace Keyden.Views
 			set => SetValue(AuthButtonIconAnimationProperty, value);
 		}
 
-		public string AuthButtonText { get; private set; } = "Authorize";
+		public static readonly StyledProperty<string> AuthButtonTextProperty = AvaloniaProperty.Register<Window, string>(nameof(AuthButtonEnabled), "Authorize");
+		public string AuthButtonText
+		{
+			get => GetValue(AuthButtonTextProperty);
+			set => SetValue(AuthButtonTextProperty, value);
+		}
 
 		private readonly TaskCompletionSource<AuthResult> Tcs = new();
 		public Task<AuthResult> Result => Tcs.Task;
@@ -108,10 +111,11 @@ namespace Keyden.Views
 					Dispatcher.UIThread.Post(() => AuthButtonEnabled = true);
 				}, ct);
 
-			if (authRequired.HasFlag(AuthRequired.Authorization))
+			if (authRequired.HasFlag(AuthRequired.Authentication))
 			{
 				AuthButtonIcon = "fa-fingerprint";
 				AuthButtonIconVisible = true;
+				AuthButtonText = "Authenticate";
 			}
 
 			DenyButton.Click += DenyButton_Click;
