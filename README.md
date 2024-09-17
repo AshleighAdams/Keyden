@@ -37,3 +37,4 @@ git config --global commit.gpgsign true
 - Key auth info details box
 - Add ability to automatically configure Git's configure SSH agent
 - Add ability to configure Git's signing keys
+- 1Pass backend: create key options entry if not exists
