@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Pipes;
 using System.Threading.Tasks;
 
 namespace Keyden;
@@ -13,6 +15,9 @@ public interface ISystemServices
 	public event EventHandler<EventArgs> MachineLocked;
 
 	Task<AuthenticationResult> TryAuthenticateUser();
+
+	Process? GetPipeClientProcess(NamedPipeServerStream pipeServer);
+	Process? GetParentProcess(Process process);
 }
 
 public record struct AuthenticationResult
@@ -21,20 +26,4 @@ public record struct AuthenticationResult
 
 	[MemberNotNullWhen(false, nameof(Success))]
 	public string? FailMessage { get; set; }
-}
-public sealed class NullSystemServices : ISystemServices
-{
-	public bool AutomaticallyStartApp
-	{
-		get => false;
-		set { }
-	}
-	public bool IsAutomaticStart => false;
-	public event EventHandler<EventArgs> MachineLocked { add { } remove { } }
-	public TimeSpan UserIdleDuration => TimeSpan.Zero;
-
-	public Task<AuthenticationResult> TryAuthenticateUser()
-	{
-		return Task.FromResult<AuthenticationResult>(new() { Success = false, FailMessage = "Not supported" });
-	}
 }

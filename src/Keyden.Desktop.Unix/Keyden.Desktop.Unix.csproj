@@ -2,24 +2,26 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-
     <OutputType>WinExe</OutputType>
+    <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
+
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 
     <PublishSingleFile Condition="'$(Configuration)' == 'Debug'">true</PublishSingleFile>
     <PublishAot Condition="'$(Configuration)' != 'Debug'">true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>full</TrimMode>
     <XmlResolverIsNetworkingEnabledByDefault>false</XmlResolverIsNetworkingEnabledByDefault>
-    <TrimMode>link</TrimMode>
+    <OptimizationPreference>Size</OptimizationPreference>
 
+    <AssemblyName>Keyden</AssemblyName>
     <Platforms>AnyCPU;x64;ARM32;ARM64;x86</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
     <ApplicationIcon>..\Keyden.App\Assets\keyden-logo.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <PackageLicenseExpression>GPLv3</PackageLicenseExpression>
-    <AssemblyName>Keyden</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Label="Avalonia">

@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-namespace Keyden;
+namespace Keyden.Desktop.Windows;
 
 [SupportedOSPlatform("windows")]
 public static partial class Win32

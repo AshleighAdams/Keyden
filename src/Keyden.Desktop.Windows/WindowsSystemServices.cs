@@ -1,8 +1,12 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
+
+using Keyden.Desktop.Windows;
 
 using Microsoft.Win32;
 
@@ -119,5 +123,56 @@ internal sealed class WindowsSystemServices : ISystemServices
 		};
 	}
 
+	public Process? GetPipeClientProcess(NamedPipeServerStream pipeServer)
+	{
+		nint pipeHandle = pipeServer.SafePipeHandle.DangerousGetHandle();
+		if (!Win32.GetNamedPipeClientProcessId(pipeHandle, out int processId))
+			return null;
 
+		try
+		{
+			return Process.GetProcessById(processId);
+		}
+		catch (ArgumentException) { }
+
+		return null;
+	}
+
+	public Process? GetParentProcess(Process process)
+	{
+		try
+		{
+			var handle = process.Handle;
+			var pbi = new Win32.ProcessBasicInformation();
+			int status = Win32.NtQueryInformationProcess(handle, 0, ref pbi, Marshal.SizeOf(pbi), out var returnLength);
+			if (status != 0)
+				throw new Win32Exception(status);
+
+			var pid = pbi.InheritedFromUniqueProcessId.ToInt32();
+			return Process.GetProcessById(pid);
+		}
+		catch (ArgumentException) { }
+		catch (Win32Exception) { }
+
+		return null;
+
+		// OSX equiv for future reference
+		/*
+			#include <sys/sysctl.h>
+
+			#define OPProcessValueUnknown UINT_MAX
+
+			int ProcessIDForParentOfProcessID(int pid)
+			{
+				struct kinfo_proc info;
+				size_t length = sizeof(struct kinfo_proc);
+				int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, pid };
+				if (sysctl(mib, 4, &info, &length, NULL, 0) < 0)
+					return OPProcessValueUnknown;
+				if (length == 0)
+					return OPProcessValueUnknown;
+				return info.kp_eproc.e_ppid;
+			}
+		*/
+	}
 }

@@ -97,12 +97,15 @@ public class SshAgent
 {
 	private readonly SshAgentOptions Options;
 	private readonly ISshAgentHandler Handler;
+	private readonly ISystemServices SystemServices;
 
 	public SshAgent(
 		ISshAgentHandler handler,
+		ISystemServices systemServices,
 		SshAgentOptions? options = default)
 	{
 		Handler = handler;
+		SystemServices = systemServices;
 		Options = options ?? new();
 
 		BeginConnection();
@@ -155,7 +158,7 @@ public class SshAgent
 			Stream = pipeServer,
 		};
 
-		var processes = pipeServer.GetParentProcesses();
+		var processes = pipeServer.GetParentProcesses(SystemServices);
 		ClientInfo? clientInfo = null;
 
 		var messageChannel = Channel.CreateUnbounded<AgentMessage>();
