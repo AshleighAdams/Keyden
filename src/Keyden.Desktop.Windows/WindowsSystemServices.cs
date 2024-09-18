@@ -174,18 +174,21 @@ internal sealed class WindowsSystemServices : ISystemServices
 				window = new AuthPrompt(key, clientInfo, authRequired, ct);
 
 				// position the window over the application requesting auth if possible:
-				var authWindow = window.TryGetPlatformHandle()?.Handle ?? nint.Zero;
 				var clientWindow = clientInfo.MainProcess?.MainWindowHandle ?? nint.Zero;
-				if (authWindow != nint.Zero && clientWindow != nint.Zero)
+				if (clientWindow != nint.Zero)
 				{
-					if (!Win32.GetWindowRect(clientWindow, out var clientRect))
+					bool clientWindowIsFocused = Win32.GetForegroundWindow() == clientInfo.MainProcess!.MainWindowHandle;
+					if (clientWindowIsFocused && Win32.GetWindowRect(clientWindow, out var clientRect))
 					{
+						window.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
+
 						var width = clientRect.Right - clientRect.Left;
 						var height = clientRect.Bottom - clientRect.Top;
-						var newX = (clientRect.Left + width / 2) - (int)(window.Width / 2);
-						var newY = (clientRect.Top + height / 2) - (int)(window.Height / 2);
+						var newX = (clientRect.Left + width / 2) - (int)(window.DesiredSize.Width / 2);
+						var newY = (clientRect.Top + height / 2) - (int)(window.DesiredSize.Height / 2);
 
 						window.Position = new(newX, newY);
+						window.WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.Manual;
 					}
 				}
 

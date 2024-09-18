@@ -16,6 +16,8 @@ internal unsafe static partial class ProcessExtensions
 		{
 			if (!set.Add(p))
 				break;
+			if (processes.Count > 24)
+				break;
 
 			processes.Add(p);
 			p = systemServices.GetParentProcess(p);
