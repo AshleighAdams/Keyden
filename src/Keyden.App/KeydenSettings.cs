@@ -62,9 +62,8 @@ public partial class KeydenSettings : ObservableObject
 		set
 		{
 			var sb = new StringBuilder();
-			using var hash = SHA256.Create();
 
-			var result = hash.ComputeHash(Encoding.UTF8.GetBytes(Salt + value));
+			var result = SHA256.HashData(Encoding.UTF8.GetBytes(Salt + value));
 			foreach (byte b in result)
 				sb.Append(b.ToString("x2"));
 
@@ -77,9 +76,8 @@ public partial class KeydenSettings : ObservableObject
 	public bool CheckPin(string pin)
 	{
 		var sb = new StringBuilder();
-		using var hash = SHA256.Create();
 
-		var result = hash.ComputeHash(Encoding.UTF8.GetBytes(Salt + pin));
+		var result = SHA256.HashData(Encoding.UTF8.GetBytes(Salt + pin));
 		foreach (byte b in result)
 			sb.Append(b.ToString("x2"));
 
