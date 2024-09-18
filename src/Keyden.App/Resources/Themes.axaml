@@ -6,6 +6,7 @@
 
     <ResourceDictionary x:Key="Light">
       <FontWeight x:Key="Text.Weight">Medium</FontWeight>
+      <Color x:Key="Text.Disabled">#66000000</Color>
       
       <Color x:Key="Color.MacOS.Close">#FFFF6059</Color>
       <Color x:Key="Color.MacOS.Minimize">#FFFFBE2F</Color>
@@ -64,6 +65,7 @@
 
     <ResourceDictionary x:Key="Dark">
       <FontWeight x:Key="Text.Weight">Medium</FontWeight>
+      <Color x:Key="Text.Disabled">#66FFFFFF</Color>
       
       <Color x:Key="Color.MacOS.Close">#FFFF5E56</Color>
       <Color x:Key="Color.MacOS.Minimize">#FFFCBB2D</Color>

@@ -58,8 +58,24 @@ public sealed class GenericSystemServices : ISystemServices
 		}
 	}
 
+	public async Task<bool> TryUnlockSettings(object? requester, CancellationToken ct)
+	{
+		UnlockPrompt? window = null;
+		try
+		{
+			window = new UnlockPrompt();
+			window.Show();
+			return await window.Result;
+		}
+		finally
+		{
+			window?.Close();
+		}
+	}
+
 	public void NotifyPreauthorizedKey(ClientInfo clientInfo, SshKey key)
 	{
 	}
+
 	public string AuthenticationBranding => "None";
 }

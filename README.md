@@ -36,4 +36,3 @@ git config --global commit.gpgsign true
 - Add welcome popup showing how to configure Git
 - Add ability to automatically configure Git's configure SSH agent
 - Add ability to configure Git's signing keys
-- Security settings should be able to be locked via PIN or via Windows Hello etc

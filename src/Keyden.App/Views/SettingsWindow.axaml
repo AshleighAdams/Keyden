@@ -114,7 +114,17 @@
           
         </StackPanel>
 
-        <StackPanel IsVisible="{Binding IsSecurityTabSelected}" Spacing="8">
+        <StackPanel IsVisible="{Binding IsSecurityTabSelectedAndLocked}" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+          <Button Name="UnlockButton"
+                  Click="UnlockButton_Click"
+                  IsEnabled="{Binding NotUnlocking}">
+            Unlock
+          </Button>
+
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsSecurityTabSelectedAndUnlocked}" Spacing="8">
 
           <StackPanel Orientation="Horizontal" Spacing="5">
             <TextBlock>Authentication mode:</TextBlock>

@@ -20,6 +20,7 @@ public interface ISystemServices
 			ClientInfo clientInfo,
 			SshKey key,
 			CancellationToken ct);
+	Task<bool> TryUnlockSettings(object? requester, CancellationToken ct);
 	void NotifyPreauthorizedKey(ClientInfo clientInfo, SshKey key);
 	string AuthenticationBranding { get; }
 

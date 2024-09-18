@@ -2,26 +2,62 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="https://github.com/projektanker/icons.avalonia"
              xmlns:views="clr-namespace:Keyden.Views"
              xmlns:vm="clr-namespace:Keyden.ViewModels"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="800"
              x:Class="Keyden.Views.KeyOptionsView"
              x:DataType="vm:KeyOptionsViewModel">
-  <Grid>
+  <Panel>
+    <Panel IsVisible="{Binding Key.Modified}" VerticalAlignment="Top">
+      <TextBlock IsVisible="{Binding !IsKeyNull}"
+                 TextAlignment="Center"
+                 Foreground="{DynamicResource ThemeForegroundBrush}"
+                 Opacity="0.5"
+                 Padding="5"
+                 FontSize="12"
+                 FontStyle="Italic">
+        Sync to apply changes
+      </TextBlock>
+    </Panel>
 
-    <ScrollViewer IsVisible="{Binding !IsKeyNull}">
+    <ScrollViewer IsVisible="{Binding !IsKeyNull}" Grid.Row="1">
       <Border Padding="16,22,16,10">
         <StackPanel Orientation="Vertical"
                     VerticalAlignment="Top"
                     Spacing="22">
-          <Border Padding="16,0,0,0">
-            <StackPanel Orientation="Horizontal" Spacing="16">
-              <views:KeyIcon Width="64"/>
-              <TextBlock Text="{Binding Key.Name}"
-                         VerticalAlignment="Center"
-                         FontSize="20.5" FontWeight="SemiBold" />
-            </StackPanel>
-          </Border>
+          <DockPanel HorizontalAlignment="Stretch">
+            <Button Name="ThreeDots"
+                    DockPanel.Dock="Right"
+                    Padding="2"
+                    CornerRadius="8">
+              <Button.Content>
+                <i:Icon Value="mdi-dots-vertical" FontSize="24" Foreground="{DynamicResource Color.Button.Foreground}" />
+              </Button.Content>
+              <Button.Flyout>
+                <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                  <MenuItem Name="EditButton" Header="Edit options"/>
+                </MenuFlyout>
+              </Button.Flyout>
+              <Button.Styles>
+                <Style Selector="Button">
+                  <Setter Property="Background" Value="Transparent"/>
+                </Style>
+                <Style Selector="Button:pointerover /template/ ContentPresenter">
+                  <Setter Property="Background" Value="{DynamicResource Brush.Sidebar.Hover}"/>
+                </Style>
+              </Button.Styles>
+            </Button>
+
+            <Border Padding="16,0,0,0" DockPanel.Dock="Left">
+              <StackPanel Orientation="Horizontal" Spacing="16">
+                <views:KeyIcon Width="64"/>
+                <TextBlock Text="{Binding Key.Name}"
+                           VerticalAlignment="Center"
+                           FontSize="20.5" FontWeight="SemiBold" />
+              </StackPanel>
+            </Border>
+          </DockPanel>
 
           <Border Margin="0,2" BorderThickness="1" CornerRadius="8">
             <StackPanel>
@@ -41,7 +77,7 @@
             </StackPanel>
           </Border>
 
-          <Border Padding="16,0">
+          <Border Padding="16,0" Name="PropertiesRoot" IsEnabled="{Binding IsUnlocked}">
             <Grid ColumnDefinitions="32,32,*"
                   RowDefinitions="*,*,*,*,*,*,*,*,*,*,*"
                   Classes="table">
@@ -70,13 +106,13 @@
                           Orientation="Horizontal" Spacing="5">
                 <CheckBox IsChecked="{Binding RemainAuthorizedUntilKeyInactivity}">Until</CheckBox>
                 <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthorizedUntilKeyInactivityFor}"/>
-                <TextBlock VerticalAlignment="Center">of key inactivity</TextBlock>
+                <TextBlock VerticalAlignment="Center" Classes.disabled="{Binding !IsUnlocked}">of key inactivity</TextBlock>
               </StackPanel>
               <StackPanel Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
                 <CheckBox IsChecked="{Binding RemainAuthorizedUntilUserInactivity}">Until</CheckBox>
                 <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthorizedUntilUserInactivityFor}"/>
-                <TextBlock VerticalAlignment="Center">of user inactivity</TextBlock>
+                <TextBlock VerticalAlignment="Center" Classes.disabled="{Binding !IsUnlocked}">of user inactivity</TextBlock>
               </StackPanel>
               <StackPanel Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
@@ -96,13 +132,13 @@
                           Orientation="Horizontal" Spacing="5">
                 <CheckBox IsChecked="{Binding RemainAuthenticatedUntilKeyInactivity}">Until</CheckBox>
                 <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthenticatedUntilKeyInactivityFor}"/>
-                <TextBlock VerticalAlignment="Center">of key inactivity</TextBlock>
+                <TextBlock VerticalAlignment="Center" Classes.disabled="{Binding !IsUnlocked}">of key inactivity</TextBlock>
               </StackPanel>
               <StackPanel Grid.Row="9" Grid.Column="2" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
                 <CheckBox IsChecked="{Binding RemainAuthenticatedUntilUserInactivity}">Until</CheckBox>
                 <ComboBox ItemsSource="{Binding InactivityDurations}" SelectedValue="{Binding RemainAuthenticatedUntilUserInactivityFor}"/>
-                <TextBlock VerticalAlignment="Center">of user inactivity</TextBlock>
+                <TextBlock VerticalAlignment="Center" Classes.disabled="{Binding !IsUnlocked}">of user inactivity</TextBlock>
               </StackPanel>
               <StackPanel Grid.Row="10" Grid.Column="2" Grid.ColumnSpan="99"
                           Orientation="Horizontal" Spacing="5">
@@ -114,11 +150,13 @@
         </StackPanel>
       </Border>
     </ScrollViewer>
-
-    <TextBlock IsVisible="{Binding IsKeyNull}" Text="Hello Avalonia" HorizontalAlignment="Center" VerticalAlignment="Center" />
-  </Grid>
+  </Panel>
 
   <UserControl.Styles>
+    <Style Selector="TextBlock.disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Text.Disabled}" />
+    </Style>
+    
     <Style Selector="Border">
       <Setter Property="BorderBrush" Value="{DynamicResource Color.Border.Light}"/>
     </Style>

@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
+using Avalonia.Interactivity;
 using Avalonia.Platform;
 using Avalonia.Styling;
 
@@ -13,6 +14,7 @@ namespace Keyden.Views;
 
 public partial class SettingsWindow : Window
 {
+	private readonly SettingsViewModel ViewModel;
 	public SettingsWindow()
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -26,7 +28,7 @@ public partial class SettingsWindow : Window
 			ExtendClientAreaTitleBarHeightHint = -1;
 		}
 
-		DataContext = App.GetService<SettingsViewModel>();
+		DataContext = ViewModel = App.GetService<SettingsViewModel>();
 
 		InitializeComponent();
 
@@ -38,6 +40,13 @@ public partial class SettingsWindow : Window
 	private void Window_ActualThemeVariantChanged(object? sender, EventArgs e)
 	{
 		RefreshAcrylicProperties();
+	}
+
+	protected override void OnClosed(EventArgs e)
+	{
+		base.OnClosed(e);
+
+		ViewModel.Lock();
 	}
 
 	private void RefreshAcrylicProperties()
@@ -61,6 +70,11 @@ public partial class SettingsWindow : Window
 			Acrylic2.Material.TintOpacity = 0;
 			Acrylic2.Material.MaterialOpacity = 0;
 		}
+	}
+
+	private void UnlockButton_Click(object? sender, RoutedEventArgs e)
+	{
+		ViewModel.Unlock();
 	}
 }
 

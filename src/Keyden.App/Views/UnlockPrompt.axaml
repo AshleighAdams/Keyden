@@ -1,0 +1,110 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        xmlns:views="clr-namespace:Keyden.Views"
+        mc:Ignorable="d"
+        Width="350" MinHeight="150"
+        Padding="20"
+        SizeToContent="Height"
+        x:Class="Keyden.Views.UnlockPrompt"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="Unlock Keyden"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        TransparencyLevelHint="Mica,AcrylicBlur,Blur"
+        Background="Transparent"
+        Topmost="True">
+  <Panel>
+    
+    <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-24" Name="Acrylic">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial
+            BackgroundSource="Digger"
+            FallbackColor="{DynamicResource Color.Window}"
+            TintColor="{DynamicResource Color.Window.AltGlass}"
+            TintOpacity="{DynamicResource Color.Window.AltGlass.TintOpacity}"
+            MaterialOpacity="{DynamicResource Color.Window.AltGlass.MaterialOpacity}" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    
+    <StackPanel Spacing="12">
+      <TextBlock Text="Unlock Keyden"
+                 TextAlignment="Center"
+                 FontSize="21"
+                 Margin="0,8,0,0"/>
+
+      <TextBlock FontSize="16"
+                 FontWeight="Normal"
+                 TextAlignment="Center"
+                 TextWrapping="Wrap"
+                 Margin="0,8">
+        Allow modifications to sensitive settings
+      </TextBlock>
+      
+      <TextBox Name="Pin"
+               IsVisible="True"
+               Watermark="Enter PIN"
+               PasswordChar="•"
+               HorizontalAlignment="Stretch" />
+    
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom"
+                  Spacing="5">
+        <Button Name="DenyButton"
+                Classes="deny"
+                HotKey="Escape">
+          Cancel
+        </Button>
+        <Button Name="UnlockButton"
+                Classes="confirm"
+                HotKey="Enter">
+          Unlock
+        </Button>
+      </StackPanel>
+    </StackPanel>
+  </Panel>
+
+  <Window.Styles>
+
+    <Style Selector="Button.confirm">
+      <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Brush.ConfirmButton.Border}"/>
+
+      <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background.Hover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background.Press}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.ConfirmButton.Foreground}"/>
+      </Style>
+    </Style>
+
+    <Style Selector="Button.deny">
+      <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Brush.DenyButton.Border}"/>
+
+      <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background.Hover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
+      </Style>
+      <Style Selector="^:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.DenyButton.Background.Press}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.DenyButton.Foreground}"/>
+      </Style>
+    </Style>
+    
+  </Window.Styles>
+</Window>

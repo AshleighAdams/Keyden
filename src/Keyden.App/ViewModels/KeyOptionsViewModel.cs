@@ -1,7 +1,13 @@
+using Avalonia.Controls;
+using Avalonia.Media;
+
+using Keyden.Views;
+
 using ReactiveUI;
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Keyden.ViewModels;
 
@@ -34,6 +40,12 @@ public static class ModelTimeSpanExtensions
 
 public class KeyOptionsViewModel : ViewModelBase
 {
+	private readonly ISystemServices SystemServices;
+	public KeyOptionsViewModel()
+	{
+		SystemServices = App.GetService<ISystemServices>();
+	}
+
 	private readonly string FallbackTimeSpan = "1 minute";
 	public string[] KeepUnlockedDurations { get; } =
 	[
@@ -258,6 +270,7 @@ public class KeyOptionsViewModel : ViewModelBase
 	private readonly string[] Properties =
 	[
 		nameof(Key),
+		nameof(IsUnlocked),
 		nameof(IsKeyNull),
 		nameof(MachineName),
 		nameof(EnabledOnLocalMachine),
@@ -318,6 +331,41 @@ public class KeyOptionsViewModel : ViewModelBase
 	private void Key_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
 	{
 		this.RaisePropertyChanged(e.PropertyName);
+	}
+
+	private bool _IsUnlocked = false;
+	public bool IsUnlocked
+	{
+		get => _IsUnlocked;
+		set
+		{
+			this.RaiseAndSetIfChanged(ref _IsUnlocked, value);
+		}
+	}
+
+	public void Lock()
+	{
+		IsUnlocked = false;
+	}
+
+	public async void Unlock(Window? window)
+	{
+		try
+		{
+			var success = await SystemServices.TryUnlockSettings(window, default);
+			if (success)
+				IsUnlocked = true;
+		}
+		catch (BackendException ex)
+		{
+			if (await ExceptionWindow.Prompt(ex.Message, default) == ExceptionWindowResult.Abort)
+				throw;
+		}
+		catch (Exception ex)
+		{
+			if (await ExceptionWindow.Prompt(ex.ToString(), default) == ExceptionWindowResult.Abort)
+				throw;
+		}
 	}
 
 	public bool IsKeyNull => Key is null;

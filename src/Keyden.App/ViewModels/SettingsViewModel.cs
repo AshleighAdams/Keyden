@@ -2,6 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
+
+using DynamicData.Kernel;
+
+using Keyden.Views;
 
 using Microsoft.Win32;
 
@@ -33,17 +38,20 @@ public class SettingsViewModel : ViewModelBase
 
 			this.RaisePropertyChanging(nameof(TabIndexSelected));
 			this.RaisePropertyChanging(nameof(IsGeneralTabSelected));
-			this.RaisePropertyChanging(nameof(IsSecurityTabSelected));
+			this.RaisePropertyChanging(nameof(IsSecurityTabSelectedAndLocked));
+			this.RaisePropertyChanging(nameof(IsSecurityTabSelectedAndUnlocked));
 			this.RaisePropertyChanging(nameof(IsAdvancedTabSelected));
 			_TabIndexSelected = value;
 			this.RaisePropertyChanged(nameof(TabIndexSelected));
 			this.RaisePropertyChanged(nameof(IsGeneralTabSelected));
-			this.RaisePropertyChanged(nameof(IsSecurityTabSelected));
+			this.RaisePropertyChanged(nameof(IsSecurityTabSelectedAndLocked));
+			this.RaisePropertyChanged(nameof(IsSecurityTabSelectedAndUnlocked));
 			this.RaisePropertyChanged(nameof(IsAdvancedTabSelected));
 		}
 	}
 	public bool IsGeneralTabSelected => TabIndexSelected == 0;
-	public bool IsSecurityTabSelected => TabIndexSelected == 2;
+	public bool IsSecurityTabSelectedAndLocked => TabIndexSelected == 2 && !SecurityUnlocked;
+	public bool IsSecurityTabSelectedAndUnlocked => TabIndexSelected == 2 && SecurityUnlocked;
 	public bool IsAdvancedTabSelected => TabIndexSelected == 1;
 
 	public IReadOnlyList<KeystoreBackend> KeystoreBackends =>
@@ -63,6 +71,70 @@ public class SettingsViewModel : ViewModelBase
 			SystemServices.AutomaticallyStartApp = value;
 			this.RaisePropertyChanged(nameof(AutomaticallyStartup));
 		}
+	}
+
+	private bool _SecurityUnlocked = false;
+	public bool SecurityUnlocked
+	{
+		get => _SecurityUnlocked;
+		set
+		{
+			this.RaisePropertyChanging(nameof(SecurityUnlocked));
+			this.RaisePropertyChanging(nameof(IsSecurityTabSelectedAndLocked));
+			this.RaisePropertyChanging(nameof(IsSecurityTabSelectedAndUnlocked));
+			_SecurityUnlocked = value;
+			this.RaisePropertyChanged(nameof(SecurityUnlocked));
+			this.RaisePropertyChanged(nameof(IsSecurityTabSelectedAndLocked));
+			this.RaisePropertyChanged(nameof(IsSecurityTabSelectedAndUnlocked));
+		}
+	}
+
+	private bool _NotUnlocking = true;
+	public bool NotUnlocking
+	{
+		get => _NotUnlocking;
+		set
+		{
+			this.RaisePropertyChanging(nameof(NotUnlocking));
+			_NotUnlocking = value;
+			this.RaisePropertyChanged(nameof(NotUnlocking));
+		}
+	}
+
+	private CancellationTokenSource? Cts { get; set; } = null;
+	public async void Unlock()
+	{
+		try
+		{
+			Cts ??= new CancellationTokenSource();
+			NotUnlocking = false;
+
+			var success = await SystemServices.TryUnlockSettings(this, Cts.Token);
+			if (success)
+				SecurityUnlocked = true;
+		}
+		catch (BackendException ex)
+		{
+			if (await ExceptionWindow.Prompt(ex.Message, default) == ExceptionWindowResult.Abort)
+				throw;
+		}
+		catch (Exception ex)
+		{
+			if (await ExceptionWindow.Prompt(ex.ToString(), default) == ExceptionWindowResult.Abort)
+				throw;
+		}
+		finally
+		{
+			NotUnlocking = true;
+		}
+	}
+
+	public void Lock()
+	{
+		Cts?.Cancel();
+		Cts = null;
+
+		SecurityUnlocked = false;
 	}
 }
 

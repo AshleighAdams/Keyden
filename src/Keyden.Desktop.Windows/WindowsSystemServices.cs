@@ -9,6 +9,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Avalonia.Controls;
+
 using Keyden.Desktop.Windows;
 using Keyden.Views;
 
@@ -223,9 +225,9 @@ internal sealed class WindowsSystemServices : ISystemServices
 		}
 	}
 
-	private async Task<(bool success, string? message)> TryAuthenticateUser()
+	private async Task<(bool success, string? message)> TryAuthenticateUser(bool fallbackReturn = false)
 	{
-		if (!KeyCredentialManager.IsSupportedAsync().GetAwaiter().GetResult())
+		if (!await KeyCredentialManager.IsSupportedAsync())
 			return (false, "Not supported");
 
 		var got = await KeyCredentialManager.RequestCreateAsync("login", KeyCredentialCreationOption.ReplaceExisting);
@@ -233,18 +235,43 @@ internal sealed class WindowsSystemServices : ISystemServices
 		{
 			KeyCredentialStatus.Success => (true, null),
 			KeyCredentialStatus.UnknownError => (false, "Unknown failure"),
-			KeyCredentialStatus.NotFound => (false, "Not found"),
 			KeyCredentialStatus.UserCanceled => (false, "User canceled"),
-			KeyCredentialStatus.UserPrefersPassword => (false, "User prefers password"),
+			KeyCredentialStatus.NotFound => (fallbackReturn, "Not found"),
+			KeyCredentialStatus.UserPrefersPassword => (fallbackReturn, "User prefers password"),
 			KeyCredentialStatus.CredentialAlreadyExists => (false, "Already exists"),
 			KeyCredentialStatus.SecurityDeviceLocked => (false, "Security device locked"),
 			_ => (false, "Unknown failure (2)"),
 		};
 	}
 
+	public async Task<bool> TryUnlockSettings(object? requester, CancellationToken ct)
+	{
+		var settings = App.GetService<KeydenSettings>();
+
+		if (settings.AuthenticationMode == AuthenticationMode.System)
+			return (await TryAuthenticateUser(fallbackReturn: true)).success;
+
+		UnlockPrompt? window = null;
+		try
+		{
+			window = new UnlockPrompt(ct);
+
+			if (requester is Window parentWindow)
+				window.Show(parentWindow);
+			else
+				window.Show();
+			return await window.Result;
+		}
+		finally
+		{
+			window?.Close();
+		}
+	}
+
 	public void NotifyPreauthorizedKey(ClientInfo clientInfo, SshKey key)
 	{
 		// TODO: popup a notification if the setting is enabled
 	}
+
 	public string AuthenticationBranding => "Windows Hello";
 }

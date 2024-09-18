@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -34,6 +34,8 @@ public partial class ObservableSshKey : ObservableObject
 
 	private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
 	{
+		if (e.PropertyName == nameof(Modified))
+			return;
 		Modified = true;
 	}
 
@@ -102,7 +104,9 @@ public partial class ObservableSshKey : ObservableObject
 
 		Modified = false;
 	}
-	public bool Modified { get; set; } = false;
+
+	[ObservableProperty]
+	public bool _Modified;
 
 	public string Id { get; }
 

@@ -328,7 +328,7 @@ public class AgentK : ISshAgentHandler
 	private readonly Dictionary<string, KeyInfo> KeyInfos = new();
 
 
-	private async ValueTask<AuthRequired> QueryAuth(SshKey key, SshKeyOptions options, ClientInfo clientInfo, CancellationToken ct)
+	private AuthRequired QueryAuth(SshKey key, SshKeyOptions options, ClientInfo clientInfo)
 	{
 		var ret = AuthRequired.None;
 
@@ -534,7 +534,7 @@ public class AgentK : ISshAgentHandler
 			return default;
 		}
 
-		var authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
+		var authRequired = QueryAuth(publicKey, keyOptions, info);
 
 		// check for pre-authorization
 		if (authRequired == AuthRequired.None)
@@ -547,7 +547,7 @@ public class AgentK : ISshAgentHandler
 		using var @lock = new ScopedLock(PromptQueue);
 
 		// refresh the required auth, a previous reuqest could've changed this, and some time has passed since
-		authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
+		authRequired = QueryAuth(publicKey, keyOptions, info);
 
 		// check again for pre-authorization
 		if (authRequired is AuthRequired.None)
