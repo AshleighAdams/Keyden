@@ -56,6 +56,46 @@ file static class JsonExtensionMethods
 
 public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 {
+	private readonly static UTF8Encoding Utf8 = new(encoderShouldEmitUTF8Identifier: false);
+	private static async Task<string> Op(string args, CancellationToken ct, string? stdIn = null)
+	{
+		Process proc;
+		try
+		{
+			proc = Process.Start(
+				new ProcessStartInfo("op", args)
+				{
+					UseShellExecute = false,
+					CreateNoWindow = true,
+					RedirectStandardInput = true,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					StandardInputEncoding = Utf8,
+					StandardOutputEncoding = Utf8,
+					StandardErrorEncoding = Utf8,
+				}) ?? throw new BackendException("Failed to execute `op`, is 1Password CLI installed?");
+		}
+		catch (Exception ex)
+		{
+			throw new BackendException($"Failed to execute `op`, is 1Password CLI installed?\n\n{ex.Message}");
+		}
+
+		if (stdIn is not null)
+		{
+			await proc.StandardInput.WriteAsync(stdIn);
+			await proc.StandardInput.FlushAsync();
+		}
+		proc.StandardInput.Close();
+
+		var (stdOut, stdErr) = (proc.StandardOutput.ReadToEndAsync(ct), proc.StandardError.ReadToEndAsync(ct));
+		await proc.WaitForExitAsync(ct);
+
+		if (proc.ExitCode != 0)
+			throw new BackendException($"Exit code {proc.ExitCode} returned by op:\n{await stdErr}");
+
+		return await stdOut;
+	}
+
 	private List<SshKey> PublicKeys { get; } = [];
 	private List<SshKey> PrivateKeys { get; } = [];
 
@@ -73,24 +113,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 	{
 		var sw = Stopwatch.StartNew();
 
-		var proc = Process.Start(
-			new ProcessStartInfo("op", "item list --categories \"SSH Key\" --format json")
-			{
-				UseShellExecute = false,
-				WindowStyle = ProcessWindowStyle.Hidden,
-				CreateNoWindow = true,
-				RedirectStandardOutput = true,
-				RedirectStandardError = true,
-			}) ?? throw new SystemException("Failed to start op");
-
-		var procOutput = await proc.StandardOutput.ReadToEndAsync(ct);
-
-		if (proc.ExitCode != 0)
-		{
-			var errorOutput = await proc.StandardError.ReadToEndAsync(ct);
-			throw new BackendException($"Process `op` returned exit code {proc.ExitCode}:\n{errorOutput}");
-		}
-
+		var procOutput = await Op("item list --categories \"SSH Key\" --format json", ct);
 		var keysDoc = JsonDocument.Parse(procOutput);
 
 		var tasks = new List<Task>();
@@ -119,19 +142,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			});
 		}
 
-		proc = Process.Start(
-			new ProcessStartInfo("op", "item get --format json --fields label=public_key,label=private_key")
-			{
-				UseShellExecute = false,
-				WindowStyle = ProcessWindowStyle.Hidden,
-				CreateNoWindow = true,
-				RedirectStandardOutput = true,
-				RedirectStandardInput = true,
-			}) ?? throw new SystemException("Failed to start op");
-
-		var input = proc.StandardInput;
-		var output = proc.StandardOutput.BaseStream;
-
 		var ids = new StringBuilder();
 		bool first = true;
 		ids.Append('[');
@@ -144,15 +154,13 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			ids.Append($$"""{"id":"{{newId}}"}""");
 		}
 		ids.Append(']');
-		await input.WriteAsync(ids);
-		input.Close();
 
-		var ms = new MemoryStream();
-		await output.CopyToAsync(ms);
+		var itemGetOutput = await Op("item get --format json --fields label=public_key,label=private_key", ct, ids.ToString());
 
+		// TODO: dotnet 9 will make this Action stuff no longer required
 		new Action(() =>
 		{
-			var outputBytes = ms.ToArray();
+			var outputBytes = Utf8.GetBytes(itemGetOutput);
 			var outputSpan = (Span<byte>)outputBytes;
 			
 			for (int i = 0; i < newKeys.Count; i++)
@@ -178,7 +186,8 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 					{
 						privateKey = field.GetProperty("value").GetString();
 
-						if (field.TryGetProperty("ssh_formats", out var sshFormats) &&
+						if (
+							field.TryGetProperty("ssh_formats", out var sshFormats) &&
 							sshFormats.TryGetProperty("openssh", out var openSshKey))
 						{
 							privateKey = openSshKey.GetProperty("value").GetString();
@@ -281,7 +290,6 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 		obj["RemainAuthenticatedUntilLocked"] = opts.RemainAuthenticatedUntilLocked.AsJsonValue();
 	}
 
-	private readonly UTF8Encoding Utf8 = new(encoderShouldEmitUTF8Identifier: false);
 	async Task ISshKeyOptionsStore.SyncKeyOptions(CancellationToken ct)
 	{
 		var jsonSerializerOptions = new JsonSerializerOptions()
@@ -289,17 +297,44 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			WriteIndented = true,
 		};
 
-		var proc = Process.Start(
-			new ProcessStartInfo("op", $"item get {KewardenOptionsEntryName} --format json")
-			{
-				UseShellExecute = false,
-				//WindowStyle = ProcessWindowStyle.Hidden,
-				CreateNoWindow = true,
-				RedirectStandardOutput = true,
-			}) ?? throw new BackendException("Failed to launch `op`, is 1Password CLI installed?");
+		string? opEntryJson;
+		try
+		{
+			opEntryJson = await Op($"item get {KewardenOptionsEntryName} --format json", ct);
+		}
+		catch (BackendException e) when (e.Message.Contains("isn't an item. Specify the item with its UUID", StringComparison.Ordinal))
+		{
+			opEntryJson = null;
+		}
 
-		var optionsDoc = (await JsonNode.ParseAsync(proc.StandardOutput.BaseStream, cancellationToken: ct))?.AsObject()
-			?? throw new BackendException("Couldn't parse json");
+		if (opEntryJson is null)
+		{
+			var templateJson =
+				$$"""
+				{
+					"title": {{KewardenOptionsEntryName}},
+					"category": "SECURE_NOTE",
+					"fields": [
+						{
+							"id": "notesPlain",
+							"type": "STRING",
+							"purpose": "NOTES",
+							"label": "notesPlain",
+							"value": ""
+						},
+						{
+							"type": "STRING",
+							"label": "json",
+							"value": "{}"
+						}
+					]
+				}
+				""";
+			opEntryJson = await Op(@"item create --format json --no-color -", ct, stdIn: templateJson);
+		}
+
+		var optionsDoc = JsonNode.Parse(opEntryJson)?.AsObject()
+			?? throw new BackendException($"Couldn't locale main options object in {KewardenOptionsEntryName}");
 
 		var fields = optionsDoc["fields"]!.AsArray();
 		JsonNode? optionsJsonField = null;
@@ -372,43 +407,7 @@ public sealed class OnePassCliSshKeyStore : ISshKeyStore, ISshKeyOptionsStore
 			var fullJson = optionsDoc.ToJsonString();
 
 			DirtyOptions.Clear();
-
-			proc = new Process()
-			{
-				StartInfo = new ProcessStartInfo("op", $"item edit {KewardenOptionsEntryName} --format json --no-color")
-				{
-					WindowStyle = ProcessWindowStyle.Hidden,
-					UseShellExecute = false,
-					CreateNoWindow = true,
-					RedirectStandardError = true,
-					RedirectStandardOutput = true,
-					RedirectStandardInput = true,
-					StandardInputEncoding = Utf8,
-					StandardOutputEncoding = Utf8,
-					StandardErrorEncoding = Utf8,
-				} ?? throw new SystemException("Failed to start op"),
-				EnableRaisingEvents = true,
-			};
-			
-			var tcs = new TaskCompletionSource<int>();
-			proc.Exited += (s, e) => tcs.SetResult(proc.ExitCode);
-			proc.Start();
-
-			await proc.StandardInput.WriteAsync(fullJson);
-			await proc.StandardInput.FlushAsync();
-			proc.StandardInput.Close();
-
-			Task<string> stdoutTask = proc.StandardOutput.ReadToEndAsync();
-			Task<string> stderrTask = proc.StandardError.ReadToEndAsync();
-
-			await Task.WhenAll(stdoutTask, stderrTask, tcs.Task);
-
-			int exitCode = await tcs.Task;
-			if (exitCode != 0)
-			{
-				var msg = $"1Password: {await stdoutTask + await stderrTask}";
-				throw new BackendException(msg);
-			}
+			await Op($"item edit {KewardenOptionsEntryName} --format json --no-color", ct, fullJson);
 		}
 	}
 }
