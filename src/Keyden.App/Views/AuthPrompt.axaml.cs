@@ -2,8 +2,10 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
 
@@ -20,11 +22,12 @@ namespace Keyden.Views
 {
 	public partial class AuthPrompt : Window
 	{
-		public SshKey Key { get; private set; }
-		public ClientInfo ClientInfo { get; private set; }
-		public string AppName { get; private set; }
-		public string AppUser { get; private set; }
-		public string ProcessHierarchy { get; private set; }
+		public SshKey Key { get; }
+		public ClientInfo ClientInfo { get; }
+		public KeydenSettings Settings { get; }
+		public string AppName { get; }
+		public string AppUser { get; }
+		public string ProcessHierarchy { get; }
 
 
 		public static readonly StyledProperty<bool> AuthButtonEnabledProperty = AvaloniaProperty.Register<Window, bool>(nameof(AuthButtonEnabled), false);
@@ -69,12 +72,14 @@ namespace Keyden.Views
 			set => SetValue(IsExpandedProperty, value);
 		}
 
+		private readonly AuthRequired AuthRequired;
 		private readonly TaskCompletionSource<AuthResult> Tcs = new();
 		public Task<AuthResult> Result => Tcs.Task;
 
 		public AuthPrompt()
 		{
 			Key = new() { Id = string.Empty, Name = "Primary" };
+			Settings = new();
 			ClientInfo = new()
 			{
 				Processes = [],
@@ -83,6 +88,8 @@ namespace Keyden.Views
 			AppName = "Something";
 			AppUser = "Someone";
 			ProcessHierarchy = "Something, bash, git-bash, Code, Explorer";
+			AuthRequired = AuthRequired.Authorization | AuthRequired.Authorization;
+			AuthButtonEnabled = true;
 
 			InitializeComponent();
 
@@ -104,12 +111,23 @@ namespace Keyden.Views
 		{
 			Key = key;
 			ClientInfo = clientInfo;
+			Settings = App.GetService<KeydenSettings>();
 			AppName = clientInfo.ApplicationName;
 			AppUser = clientInfo.Username;
 			ProcessHierarchy = clientInfo.Processes.Count > 0
 				? string.Join(", ", clientInfo.Processes.Select(static p => p.ProcessName).CompactDuplicates())
 				: "Unknown";
-			AuthButtonIconVisible = false;
+			AuthRequired = authRequired;
+
+
+			if (AuthRequired.HasFlag(AuthRequired.Authentication))
+			{
+				AuthButtonIcon = "fa-fingerprint";
+				AuthButtonIconVisible = true;
+				AuthButtonText = "Authenticate";
+			}
+			else
+				AuthButtonIconVisible = false;
 
 			InitializeComponent();
 
@@ -138,16 +156,14 @@ namespace Keyden.Views
 					Dispatcher.UIThread.Post(() => AuthButtonEnabled = true);
 				}, ct);
 
-			if (authRequired.HasFlag(AuthRequired.Authentication))
-			{
-				AuthButtonIcon = "fa-fingerprint";
-				AuthButtonIconVisible = true;
-				AuthButtonText = "Authenticate";
-			}
 
 			DenyButton.Click += DenyButton_Click;
 			AuthButton.Click += AuthButton_Click;
 			Closed += AuthPrompt_Closed;
+			Pin.TextChanged += Pin_TextChanged;
+			Pin.KeyDown += Pin_KeyDown;
+			Pin.GotFocus += Pin_GotFocus;
+			Pin.LostFocus += Pin_LostFocus;
 		}
 
 		private void AuthPrompt_Closed(object? sender, EventArgs e)
@@ -166,16 +182,61 @@ namespace Keyden.Views
 
 		private void AuthButton_Click(object? sender, RoutedEventArgs e)
 		{
-			AuthButtonEnabled = false;
-			AuthButtonIcon = "mdi-loading";
-			AuthButtonIconVisible = true;
-			AuthButtonIconAnimation = IconAnimation.Spin;
-
-			Tcs.TrySetResult(new()
+			if (AuthRequired.HasFlag(AuthRequired.Authentication) && Settings.AuthenticationMode == AuthenticationMode.InternalPIN)
 			{
-				Success = true,
-				FreshAuthorization = true,
-			});
+				PinBackdrop.IsVisible = true;
+				Pin.Focus();
+			}
+			else
+			{
+				AuthButtonEnabled = false;
+				AuthButtonIcon = "mdi-loading";
+				AuthButtonIconVisible = true;
+				AuthButtonIconAnimation = IconAnimation.Spin;
+
+				Tcs.TrySetResult(new()
+				{
+					Success = true,
+					FreshAuthorization = true,
+				});
+			}
+		}
+
+		private void Pin_LostFocus(object? sender, RoutedEventArgs e)
+		{
+			PinBackdrop.IsVisible = false;
+		}
+
+		private void Pin_GotFocus(object? sender, GotFocusEventArgs e)
+		{
+			PinBackdrop.IsVisible = true;
+		}
+
+		private void Pin_KeyDown(object? sender, KeyEventArgs e)
+		{
+			if (e.Key == Avalonia.Input.Key.Enter)
+			{
+				if (Pin.Text != Settings.AuthenticationPin)
+					Pin.Text = string.Empty;
+			}
+		}
+
+		private void Pin_TextChanged(object? sender, TextChangedEventArgs e)
+		{
+			if (Pin.Text == Settings.AuthenticationPin)
+			{
+				AuthButtonEnabled = false;
+				AuthButtonIcon = "mdi-loading";
+				AuthButtonIconVisible = true;
+				AuthButtonIconAnimation = IconAnimation.Spin;
+
+				Tcs.TrySetResult(new()
+				{
+					Success = true,
+					FreshAuthorization = AuthRequired.HasFlag(AuthRequired.Authorization),
+					FreshAuthentication = AuthRequired.HasFlag(AuthRequired.Authentication),
+				});
+			}
 		}
 
 		private CancellationTokenSource? AnimationCts;

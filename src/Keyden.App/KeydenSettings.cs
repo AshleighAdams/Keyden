@@ -41,6 +41,20 @@ public partial class KeydenSettings : ObservableObject
 			OnPropertyChanged(nameof(DeveloperMode));
 		}
 	}
+
+	private AuthenticationMode _AuthenticationMode = AuthenticationMode.System;
+	public AuthenticationMode AuthenticationMode
+	{
+		get => _AuthenticationMode;
+		set => SetProperty(ref _AuthenticationMode, value);
+	}
+
+	private string _AuthenticationPin = string.Empty;
+	public string AuthenticationPin
+	{
+		get => _AuthenticationPin;
+		set => SetProperty(ref _AuthenticationPin, value);
+	}
 }
 
 public enum KeystoreBackend
@@ -48,6 +62,12 @@ public enum KeystoreBackend
 	None,
 	DeveloperTest,
 	OnePassCLI,
+}
+
+public enum AuthenticationMode
+{
+	System,
+	InternalPIN,
 }
 
 [JsonSourceGenerationOptions(WriteIndented = true)]

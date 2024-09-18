@@ -15,8 +15,6 @@ namespace Keyden;
 
 public class AgentK : ISshAgentHandler
 {
-	private KeydenSettings Settings { get; }
-
 	private readonly ISshKeyStore KeyStore;
 	private readonly ISshKeyOptionsStore KeyOptionsStore;
 	private readonly ISystemServices SystemServices;
@@ -24,12 +22,10 @@ public class AgentK : ISshAgentHandler
 	public event Action<ActivityItem>? NewActivity;
 
 	public AgentK(
-		KeydenSettings settings,
 		ISshKeyStore keyStore,
 		ISshKeyOptionsStore keyOptionsStore,
 		ISystemServices systemServices)
 	{
-		Settings = settings;
 		KeyStore = keyStore;
 		KeyOptionsStore = keyOptionsStore;
 		SystemServices = systemServices;

@@ -169,7 +169,8 @@ internal sealed class WindowsSystemServices : ISystemServices
 		AuthPrompt? window = null;
 		try
 		{
-			if (authRequired.HasFlag(AuthRequired.Authentication))
+			var settings = App.GetService<KeydenSettings>();
+			if (authRequired.HasFlag(AuthRequired.Authorization) || settings.AuthenticationMode != AuthenticationMode.System)
 			{
 				window = new AuthPrompt(key, clientInfo, authRequired, ct);
 
@@ -193,11 +194,16 @@ internal sealed class WindowsSystemServices : ISystemServices
 				}
 
 				window.Show();
+				window.Activate();
 				result = await window.Result;
 				window.Topmost = false;
 			}
 
-			if (result.Success && authRequired.HasFlag(AuthRequired.Authentication))
+			bool authenticationRequired =
+				result.Success &&
+				result.FreshAuthentication == false &&
+				authRequired.HasFlag(AuthRequired.Authentication);
+			if (authenticationRequired)
 			{
 				var (authenticated, message) = await TryAuthenticateUser();
 				if (authenticated)
@@ -240,4 +246,5 @@ internal sealed class WindowsSystemServices : ISystemServices
 	{
 		// TODO: popup a notification if the setting is enabled
 	}
+	public string AuthenticationBranding => "Windows Hello";
 }

@@ -19,7 +19,8 @@
         TransparencyLevelHint="Mica,AcrylicBlur,Blur"
         Background="Transparent"
         Topmost="True">
-  <Panel>
+  <Panel Name="RootPanel">
+    
     <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-24" Name="Acrylic">
       <ExperimentalAcrylicBorder.Material>
         <ExperimentalAcrylicMaterial
@@ -110,6 +111,13 @@
         </Button>
       </StackPanel>
     </StackPanel>
+
+    <Panel Name="PinBackdrop" IsVisible="False" >
+      <Rectangle Fill="#333" Opacity="0.5" Margin="-24"/>
+      <Border Background="{DynamicResource Color.Window}" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="8" Padding="5">
+        <TextBox Name="Pin" Watermark="Enter PIN" Width="250" PasswordChar="•" HorizontalAlignment="Center" Height="0"/>
+      </Border>
+    </Panel>
   </Panel>
 
   <Window.Styles>

@@ -22,23 +22,28 @@ public sealed class GenericSystemServices : ISystemServices
 	public Process? GetPipeClientProcess(NamedPipeServerStream pipeServer) => null;
 	public Process? GetParentProcess(Process process) => null;
 
-
 	public async Task<AuthResult> TryAuthUser(AuthRequired authRequired, ClientInfo clientInfo, SshKey key, CancellationToken ct)
 	{
 		AuthResult result = new() { Success = true };
 		AuthPrompt? window = null;
 		try
 		{
-			if (authRequired.HasFlag(AuthRequired.Authentication))
+			var settings = App.GetService<KeydenSettings>();
+			if (authRequired.HasFlag(AuthRequired.Authorization) || settings.AuthenticationMode != AuthenticationMode.System)
 			{
 				window = new AuthPrompt(key, clientInfo, authRequired, ct);
 
 				window.Show();
+				window.Activate();
 				result = await window.Result;
 				window.Topmost = false;
 			}
 
-			if (result.Success && authRequired.HasFlag(AuthRequired.Authentication))
+			bool authenticationRequired =
+				result.Success &&
+				result.FreshAuthentication == false &&
+				authRequired.HasFlag(AuthRequired.Authentication);
+			if (authenticationRequired)
 			{
 				await Task.Delay(1000);
 				result.FreshAuthentication = true;
@@ -56,4 +61,5 @@ public sealed class GenericSystemServices : ISystemServices
 	public void NotifyPreauthorizedKey(ClientInfo clientInfo, SshKey key)
 	{
 	}
+	public string AuthenticationBranding => "None";
 }

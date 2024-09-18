@@ -21,6 +21,7 @@ public interface ISystemServices
 			SshKey key,
 			CancellationToken ct);
 	void NotifyPreauthorizedKey(ClientInfo clientInfo, SshKey key);
+	string AuthenticationBranding { get; }
 
 	Process? GetPipeClientProcess(NamedPipeServerStream pipeServer);
 	Process? GetParentProcess(Process process);

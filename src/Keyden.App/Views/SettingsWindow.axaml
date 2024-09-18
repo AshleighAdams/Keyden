@@ -63,13 +63,18 @@
                   HorizontalAlignment="Stretch"/>
 
     <ScrollViewer Grid.Column="0" Padding="8">
-      <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto">
+      <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
         <views:TabItem Grid.Row="0"
                        Icon="fa-cog"
                        Text="General"
                        Index="0"
                        SelectedIndex="{Binding TabIndexSelected}"/>
         <views:TabItem Grid.Row="1"
+                       Icon="fa-shield"
+                       Text="Security"
+                       Index="2"
+                       SelectedIndex="{Binding TabIndexSelected}"/>
+        <views:TabItem Grid.Row="2"
                        Icon="fa-code"
                        Text="Advanced"
                        Index="1"
@@ -109,6 +114,26 @@
           
         </StackPanel>
 
+        <StackPanel IsVisible="{Binding IsSecurityTabSelected}" Spacing="8">
+
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBlock>Authentication mode:</TextBlock>
+            <ComboBox ItemsSource="{Binding AuthenticationModes}"
+                      SelectedItem="{Binding Settings.AuthenticationMode}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Converter={StaticResource EnumConverter}}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBlock>PIN:</TextBlock>
+            <TextBox Width="200" Text="{Binding Settings.AuthenticationPin}" PasswordChar="•" />
+          </StackPanel>
+
+        </StackPanel>
 
         <StackPanel IsVisible="{Binding IsAdvancedTabSelected}" Spacing="8">
 

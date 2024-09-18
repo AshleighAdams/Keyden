@@ -66,6 +66,12 @@ public partial class SettingsWindow : Window
 
 public class EnumDescriptionConverter : IValueConverter
 {
+	private ISystemServices SystemServices { get; }
+	public EnumDescriptionConverter()
+	{
+		SystemServices = App.GetService<ISystemServices>();
+	}
+
 	object IValueConverter.Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
 		return value switch
@@ -76,6 +82,12 @@ public class EnumDescriptionConverter : IValueConverter
 				KeystoreBackend.DeveloperTest => "Developer Test",
 				KeystoreBackend.OnePassCLI => "1Password CLI",
 				_ => backend.ToString(),
+			},
+			AuthenticationMode authMode => authMode switch
+			{
+				AuthenticationMode.System => SystemServices.AuthenticationBranding,
+				AuthenticationMode.InternalPIN => "PIN",
+				_ => authMode.ToString(),
 			},
 			_ => value?.ToString() ?? string.Empty,
 		};

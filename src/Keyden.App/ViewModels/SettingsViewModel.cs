@@ -33,20 +33,25 @@ public class SettingsViewModel : ViewModelBase
 
 			this.RaisePropertyChanging(nameof(TabIndexSelected));
 			this.RaisePropertyChanging(nameof(IsGeneralTabSelected));
+			this.RaisePropertyChanging(nameof(IsSecurityTabSelected));
 			this.RaisePropertyChanging(nameof(IsAdvancedTabSelected));
 			_TabIndexSelected = value;
 			this.RaisePropertyChanged(nameof(TabIndexSelected));
 			this.RaisePropertyChanged(nameof(IsGeneralTabSelected));
+			this.RaisePropertyChanged(nameof(IsSecurityTabSelected));
 			this.RaisePropertyChanged(nameof(IsAdvancedTabSelected));
 		}
 	}
 	public bool IsGeneralTabSelected => TabIndexSelected == 0;
+	public bool IsSecurityTabSelected => TabIndexSelected == 2;
 	public bool IsAdvancedTabSelected => TabIndexSelected == 1;
 
 	public IReadOnlyList<KeystoreBackend> KeystoreBackends =>
 		Settings.DeveloperMode
 			? [KeystoreBackend.None, KeystoreBackend.OnePassCLI, KeystoreBackend.DeveloperTest]
 			: [KeystoreBackend.None, KeystoreBackend.OnePassCLI];
+
+	public IReadOnlyList<AuthenticationMode> AuthenticationModes { get; } = [AuthenticationMode.System, AuthenticationMode.InternalPIN];
 
 	public bool AutomaticallyStartup
 	{
