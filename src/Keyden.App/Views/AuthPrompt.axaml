@@ -5,9 +5,9 @@
         xmlns:i="https://github.com/projektanker/icons.avalonia"
         xmlns:views="clr-namespace:Keyden.Views"
         mc:Ignorable="d"
-        MinWidth="330" MaxWidth="400" MinHeight="150"
+        Width="350" MinHeight="150"
         Padding="24"
-        SizeToContent="WidthAndHeight"
+        SizeToContent="Height"
         x:Class="Keyden.Views.AuthPrompt"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="AuthPrompt"
@@ -38,7 +38,7 @@
 
       <TextBlock FontSize="16"
                  FontWeight="Normal"
-                 TextAlignment="Left"
+                 TextAlignment="Center"
                  TextWrapping="Wrap">
         Allow
         <Run FontWeight="SemiBold" Text="{Binding AppName}"/>
@@ -48,14 +48,40 @@
       <Border Background="{DynamicResource Brush.Auth.Key.Background}"
               CornerRadius="8"
               BorderBrush="{DynamicResource Brush.Auth.Key.Border}"
-              BorderThickness="1"
-              Padding="12,10">
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <i:Icon Value="fa-chevron-right" FontSize="10" Opacity="0.5" />
-          <views:KeyIcon />
-          <TextBlock Text="{Binding Key.Name}"
-                     FontWeight="SemiBold"
-                     VerticalAlignment="Center"/>
+              BorderThickness="1">
+        <StackPanel>
+          <Border Name="KeyTitleBar"
+                  Padding="12,10"
+                  Background="Transparent"
+                  CornerRadius="8,8,0,0"
+                  IsHitTestVisible="True">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Border Name="Chevron" Classes="chevron">
+                <i:Icon Value="fa-chevron-right" FontSize="10" Opacity="0.5" />
+              </Border>
+              <views:KeyIcon />
+              <TextBlock Text="{Binding Key.Name}"
+                         FontWeight="SemiBold"
+                         VerticalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+
+          <StackPanel Name="Resizer" ClipToBounds="True" MaxHeight="0">
+            <ScrollViewer Name="CollapsableContent" MaxHeight="150">
+              <SelectableTextBlock FontSize="4"
+                                   Margin="12,0,12,12"
+                                   TextWrapping="Wrap">
+                <Run Text="Process user" FontWeight="Bold" FontSize="12"/>
+                <LineBreak/>
+                <Run Text="{Binding AppUser}" FontSize="12"/>
+                <LineBreak/>
+                <LineBreak/>
+                <Run Text="Process hierarchy" FontWeight="Bold" FontSize="12"/>
+                <LineBreak/>
+                <Run Text="{Binding ProcessHierarchy}" FontSize="12"/>
+              </SelectableTextBlock>
+            </ScrollViewer>
+          </StackPanel>
         </StackPanel>
       </Border>
     
@@ -87,6 +113,22 @@
   </Panel>
 
   <Window.Styles>
+
+    <Style Selector="Border.chevron">
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" Easing="CubicEaseInOut"/>
+        </Transitions>
+      </Setter>
+
+      <Style Selector="^">
+        <Setter Property="RenderTransform" Value="rotate(0deg)"/>
+      </Style>
+      <Style Selector="^.rotate">
+        <Setter Property="RenderTransform" Value="rotate(90deg)"/>
+      </Style>
+    </Style>
+    
 
     <Style Selector="Button.confirm">
       <Setter Property="Background" Value="{DynamicResource Brush.ConfirmButton.Background}"/>

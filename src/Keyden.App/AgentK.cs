@@ -298,7 +298,8 @@ public class AgentK : ISshAgentHandler
 		var mainProcess = info.MainProcess;
 		var processChain = string.Join(", ", info.Processes
 			.Until(p => p == mainProcess)
-			.Select(static p => p.ProcessName));
+			.Select(static p => p.ProcessName)
+			.CompactDuplicates());
 
 		if (!string.IsNullOrEmpty(processChain))
 			processChain = $" (via {processChain})";

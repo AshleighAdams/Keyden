@@ -1,11 +1,18 @@
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Styling;
 using Avalonia.Threading;
+
+using DynamicData.Kernel;
 
 using Projektanker.Icons.Avalonia;
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +23,9 @@ namespace Keyden.Views
 		public SshKey Key { get; private set; }
 		public ClientInfo ClientInfo { get; private set; }
 		public string AppName { get; private set; }
+		public string AppUser { get; private set; }
+		public string ProcessHierarchy { get; private set; }
+
 
 		public static readonly StyledProperty<bool> AuthButtonEnabledProperty = AvaloniaProperty.Register<Window, bool>(nameof(AuthButtonEnabled), false);
 		public bool AuthButtonEnabled
@@ -52,6 +62,13 @@ namespace Keyden.Views
 			set => SetValue(AuthButtonTextProperty, value);
 		}
 
+		public static readonly StyledProperty<bool> IsExpandedProperty = AvaloniaProperty.Register<TabItem, bool>(nameof(IsExpanded), defaultValue: false);
+		public bool IsExpanded
+		{
+			get => GetValue(IsExpandedProperty);
+			set => SetValue(IsExpandedProperty, value);
+		}
+
 		private readonly TaskCompletionSource<AuthResult> Tcs = new();
 		public Task<AuthResult> Result => Tcs.Task;
 
@@ -64,8 +81,12 @@ namespace Keyden.Views
 				Username = "Someone",
 			};
 			AppName = "Something";
+			AppUser = "Someone";
+			ProcessHierarchy = "Something, bash, git-bash, Code, Explorer";
 
 			InitializeComponent();
+
+			KeyTitleBar.PointerPressed += KeyTitleBar_PointerPressed;
 
 			if (ActualTransparencyLevel == WindowTransparencyLevel.Mica)
 			{
@@ -85,9 +106,15 @@ namespace Keyden.Views
 			Key = key;
 			ClientInfo = clientInfo;
 			AppName = clientInfo.ApplicationName;
-			AuthButtonIconVisible = true;
+			AppUser = clientInfo.Username;
+			ProcessHierarchy = clientInfo.Processes.Count > 0
+				? string.Join(", ", clientInfo.Processes.Select(static p => p.ProcessName).CompactDuplicates())
+				: "Unknown";
+			AuthButtonIconVisible = false;
 
 			InitializeComponent();
+
+			KeyTitleBar.PointerPressed += KeyTitleBar_PointerPressed;
 
 			if (ActualTransparencyLevel == WindowTransparencyLevel.Mica)
 			{
@@ -149,6 +176,49 @@ namespace Keyden.Views
 				Success = true,
 				FreshAuthorization = true,
 			});
+		}
+
+		private CancellationTokenSource? AnimationCts;
+		private readonly CubicEaseInOut AnimationEasing = new();
+		private void KeyTitleBar_PointerPressed(object? sender, PointerPressedEventArgs e)
+		{
+			IsExpanded = !IsExpanded;
+
+			if (IsExpanded)
+				Chevron.Classes.Add("rotate");
+			else
+				Chevron.Classes.Remove("rotate");
+
+			var oldMaxHeight = double.IsPositiveInfinity(Resizer.MaxHeight) ? CollapsableContent.DesiredSize.Height : Resizer.MaxHeight;
+			var newMaxHeight = IsExpanded ? CollapsableContent.DesiredSize.Height : 0.0;
+			var finalMaxHeight = IsExpanded ? double.PositiveInfinity : 0.0;
+			var duration = 0.1;
+
+			var anim = new Animation()
+			{
+				Duration = TimeSpan.FromSeconds(duration),
+				IterationCount = new IterationCount(1, IterationType.Many),
+				Easing = AnimationEasing,
+				Children =
+					{
+						new KeyFrame()
+						{
+							Setters = { new Setter{ Property = MaxHeightProperty, Value = oldMaxHeight } },
+							KeyTime = TimeSpan.FromSeconds(0.0),
+						},
+						new KeyFrame()
+						{
+							Setters = { new Setter{ Property = MaxHeightProperty, Value = newMaxHeight } },
+							KeyTime = TimeSpan.FromSeconds(duration),
+						},
+					},
+			};
+
+			AnimationCts?.Cancel();
+			// before starting the animation, the new final value must be set
+			Resizer.MaxHeight = finalMaxHeight;
+			AnimationCts = new CancellationTokenSource();
+			_ = anim.RunAsync(Resizer, AnimationCts.Token);
 		}
 	}
 }

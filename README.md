@@ -34,7 +34,10 @@ git config --global commit.gpgsign true
 ## TODO:
 
 - Authentication backends
-- Key auth info details box
+	- Add alternate method to authenticate for OSes
+- Delegate auth prompt creation to ISystemServices
+	- Allows the use of system auth integrations into the auth prompt
+	- Possible to native or more native-like prompts
 - Add ability to automatically configure Git's configure SSH agent
 - Add ability to configure Git's signing keys
 - 1Pass backend: create key options entry if not exists
