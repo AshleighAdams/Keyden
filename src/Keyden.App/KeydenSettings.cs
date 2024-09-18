@@ -1,6 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 namespace Keyden;
 
@@ -49,11 +52,38 @@ public partial class KeydenSettings : ObservableObject
 		set => SetProperty(ref _AuthenticationMode, value);
 	}
 
-	private string _AuthenticationPin = string.Empty;
+	public string Salt { get; set; } = RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 32);
+	public string PinHash { get; set; } = string.Empty;
+
+	[JsonIgnore]
 	public string AuthenticationPin
 	{
-		get => _AuthenticationPin;
-		set => SetProperty(ref _AuthenticationPin, value);
+		get => "hello there :)";
+		set
+		{
+			var sb = new StringBuilder();
+			using var hash = SHA256.Create();
+
+			var result = hash.ComputeHash(Encoding.UTF8.GetBytes(Salt + value));
+			foreach (byte b in result)
+				sb.Append(b.ToString("x2"));
+
+			OnPropertyChanging(nameof(AuthenticationPin));
+			PinHash = sb.ToString();
+			OnPropertyChanged(nameof(AuthenticationPin));
+		}
+	}
+
+	public bool CheckPin(string pin)
+	{
+		var sb = new StringBuilder();
+		using var hash = SHA256.Create();
+
+		var result = hash.ComputeHash(Encoding.UTF8.GetBytes(Salt + pin));
+		foreach (byte b in result)
+			sb.Append(b.ToString("x2"));
+
+		return PinHash == sb.ToString();
 	}
 }
 

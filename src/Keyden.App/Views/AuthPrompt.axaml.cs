@@ -2,14 +2,10 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
-
-using DynamicData.Kernel;
 
 using Projektanker.Icons.Avalonia;
 
@@ -74,6 +70,7 @@ namespace Keyden.Views
 
 		private readonly AuthRequired AuthRequired;
 		private readonly TaskCompletionSource<AuthResult> Tcs = new();
+		private bool PinMode { get; } = false;
 		public Task<AuthResult> Result => Tcs.Task;
 
 		public AuthPrompt()
@@ -94,6 +91,8 @@ namespace Keyden.Views
 			InitializeComponent();
 
 			KeyTitleBar.PointerPressed += KeyTitleBar_PointerPressed;
+			KeyTitleBar.PointerEntered += KeyTitleBar_PointerEntered;
+			KeyTitleBar.PointerExited += KeyTitleBar_PointerExited;
 
 			if (ActualTransparencyLevel == WindowTransparencyLevel.Mica)
 			{
@@ -119,8 +118,13 @@ namespace Keyden.Views
 				: "Unknown";
 			AuthRequired = authRequired;
 
-
-			if (AuthRequired.HasFlag(AuthRequired.Authentication))
+			if (AuthRequired.HasFlag(AuthRequired.Authentication) && Settings.AuthenticationMode == AuthenticationMode.InternalPIN)
+			{
+				PinMode = true;
+				AuthButtonIconVisible = false;
+				AuthButtonText = "Authenticate";
+			}
+			else if (AuthRequired.HasFlag(AuthRequired.Authentication))
 			{
 				AuthButtonIcon = "fa-fingerprint";
 				AuthButtonIconVisible = true;
@@ -132,6 +136,8 @@ namespace Keyden.Views
 			InitializeComponent();
 
 			KeyTitleBar.PointerPressed += KeyTitleBar_PointerPressed;
+			KeyTitleBar.PointerEntered += KeyTitleBar_PointerEntered;
+			KeyTitleBar.PointerExited += KeyTitleBar_PointerExited;
 
 			if (ActualTransparencyLevel == WindowTransparencyLevel.Mica)
 			{
@@ -160,10 +166,16 @@ namespace Keyden.Views
 			DenyButton.Click += DenyButton_Click;
 			AuthButton.Click += AuthButton_Click;
 			Closed += AuthPrompt_Closed;
-			Pin.TextChanged += Pin_TextChanged;
-			Pin.KeyDown += Pin_KeyDown;
-			Pin.GotFocus += Pin_GotFocus;
-			Pin.LostFocus += Pin_LostFocus;
+
+			Pin.IsVisible = PinMode;
+			if (PinMode)
+				Pin.AttachedToVisualTree += Pin_AttachedToVisualTree;
+		}
+
+		private void Pin_AttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+		{
+			if (PinMode)
+				Pin.Focus();
 		}
 
 		private void AuthPrompt_Closed(object? sender, EventArgs e)
@@ -184,8 +196,26 @@ namespace Keyden.Views
 		{
 			if (AuthRequired.HasFlag(AuthRequired.Authentication) && Settings.AuthenticationMode == AuthenticationMode.InternalPIN)
 			{
-				PinBackdrop.IsVisible = true;
-				Pin.Focus();
+				if (Settings.CheckPin(Pin.Text ?? string.Empty))
+				{
+					AuthButtonEnabled = false;
+					AuthButtonIcon = "mdi-loading";
+					AuthButtonIconVisible = true;
+					AuthButtonIconAnimation = IconAnimation.Spin;
+					Pin.IsEnabled = false;
+
+					Tcs.TrySetResult(new()
+					{
+						Success = true,
+						FreshAuthorization = AuthRequired.HasFlag(AuthRequired.Authorization),
+						FreshAuthentication = AuthRequired.HasFlag(AuthRequired.Authentication),
+					});
+				}
+				else
+				{
+					Pin.Text = string.Empty;
+					Pin.Focus();
+				}
 			}
 			else
 			{
@@ -198,43 +228,6 @@ namespace Keyden.Views
 				{
 					Success = true,
 					FreshAuthorization = true,
-				});
-			}
-		}
-
-		private void Pin_LostFocus(object? sender, RoutedEventArgs e)
-		{
-			PinBackdrop.IsVisible = false;
-		}
-
-		private void Pin_GotFocus(object? sender, GotFocusEventArgs e)
-		{
-			PinBackdrop.IsVisible = true;
-		}
-
-		private void Pin_KeyDown(object? sender, KeyEventArgs e)
-		{
-			if (e.Key == Avalonia.Input.Key.Enter)
-			{
-				if (Pin.Text != Settings.AuthenticationPin)
-					Pin.Text = string.Empty;
-			}
-		}
-
-		private void Pin_TextChanged(object? sender, TextChangedEventArgs e)
-		{
-			if (Pin.Text == Settings.AuthenticationPin)
-			{
-				AuthButtonEnabled = false;
-				AuthButtonIcon = "mdi-loading";
-				AuthButtonIconVisible = true;
-				AuthButtonIconAnimation = IconAnimation.Spin;
-
-				Tcs.TrySetResult(new()
-				{
-					Success = true,
-					FreshAuthorization = AuthRequired.HasFlag(AuthRequired.Authorization),
-					FreshAuthentication = AuthRequired.HasFlag(AuthRequired.Authentication),
 				});
 			}
 		}
@@ -280,6 +273,16 @@ namespace Keyden.Views
 			Resizer.MaxHeight = finalMaxHeight;
 			AnimationCts = new CancellationTokenSource();
 			_ = anim.RunAsync(Resizer, AnimationCts.Token);
+		}
+
+		private void KeyTitleBar_PointerEntered(object? sender, PointerEventArgs e)
+		{
+			KeyTitleBar.Parent?.Parent?.Classes.Add("hover");
+		}
+
+		private void KeyTitleBar_PointerExited(object? sender, PointerEventArgs e)
+		{
+			KeyTitleBar.Parent?.Parent?.Classes.Remove("hover");
 		}
 	}
 }
