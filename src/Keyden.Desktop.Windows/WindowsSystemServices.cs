@@ -228,7 +228,7 @@ internal sealed class WindowsSystemServices : ISystemServices
 	private async Task<(bool success, string? message)> TryAuthenticateUser(bool fallbackReturn = false)
 	{
 		if (!await KeyCredentialManager.IsSupportedAsync())
-			return (false, "Not supported");
+			return (fallbackReturn, "Not supported");
 
 		var got = await KeyCredentialManager.RequestCreateAsync("login", KeyCredentialCreationOption.ReplaceExisting);
 		return got.Status switch

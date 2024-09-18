@@ -93,6 +93,7 @@ public partial class App : Application
 			SettingsWindow.Closed += (s, e) => SettingsWindow = null;
 		}
 		SettingsWindow.Show();
+		SettingsWindow.Activate();
 	}
 
 	private static AboutWindow? AboutWindow { get; set; }
@@ -104,6 +105,7 @@ public partial class App : Application
 			AboutWindow.Closed += (s, e) => AboutWindow = null;
 		}
 		AboutWindow.Show();
+		AboutWindow.Activate();
 	}
 	private static MainWindow? MainWindow { get; set; }
 	public static void ShowMainWindow()
@@ -114,6 +116,7 @@ public partial class App : Application
 			MainWindow.Closed += (s, e) => MainWindow = null;
 		}
 		MainWindow.Show();
+		MainWindow.Activate();
 	}
 
 	private void MenuSettings_Click(object? sender, EventArgs e) => ShowSettingsWindow();

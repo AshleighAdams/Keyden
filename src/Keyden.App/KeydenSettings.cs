@@ -55,33 +55,36 @@ public partial class KeydenSettings : ObservableObject
 	public string Salt { get; set; } = RandomNumberGenerator.GetString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 32);
 	public string PinHash { get; set; } = string.Empty;
 
+	public string HashPin(string pin)
+	{
+		if (string.IsNullOrEmpty(pin))
+			return string.Empty;
+
+		var sb = new StringBuilder();
+
+		var result = SHA256.HashData(Encoding.UTF8.GetBytes(Salt + pin));
+		foreach (byte b in result)
+			sb.Append(b.ToString("x2"));
+		return sb.ToString();
+	}
+
 	[JsonIgnore]
 	public string AuthenticationPin
 	{
-		get => "hello there :)";
+		get => string.IsNullOrEmpty(Salt) ? string.Empty : "sneakypeaky";
 		set
 		{
-			var sb = new StringBuilder();
-
-			var result = SHA256.HashData(Encoding.UTF8.GetBytes(Salt + value));
-			foreach (byte b in result)
-				sb.Append(b.ToString("x2"));
-
 			OnPropertyChanging(nameof(AuthenticationPin));
-			PinHash = sb.ToString();
+			PinHash = HashPin(value);
 			OnPropertyChanged(nameof(AuthenticationPin));
 		}
 	}
 
 	public bool CheckPin(string pin)
 	{
-		var sb = new StringBuilder();
-
-		var result = SHA256.HashData(Encoding.UTF8.GetBytes(Salt + pin));
-		foreach (byte b in result)
-			sb.Append(b.ToString("x2"));
-
-		return PinHash == sb.ToString();
+		if (string.IsNullOrEmpty(PinHash) && string.IsNullOrEmpty(pin))
+			return true;
+		return HashPin(pin) ==  PinHash;
 	}
 }
 
