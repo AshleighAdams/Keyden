@@ -1,14 +1,20 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Keyden.Desktop.Windows;
+using Keyden.Views;
 
 using Microsoft.Win32;
+
+using Renci.SshNet;
 
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -104,25 +110,6 @@ internal sealed class WindowsSystemServices : ISystemServices
 		}
 	}
 
-	public async Task<AuthenticationResult> TryAuthenticateUser()
-	{
-		if (!KeyCredentialManager.IsSupportedAsync().GetAwaiter().GetResult())
-			return new() { Success = false, FailMessage = "Not supported" };
-
-		var got = await KeyCredentialManager.RequestCreateAsync("login", KeyCredentialCreationOption.ReplaceExisting);
-		return got.Status switch
-		{
-			KeyCredentialStatus.Success => new() { Success = true },
-			KeyCredentialStatus.UnknownError => new() { Success = false, FailMessage = "Unknown failure" },
-			KeyCredentialStatus.NotFound => new() { Success = false, FailMessage = "Not found" },
-			KeyCredentialStatus.UserCanceled => new() { Success = false, FailMessage = "User canceled" },
-			KeyCredentialStatus.UserPrefersPassword => new() { Success = false, FailMessage = "User prefers password" },
-			KeyCredentialStatus.CredentialAlreadyExists => new() { Success = false, FailMessage = "Already exists" },
-			KeyCredentialStatus.SecurityDeviceLocked => new() { Success = false, FailMessage = "Security device locked" },
-			_ => new() { Success = false, FailMessage = "Unknown failure (2)" },
-		};
-	}
-
 	public Process? GetPipeClientProcess(NamedPipeServerStream pipeServer)
 	{
 		nint pipeHandle = pipeServer.SafePipeHandle.DangerousGetHandle();
@@ -174,5 +161,80 @@ internal sealed class WindowsSystemServices : ISystemServices
 				return info.kp_eproc.e_ppid;
 			}
 		*/
+	}
+
+	public async Task<AuthResult> TryAuthUser(AuthRequired authRequired, ClientInfo clientInfo, SshKey key, CancellationToken ct)
+	{
+		AuthResult result = new(){ Success = true };
+		AuthPrompt? window = null;
+		try
+		{
+			if (authRequired.HasFlag(AuthRequired.Authentication))
+			{
+				window = new AuthPrompt(key, clientInfo, authRequired, ct);
+
+				// position the window over the application requesting auth if possible:
+				var authWindow = window.TryGetPlatformHandle()?.Handle ?? nint.Zero;
+				var clientWindow = clientInfo.MainProcess?.MainWindowHandle ?? nint.Zero;
+				if (authWindow != nint.Zero && clientWindow != nint.Zero)
+				{
+					if (!Win32.GetWindowRect(clientWindow, out var clientRect))
+					{
+						var width = clientRect.Right - clientRect.Left;
+						var height = clientRect.Bottom - clientRect.Top;
+						var newX = (clientRect.Left + width / 2) - (int)(window.Width / 2);
+						var newY = (clientRect.Top + height / 2) - (int)(window.Height / 2);
+
+						window.Position = new(newX, newY);
+					}
+				}
+
+				window.Show();
+				result = await window.Result;
+				window.Topmost = false;
+			}
+
+			if (result.Success && authRequired.HasFlag(AuthRequired.Authentication))
+			{
+				var (authenticated, message) = await TryAuthenticateUser();
+				if (authenticated)
+					result.FreshAuthentication = true;
+				else
+				{
+					result.Success = false;
+					result.Message = message;
+				}
+			}
+
+			return result;
+		}
+		finally
+		{
+			window?.Close();
+		}
+	}
+
+	private async Task<(bool success, string? message)> TryAuthenticateUser()
+	{
+		if (!KeyCredentialManager.IsSupportedAsync().GetAwaiter().GetResult())
+			return (false, "Not supported");
+
+		var got = await KeyCredentialManager.RequestCreateAsync("login", KeyCredentialCreationOption.ReplaceExisting);
+		return got.Status switch
+		{
+			KeyCredentialStatus.Success => (true, null),
+			KeyCredentialStatus.UnknownError => (false, "Unknown failure"),
+			KeyCredentialStatus.NotFound => (false, "Not found"),
+			KeyCredentialStatus.UserCanceled => (false, "User canceled"),
+			KeyCredentialStatus.UserPrefersPassword => (false, "User prefers password"),
+			KeyCredentialStatus.CredentialAlreadyExists => (false, "Already exists"),
+			KeyCredentialStatus.SecurityDeviceLocked => (false, "Security device locked"),
+			_ => (false, "Unknown failure (2)"),
+		};
+	}
+
+	public void NotifyPreauthorizedKey(ClientInfo clientInfo, SshKey key)
+	{
+		// TODO: popup a notification if the setting is enabled
 	}
 }

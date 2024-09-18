@@ -63,7 +63,7 @@ public class SettingsViewModel : ViewModelBase
 
 public class DesignSettingsViewModel : SettingsViewModel
 {
-	public DesignSettingsViewModel() : base(new NullSystemServices(), new())
+	public DesignSettingsViewModel() : base(new GenericSystemServices(), new())
 	{
 	}
 }

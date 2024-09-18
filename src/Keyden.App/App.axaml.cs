@@ -20,7 +20,7 @@ public partial class App : Application
 	public ISystemServices SystemServices { get; }
 	public App()
 	{
-		SystemServices = new NullSystemServices();
+		SystemServices = new GenericSystemServices();
 	}
 	public App(ISystemServices systemServices)
 	{

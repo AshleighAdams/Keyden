@@ -35,6 +35,6 @@ internal sealed class Program
 
 	public static ISystemServices CreateSystemServices()
 	{
-		return new NullSystemServices();
+		return new GenericSystemServices();
 	}
 }

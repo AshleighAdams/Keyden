@@ -11,6 +11,18 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool IsImmersiveProcess(nint process);
 
+	[LibraryImport("user32.dll")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool GetWindowRect(nint handle, out Rect rect);
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct Rect
+	{
+		public int Left;
+		public int Top;
+		public int Right;
+		public int Bottom;
+	}
 
 	[LibraryImport("user32.dll", EntryPoint = "GetLastInputInfo")]
 	[return: MarshalAs(UnmanagedType.Bool)]

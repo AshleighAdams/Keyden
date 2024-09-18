@@ -13,22 +13,6 @@ using Keyden.Views;
 
 namespace Keyden;
 
-public struct AuthResult
-{
-	public bool Success { get; set; }
-	public bool Rejected { get; set; }
-	public bool FreshAuthorization { get; set; }
-	public bool FreshAuthentication { get; set; }
-}
-
-[Flags]
-public enum AuthRequired
-{
-	None,
-	Authorization,
-	Authentication,
-}
-
 public class AgentK : ISshAgentHandler
 {
 	private KeydenSettings Settings { get; }
@@ -326,7 +310,6 @@ public class AgentK : ISshAgentHandler
 	}
 
 	private SemaphoreSlim PromptQueue { get; } = new SemaphoreSlim(1);
-
 	public struct ScopedLock : IDisposable
 	{
 		private SemaphoreSlim? Semaphore;
@@ -555,47 +538,35 @@ public class AgentK : ISshAgentHandler
 			return default;
 		}
 
-		// check for pre-authorization
 		var authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
+
+		// check for pre-authorization
 		if (authRequired == AuthRequired.None)
+		{
+			SystemServices.NotifyPreauthorizedKey(info, publicKey);
 			return await GotAuthResult(publicKey, keyOptions, info, new() { Success = true }, ct);
+		}
 
 		await PromptQueue.WaitAsync(ct);
-
-		// check again for pre-authorization, as a previous auth request may suffice
-		authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
-		if (authRequired is AuthRequired.None)
-			return await GotAuthResult(publicKey, keyOptions, info, new() { Success = true }, ct);
-
 		using var @lock = new ScopedLock(PromptQueue);
 
-		AuthPrompt? window = null;
-		AuthResult result = new() { Success = true };
+		// refresh the required auth, a previous reuqest could've changed this, and some time has passed since
+		authRequired = await QueryAuth(publicKey, keyOptions, info, ct);
+
+		// check again for pre-authorization
+		if (authRequired is AuthRequired.None)
+		{
+			SystemServices.NotifyPreauthorizedKey(info, publicKey);
+			return await GotAuthResult(publicKey, keyOptions, info, new() { Success = true }, ct);
+		}
 
 		try
 		{
-			if (authRequired.HasFlag(AuthRequired.Authentication))
-			{
-				window = new AuthPrompt(Settings, publicKey, info, authRequired, ct);
-				window.Show();
-				result = await window.Result;
-				window.Topmost = false;
-			}
-
-			if (result.Success && authRequired.HasFlag(AuthRequired.Authentication))
-			{
-				var systemAuthResult = await SystemServices.TryAuthenticateUser();
-				if (systemAuthResult.Success)
-					result.FreshAuthentication = true;
-				else
-					result.Success = false;
-			}
-
+			var result = await SystemServices.TryAuthUser(authRequired, info, publicKey, ct);
 			return await GotAuthResult(publicKey, keyOptions, info, result, ct);
 		}
 		catch (BackendException ex)
 		{
-			window?.Close();
 			NewActivity?.Invoke(new ActivityItem()
 			{
 				Icon = "fa-circle-exclamation",
@@ -610,7 +581,6 @@ public class AgentK : ISshAgentHandler
 		}
 		catch (Exception ex)
 		{
-			window?.Close();
 			NewActivity?.Invoke(new ActivityItem()
 			{
 				Icon = "fa-circle-exclamation",
@@ -622,10 +592,6 @@ public class AgentK : ISshAgentHandler
 			if (await ExceptionWindow.Prompt(ex.ToString(), ct) == ExceptionWindowResult.Abort)
 				throw;
 			return default;
-		}
-		finally
-		{
-			window?.Close();
 		}
 	}
 }

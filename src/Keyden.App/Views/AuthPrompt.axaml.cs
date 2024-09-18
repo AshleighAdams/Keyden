@@ -97,7 +97,6 @@ namespace Keyden.Views
 
 		private readonly CancellationTokenRegistration? CancelRegistration = null;
 		public AuthPrompt(
-			KeydenSettings settings,
 			SshKey key,
 			ClientInfo clientInfo,
 			AuthRequired authRequired,
@@ -128,6 +127,7 @@ namespace Keyden.Views
 				Dispatcher.UIThread.Post(() => Close());
 			});
 
+			var settings = App.GetService<KeydenSettings>();
 			if (settings.AuthButtonEnableDelay == 0)
 				AuthButtonEnabled = true;
 			else

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Keyden;
@@ -14,16 +15,30 @@ public interface ISystemServices
 	TimeSpan UserIdleDuration { get; }
 	public event EventHandler<EventArgs> MachineLocked;
 
-	Task<AuthenticationResult> TryAuthenticateUser();
+	Task<AuthResult> TryAuthUser(
+			AuthRequired authRequired,
+			ClientInfo clientInfo,
+			SshKey key,
+			CancellationToken ct);
+	void NotifyPreauthorizedKey(ClientInfo clientInfo, SshKey key);
 
 	Process? GetPipeClientProcess(NamedPipeServerStream pipeServer);
 	Process? GetParentProcess(Process process);
 }
 
-public record struct AuthenticationResult
+public struct AuthResult
 {
-	public required bool Success { get; set; }
+	public bool Success { get; set; }
+	public bool Rejected { get; set; }
+	public bool FreshAuthorization { get; set; }
+	public bool FreshAuthentication { get; set; }
+	public string? Message { get; set; }
+}
 
-	[MemberNotNullWhen(false, nameof(Success))]
-	public string? FailMessage { get; set; }
+[Flags]
+public enum AuthRequired
+{
+	None,
+	Authorization,
+	Authentication,
 }
