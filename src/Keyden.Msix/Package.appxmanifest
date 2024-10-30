@@ -1,15 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
          xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-         xmlns:desktop="https://schemas.microsoft.com/appx/manifest/desktop/windows10"
+         xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
          xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
-         IgnorableNamespaces="uap rescap desktop uap5">
+         xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+         IgnorableNamespaces="uap rescap desktop uap5 uap10">
 
   <Identity Name="AshleighAdams.Keyden"
             Publisher="CN=Ashleigh Adams"
-            Version="0.0.21.0" />
+            Version="0.0.22.0" />
 
   <Properties>
     <DisplayName>Keyden</DisplayName>
@@ -18,18 +19,24 @@
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14393.0" MaxVersionTested="10.0.14393.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19000.0" MaxVersionTested="10.0.19000.0" />
   </Dependencies>
 
   <Resources>
     <Resource Language="x-generate"/>
   </Resources>
 
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
+    <!--<rescap:Capability Name="unvirtualizedResources"/>-->
+    <Capability Name="codeGeneration"/>
+  </Capabilities>
+
   <Applications>
-    <Application Id="App"
-                 Executable="$targetnametoken$.exe"
-                 EntryPoint="$targetentrypoint$">
+    <Application Id="Keyden"
+                 Executable="Keyden.Desktop.Windows\Keyden.exe"
+                 EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements DisplayName="Keyden"
                           Description="SSH key agent for your password manager"
                           BackgroundColor="transparent"
@@ -39,23 +46,24 @@
         </uap:DefaultTile >
         <uap:SplashScreen Image="Images\SplashScreen.png" />
         <uap:InitialRotationPreference>
-          <uap:Rotation Preference="landscape"/></uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+        </uap:InitialRotationPreference>
       </uap:VisualElements>
 
       <Extensions>
-        <!--<desktop:Extension Category="windows.startupTask"
+        <desktop:Extension Category="windows.startupTask"
                            Executable="Keyden.Desktop.Windows\Keyden.exe"
                            EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask TaskId="KeydenStartup" Enabled="true" DisplayName="Keyden"/>
-        </desktop:Extension>-->
+        </desktop:Extension>
 
-        <uap5:Extension Category="windows.startupTask"
+        <!--<uap5:Extension Category="windows.startupTask"
                         Executable="Keyden.Desktop.Windows\Keyden.exe"
-                        EntryPoint="Keyden.Desktop.Windows">
+                        EntryPoint="Windows.FullTrustApplication">
           <uap5:StartupTask TaskId="KeydenStartup"
                             Enabled="true"
                             DisplayName="Keyden" />
-        </uap5:Extension>
+        </uap5:Extension>-->
 
         <!--<uap5:Extension Category="windows.appExecutionAlias">
           <uap5:AppExecutionAlias>
@@ -65,10 +73,4 @@
       </Extensions>
     </Application>
   </Applications>
-
-  <Capabilities>
-    <Capability Name="internetClient" />
-    <rescap:Capability Name="runFullTrust" />
-    <Capability Name="codeGeneration"/>
-  </Capabilities>
 </Package>

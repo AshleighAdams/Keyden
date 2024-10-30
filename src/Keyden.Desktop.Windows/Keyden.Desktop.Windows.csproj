@@ -7,9 +7,10 @@
 
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-
-    <PublishSingleFile Condition="'$(Configuration)' == 'Debug'">true</PublishSingleFile>
-    <PublishAot Condition="'$(Configuration)' != 'Debug'">true</PublishAot>
+    
+    <PublishSingleFile>true</PublishSingleFile>
+    <!--<PublishSingleFile Condition="'$(Configuration)' == 'Debug'">true</PublishSingleFile>
+    <PublishAot Condition="'$(Configuration)' != 'Debug'">true</PublishAot>-->
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>full</TrimMode>
     <XmlResolverIsNetworkingEnabledByDefault>false</XmlResolverIsNetworkingEnabledByDefault>
