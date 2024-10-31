@@ -95,6 +95,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        pattern: '*'
+        merge-multiple: true
+
     - name: Upload release
       run: |
         set -x
