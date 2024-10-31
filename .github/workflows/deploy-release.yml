@@ -114,7 +114,7 @@ jobs:
         files=()
 
         IFS=$'\n';
-        for asset in $(find ./artifacts); do
+        for asset in $(find ./artifacts -name "*.*"); do
           files+=("$asset")
         done
 
