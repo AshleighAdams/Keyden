@@ -1,0 +1,35 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <OutputName>Keyden</OutputName>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <HarvestDirectory Include="artifacts-$(ConfigurationName)-$(PlatformName)">
+      <ComponentGroupName>Artifacts</ComponentGroupName>
+      <DirectoryRefId>ApplicationInstallFolder</DirectoryRefId>
+      <SuppressRootDirectory>true</SuppressRootDirectory>
+    </HarvestDirectory>
+    <BindPath Include="artifacts-$(ConfigurationName)-$(PlatformName)" />
+  </ItemGroup>
+  
+  <!-- Verlite integration -->
+  <PropertyGroup>
+    <UsingMicrosoftNETSdk>true</UsingMicrosoftNETSdk>
+  </PropertyGroup>
+  <Target Name="AddVersionInfo" AfterTargets="Verlite">
+    <PropertyGroup>
+      <DefineConstants>VerliteVersion=$(VerliteMajor).$(VerliteMinor).$(VerlitePatch);</DefineConstants>
+      <!--<DefineConstants>VerliteVersion=$(VerliteVersion);</DefineConstants>-->
+    </PropertyGroup>
+  </Target>
+
+  <!-- get a build -->
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="build-artifacts.bat $(ConfigurationName) $(PlatformName)" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Heat" Version="5.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+  </ItemGroup>
+</Project>

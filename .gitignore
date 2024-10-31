@@ -4,3 +4,4 @@ obj
 artifacts
 temp
 *.usersettings
+src/Keyden.Installer.Windows/artifacts-*
