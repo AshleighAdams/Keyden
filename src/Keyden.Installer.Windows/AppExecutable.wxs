@@ -1,9 +1,0 @@
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Fragment>
-    <ComponentGroup Id="ApplicationExecutable" Directory="ApplicationInstallFolder">
-      <Component>
-        <File Id="Keyden.exe" Source="Keyden.exe" />
-      </Component>
-    </ComponentGroup>
-  </Fragment>
-</Wix>
