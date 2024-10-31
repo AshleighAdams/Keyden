@@ -50,7 +50,8 @@ jobs:
 
     - name: Setup Verlite
       run: |
-        verlite_version="$(dotnet msbuild Directory.Build.props -getitem:PackageReference | jq -r '.Items.PackageReference[] | select(.Identity=="Verlite.MsBuild") .Version')"
+        #verlite_version="$(dotnet msbuild Directory.Build.props -getitem:PackageReference | jq -r '.Items.PackageReference[] | select(.Identity=="Verlite.MsBuild") .Version')"
+        verlite_version="2.5.0"
         dotnet tool install --global Verlite.CLI --version "$verlite_version"
         verlite . --enable-shadow-repo --auto-fetch --verbosity verbatim
 
