@@ -1,0 +1,5 @@
+[submodule "src/Keyden.Installer.Windows/InnoSetup"]
+	path = src/Keyden.Installer.Windows/InnoSetup
+	url = https://github.com/AshleighAdams/Keyden.git
+	branch = inno-setup
+	shallow = true

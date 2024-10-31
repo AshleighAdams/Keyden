@@ -51,7 +51,8 @@
       <Border Name="KeyBackground"
               CornerRadius="8"
               BorderBrush="{DynamicResource Brush.Auth.Key.Border}"
-              BorderThickness="1">
+              BorderThickness="1"
+              Classes.hoverxxx="{Binding RelativeSource=KeyTitleBar.IsPointerOver}">
         <StackPanel>
           <Border Name="KeyTitleBar"
                   Background="Transparent"
@@ -126,7 +127,7 @@
     <Style Selector="Border#KeyBackground">
       <Setter Property="Background" Value="{DynamicResource Brush.Auth.Key.Background}"/>
     </Style>
-    <Style Selector="Border.hover#KeyBackground">
+    <Style Selector="Border.hoverxxx#KeyBackground">
       <Setter Property="Background" Value="{DynamicResource Brush.Key.Hover}"/>
     </Style>
     
