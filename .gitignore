@@ -2,6 +2,7 @@
 bin
 obj
 artifacts
+artifacts-*
 temp
 *.usersettings
 src/Keyden.Installer.Windows/artifacts-*

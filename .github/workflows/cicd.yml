@@ -1,0 +1,134 @@
+name: Continious Integration
+
+on:
+  pull_request:
+    branches:
+      - master
+      - support/*
+    paths-ignore:
+    - docs/**
+    - README.md
+    - .editorconfig
+    - .gitattributes
+    - .gitignore
+    - .github/ISSUE_TEMPLATE/**
+    - .github/pull_request_template.md
+  push:
+    branches:
+      - master
+      - support/*
+    paths-ignore:
+    - docs/**
+    - README.md
+    - .editorconfig
+    - .gitattributes
+    - .gitignore
+    - .github/ISSUE_TEMPLATE/**
+    - .github/pull_request_template.md
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: "Unit test"
+    runs-on: windows-latest
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: '1'
+        submodules: recursive
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Setup Verlite
+      run: |
+        verlite_version="$(grep '"Verlite\.MsBuild"' Directory.Build.props | LC_ALL=en_US.utf8 grep -Po 'Version="\K[^"]+')"
+        dotnet tool install --global Verlite.CLI --version "$verlite_version"
+        verlite . --enable-shadow-repo --auto-fetch --verbosity verbatim
+
+    - name: Restore
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    - name: Test
+      run: dotnet test --configuration Release --no-build --logger GitHubActions
+
+  build:
+    name: "Build ${{ matrix.rid }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+        - rid: win-x64
+          os: windows-latest
+          project: src/Keyden.Desktop.Windows
+          installer-arch: x64
+        # - rid: win-arm64
+        #   os: ubuntu-latest
+        #   project: src/Keyden.Desktop.Windows
+        #   installer-arch: arm64
+        - rid: linux-x64
+          os: ubuntu-latest
+          project: src/Keyden.Desktop.Unix
+        # - rid: osx-x64
+        #   os: macos-13
+        #   project: src/Keyden.Desktop.Unix
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: '1'
+        submodules: recursive
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Setup Verlite
+      run: |
+        verlite_version="$(grep '"Verlite\.MsBuild"' Directory.Build.props | LC_ALL=en_US.utf8 grep -Po 'Version="\K[^"]+')"
+        dotnet tool install --global Verlite.CLI --version "$verlite_version"
+        verlite . --enable-shadow-repo --auto-fetch --verbosity verbatim
+
+    - name: Build bins
+      run: |
+        dotnet publish "${project}" --configuration Release -r "${rid}" -o "artifacts-publish"
+        mkdir artifacts
+        cd artifacts-publish
+        rm *.pdb || true
+        rm *.dbg || true
+        rm *.xml || true
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+            7z a "../artifacts/Keyden-${rid}.zip" .
+        else
+            7za a "../artifacts/Keyden-${rid}.zip" .
+        fi
+      env:
+        rid: ${{ matrix.rid }}
+        project: ${{ matrix.project }}
+
+    - name: Build installer
+      if: ${{ matrix.installer-arch != '' }}
+      run: |
+        version=$(verlite . --enable-shadow-repo)
+        cd src/Keyden.Installer.Windows
+        ./InnoSetup/ISCC.exe Keyden.iss -DVersion="$version" -DArch=$arch -DArtifactsDir=../../artifacts-publish -FKeydenSetup-$arch -O../../artifacts
+      env:
+        arch: ${{ matrix.installer-arch }}
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+        name: artifacts-${{ matrix.rid }}
+        if-no-files-found: error
+        path:  |
+          artifacts/*

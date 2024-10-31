@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # TODO: this
+  release:
+    name: Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Upload release
+      run: |
+        set -x
+        tag="${GITHUB_REF#refs/*/}"
+        files=()
+
+        IFS=$'\n';
+        for asset in $(find ./artifacts); do
+          files+=("$asset")
+        done
+
+        gh release upload "$tag" "${files[@]}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
