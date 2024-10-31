@@ -7,7 +7,7 @@ using Projektanker.Icons.Avalonia.MaterialDesign;
 
 using System;
 
-namespace Keyden.Desktop.WinRT;
+namespace Keyden.Desktop.Windows;
 
 internal sealed class Program
 {

@@ -22,7 +22,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Security.Credentials;
 
-namespace Keyden.Desktop.WinRT;
+namespace Keyden.Desktop.Windows;
 
 [SupportedOSPlatform("windows10.0.17134.0")]
 internal sealed class WindowsSystemServices : ISystemServices
