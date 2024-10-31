@@ -73,7 +73,7 @@ jobs:
           project: src/Keyden.Desktop.Windows
           installer-arch: x64
         - rid: win-arm64
-          os: ubuntu-latest
+          os: windows-latest
           project: src/Keyden.Desktop.Windows
           installer-arch: arm64
         - rid: linux-x64
