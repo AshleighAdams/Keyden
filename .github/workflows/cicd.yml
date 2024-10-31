@@ -79,15 +79,15 @@ jobs:
         - rid: linux-x64
           os: ubuntu-latest
           project: src/Keyden.Desktop.Unix
-        - rid: linux-arm64
-          os: ubuntu-latest
-          project: src/Keyden.Desktop.Unix
+        # - rid: linux-arm64
+        #   os: ubuntu-latest
+        #   project: src/Keyden.Desktop.Unix
         - rid: osx-x64
           os: macos-13
           project: src/Keyden.Desktop.Unix
-        - rid: osx-arm64
-          os: macos-13
-          project: src/Keyden.Desktop.Unix
+        # - rid: osx-arm64
+        #   os: macos-13
+        #   project: src/Keyden.Desktop.Unix
     steps:
     - uses: actions/checkout@v4
       with:
