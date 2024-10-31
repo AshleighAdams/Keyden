@@ -1,0 +1,133 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.5": {
+      "Verlite.MsBuild/2.5.0": {
+        "type": "package",
+        "build": {
+          "build/Verlite.MsBuild.props": {},
+          "build/Verlite.MsBuild.targets": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/Verlite.MsBuild.props": {},
+          "buildMultiTargeting/Verlite.MsBuild.targets": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Verlite.MsBuild/2.5.0": {
+      "sha512": "QPEqU515FONuXo5aCJ5z2Chgt62b9af5mG9tmIgvcMP9TgrX21h6ssJTLsfXoUP0HIm1oX26mdQEZwypUIavWA==",
+      "type": "package",
+      "path": "verlite.msbuild/2.5.0",
+      "files": [
+        ".nupkg.metadata",
+        "README.md",
+        "analyzers/dotnet/cs/Verlite.Core.dll",
+        "analyzers/dotnet/cs/Verlite.MsBuild.dll",
+        "build/Verlite.MsBuild.props",
+        "build/Verlite.MsBuild.targets",
+        "buildMultiTargeting/Verlite.MsBuild.props",
+        "buildMultiTargeting/Verlite.MsBuild.targets",
+        "images/packageicon.png",
+        "verlite.msbuild.2.5.0.nupkg.sha512",
+        "verlite.msbuild.nuspec",
+        "verlite/Microsoft.CodeAnalysis.dll",
+        "verlite/Microsoft.NET.StringTools.dll",
+        "verlite/Microsoft.Win32.Registry.dll",
+        "verlite/System.Buffers.dll",
+        "verlite/System.Collections.Immutable.dll",
+        "verlite/System.Configuration.ConfigurationManager.dll",
+        "verlite/System.Memory.dll",
+        "verlite/System.Numerics.Vectors.dll",
+        "verlite/System.Reflection.Metadata.dll",
+        "verlite/System.Runtime.CompilerServices.Unsafe.dll",
+        "verlite/System.Security.AccessControl.dll",
+        "verlite/System.Security.Cryptography.ProtectedData.dll",
+        "verlite/System.Security.Permissions.dll",
+        "verlite/System.Security.Principal.Windows.dll",
+        "verlite/System.Text.Encoding.CodePages.dll",
+        "verlite/System.Threading.Tasks.Extensions.dll",
+        "verlite/Verlite.Core.dll",
+        "verlite/Verlite.Core.pdb",
+        "verlite/Verlite.Core.xml",
+        "verlite/Verlite.MsBuild.deps.json",
+        "verlite/Verlite.MsBuild.dll",
+        "verlite/Verlite.MsBuild.pdb",
+        "verlite/Verlite.MsBuild.xml",
+        "verlite/cs/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/de/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/es/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/fr/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/it/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/ja/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/ko/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/pl/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/pt-BR/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/ru/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/tr/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/zh-Hans/Microsoft.CodeAnalysis.resources.dll",
+        "verlite/zh-Hant/Microsoft.CodeAnalysis.resources.dll"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.5": [
+      "Verlite.MsBuild >= 2.5.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Kayla\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Git\\KeyWarden\\src\\Keyden.Installer.Windows\\InnoSetup\\Examples\\MyDll\\C#\\MyDll.csproj",
+      "projectName": "MyDll",
+      "projectPath": "C:\\Git\\KeyWarden\\src\\Keyden.Installer.Windows\\InnoSetup\\Examples\\MyDll\\C#\\MyDll.csproj",
+      "packagesPath": "C:\\Users\\Kayla\\.nuget\\packages\\",
+      "outputPath": "C:\\Git\\KeyWarden\\src\\Keyden.Installer.Windows\\InnoSetup\\Examples\\MyDll\\C#\\obj\\",
+      "projectStyle": "PackageReference",
+      "skipContentFileWrite": true,
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Kayla\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net45"
+      ],
+      "sources": {
+        "C:\\Git\\LocalNugetRegistry": {},
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://nuget.pkg.github.com/AshleighAdams/index.json": {}
+      },
+      "frameworks": {
+        "net45": {
+          "projectReferences": {}
+        }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      }
+    },
+    "frameworks": {
+      "net45": {
+        "dependencies": {
+          "Verlite.MsBuild": {
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[2.5.0, )"
+          }
+        }
+      }
+    }
+  }
+}

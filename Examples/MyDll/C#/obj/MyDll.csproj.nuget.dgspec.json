@@ -1,0 +1,58 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Git\\KeyWarden\\src\\Keyden.Installer.Windows\\InnoSetup\\Examples\\MyDll\\C#\\MyDll.csproj": {}
+  },
+  "projects": {
+    "C:\\Git\\KeyWarden\\src\\Keyden.Installer.Windows\\InnoSetup\\Examples\\MyDll\\C#\\MyDll.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Git\\KeyWarden\\src\\Keyden.Installer.Windows\\InnoSetup\\Examples\\MyDll\\C#\\MyDll.csproj",
+        "projectName": "MyDll",
+        "projectPath": "C:\\Git\\KeyWarden\\src\\Keyden.Installer.Windows\\InnoSetup\\Examples\\MyDll\\C#\\MyDll.csproj",
+        "packagesPath": "C:\\Users\\Kayla\\.nuget\\packages\\",
+        "outputPath": "C:\\Git\\KeyWarden\\src\\Keyden.Installer.Windows\\InnoSetup\\Examples\\MyDll\\C#\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Kayla\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net45"
+        ],
+        "sources": {
+          "C:\\Git\\LocalNugetRegistry": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://nuget.pkg.github.com/AshleighAdams/index.json": {}
+        },
+        "frameworks": {
+          "net45": {
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net45": {
+          "dependencies": {
+            "Verlite.MsBuild": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.5.0, )"
+            }
+          }
+        }
+      }
+    }
+  }
+}
