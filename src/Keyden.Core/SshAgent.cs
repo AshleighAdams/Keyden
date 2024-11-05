@@ -21,44 +21,6 @@ namespace Keyden;
 
 public record SshAgentOptions
 {
-	public static string DefaultPipePath
-	{
-		get
-		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				return "openssh-ssh-agent";
-
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-			{
-				var uid = Unix.Getuid().ToString(CultureInfo.InvariantCulture);
-				var socketDirectory = $"/run/user/{uid}";
-
-				// check for legacy linux systems
-				if (!Directory.Exists(socketDirectory))
-					socketDirectory = Directory.Exists("/run") ? "/run" : "/var/run";
-
-				if (!Directory.Exists(socketDirectory))
-					return "keyden-ssh-agent";
-
-				socketDirectory += "/keyden";
-				var socketPath = $"{socketDirectory}/ssh-agent.sock";
-
-				if (!Directory.Exists(socketDirectory))
-					Directory.CreateDirectory(socketDirectory);
-				return socketPath;
-			}
-
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-			{
-				var uid = Unix.Getuid().ToString(CultureInfo.InvariantCulture);
-				return $"/var/run/{uid}-keyden-ssh-agent.sock";
-			}
-
-			return "keyden-ssh-agent";
-		}
-	}
-
-	public string PipeName { get; init; } = "openssh-ssh-agent";
 }
 
 public record struct SshKey
@@ -91,6 +53,10 @@ public interface ISshAgentHandler
 {
 	ValueTask<IReadOnlyList<SshKey>> GetPublicKeys(ClientInfo info, CancellationToken ct);
 	ValueTask<SshKey> GetPrivateKey(ReadOnlyMemory<byte> publicKeyBlob, ClientInfo info, CancellationToken ct);
+
+	string PipePath { get; }
+	event EventHandler<EventArgs> PipePathChanged;
+	Exception? ListenException { get; set; }
 }
 
 public class SshAgent
@@ -108,6 +74,7 @@ public class SshAgent
 		SystemServices = systemServices;
 		Options = options ?? new();
 
+		Handler.PipePathChanged += Handler_PipePathChanged;
 		BeginConnection();
 	}
 
@@ -117,27 +84,48 @@ public class SshAgent
 		Contents = new(),
 	};
 
+	private CancellationTokenSource? CurrentListenCts { get; set; }
+	private void Handler_PipePathChanged(object? sender, EventArgs e)
+	{
+		CurrentListenCts?.Cancel();
+		BeginConnection();
+	}
 
 	private async void BeginConnection()
 	{
 		using var cts = new CancellationTokenSource();
+		CurrentListenCts = cts;
 
-		using var pipeServer = new NamedPipeServerStream(
-			pipeName: Options.PipeName,
-			direction: PipeDirection.InOut,
-			maxNumberOfServerInstances: NamedPipeServerStream.MaxAllowedServerInstances,
-			transmissionMode: PipeTransmissionMode.Byte,
-			options: PipeOptions.Asynchronous | PipeOptions.WriteThrough | PipeOptions.CurrentUserOnly,
-			inBufferSize: 5 * 1024,
-			outBufferSize: 5 * 1024);
+		NamedPipeServerStream? pipeServer = null;
+		try
+		{
+			var pipePath = Handler.PipePath;
+			var pipePathRooted = Path.IsPathRooted(pipePath);
 
-		await pipeServer.WaitForConnectionAsync();
+			pipeServer = new NamedPipeServerStream(
+				pipeName: pipePath,
+				direction: PipeDirection.InOut,
+				maxNumberOfServerInstances: NamedPipeServerStream.MaxAllowedServerInstances,
+				transmissionMode: PipeTransmissionMode.Byte,
+				options: PipeOptions.Asynchronous | PipeOptions.WriteThrough | PipeOptions.CurrentUserOnly,
+				inBufferSize: 5 * 1024,
+				outBufferSize: 5 * 1024);
 
-		// listen for another another connection
-		BeginConnection();
+			Handler.ListenException = null;
+			await pipeServer.WaitForConnectionAsync(cts.Token);
+		}
+		catch (Exception ex)
+		{
+			CurrentListenCts = null;
+			Handler.ListenException = ex;
+			return;
+		}
 
 		try
 		{
+			// listen for another another connection
+			BeginConnection();
+
 			await HandleConnection(pipeServer, cts);
 		}
 		catch (IOException) { }
@@ -146,6 +134,7 @@ public class SshAgent
 		finally
 		{
 			cts.Cancel();
+			pipeServer?.Dispose();
 		}
 	}
 

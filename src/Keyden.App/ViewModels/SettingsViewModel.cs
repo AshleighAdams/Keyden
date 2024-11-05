@@ -101,6 +101,8 @@ public class SettingsViewModel : ViewModelBase
 		}
 	}
 
+	public string DefaultPipePath => AgentK.DefaultPipePath;
+
 	private CancellationTokenSource? Cts { get; set; } = null;
 	public async void Unlock()
 	{

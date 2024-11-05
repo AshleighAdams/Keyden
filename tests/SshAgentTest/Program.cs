@@ -108,6 +108,11 @@ file class TestAgent : ISshAgentHandler
 		},
 	};
 
+	public event EventHandler<EventArgs> PipePathChanged;
+
+	public string PipePath { get; } = string.Empty;
+	public Exception? ListenException { get; set; }
+
 	public ValueTask<IReadOnlyList<SshKey>> GetPublicKeys(ClientInfo info, CancellationToken ct)
 	{
 		var procs = string.Join(" via ", info.Processes.Select(p => p.ProcessName));

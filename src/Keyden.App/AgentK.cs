@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,17 +22,20 @@ public class AgentK : ISshAgentHandler
 	private readonly ISshKeyStore KeyStore;
 	private readonly ISshKeyOptionsStore KeyOptionsStore;
 	private readonly ISystemServices SystemServices;
+	private readonly KeydenSettings Settings;
 
 	public event Action<ActivityItem>? NewActivity;
 
 	public AgentK(
 		ISshKeyStore keyStore,
 		ISshKeyOptionsStore keyOptionsStore,
-		ISystemServices systemServices)
+		ISystemServices systemServices,
+		KeydenSettings settings)
 	{
 		KeyStore = keyStore;
 		KeyOptionsStore = keyOptionsStore;
 		SystemServices = systemServices;
+		Settings = settings;
 
 		foreach (var key in KeyStore.PublicKeys)
 		{
@@ -41,7 +48,58 @@ public class AgentK : ISshAgentHandler
 
 		SystemServices.MachineLocked += UserActivityTracker_MachineLocked;
 		MonitorIdleThread();
+
+		Settings.PropertyChanged += Settings_PropertyChanged;
 	}
+
+	private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+	{
+		if (e.PropertyName == nameof(Settings.PipePath))
+		{
+			PipePathChanged?.Invoke(this, EventArgs.Empty);
+		}
+	}
+
+	public static string DefaultPipePath
+	{
+		get
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				return "openssh-ssh-agent";
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				var uid = Unix.Getuid().ToString(CultureInfo.InvariantCulture);
+				var socketDirectory = $"/run/user/{uid}";
+
+				// check for legacy linux systems
+				if (!Directory.Exists(socketDirectory))
+					socketDirectory = Directory.Exists("/run") ? "/run" : "/var/run";
+
+				if (!Directory.Exists(socketDirectory))
+					return "keyden-ssh-agent";
+
+				socketDirectory += "/keyden";
+				var socketPath = $"{socketDirectory}/ssh-agent.sock";
+
+				if (!Directory.Exists(socketDirectory))
+					Directory.CreateDirectory(socketDirectory);
+				return socketPath;
+			}
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			{
+				var uid = Unix.Getuid().ToString(CultureInfo.InvariantCulture);
+				return $"/var/run/{uid}-keyden-ssh-agent.sock";
+			}
+
+			return "keyden-ssh-agent";
+		}
+	}
+
+	public string PipePath => string.IsNullOrEmpty(Settings.PipePath) ? DefaultPipePath : Settings.PipePath;
+	public event EventHandler<EventArgs>? PipePathChanged;
+	public Exception? ListenException { get; set; }
 
 	private void UserActivityTracker_MachineLocked(object? sender, EventArgs e)
 	{
@@ -306,6 +364,7 @@ public class AgentK : ISshAgentHandler
 	}
 
 	private SemaphoreSlim PromptQueue { get; } = new SemaphoreSlim(1);
+
 	public struct ScopedLock : IDisposable
 	{
 		private SemaphoreSlim? Semaphore;

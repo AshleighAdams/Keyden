@@ -147,6 +147,14 @@
 
         <StackPanel IsVisible="{Binding IsAdvancedTabSelected}" Spacing="8">
 
+          <Grid ColumnDefinitions="Auto,5,*">
+            <TextBlock Grid.Column="0">Pipe path</TextBlock>
+            <TextBox Grid.Column="2" Name="PipePath"
+                     HorizontalAlignment="Stretch"
+                     Watermark="{Binding DefaultPipePath}"
+                     Text="{Binding Settings.PipePath}"/>
+          </Grid>
+          
           <CheckBox IsChecked="{Binding Settings.DeveloperMode}">
             Enable developer mode
           </CheckBox>

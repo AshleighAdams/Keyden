@@ -45,6 +45,23 @@ public partial class KeydenSettings : ObservableObject
 		}
 	}
 
+	private string _PipePath = string.Empty;
+	public string PipePath
+	{
+		get => _PipePath;
+		set
+		{
+			if (value == _PipePath)
+				return;
+
+			OnPropertyChanging(nameof(PipePath));
+
+			_PipePath = value;
+			OnPropertyChanged(nameof(PipePath));
+		}
+	}
+
+
 	private AuthenticationMode _AuthenticationMode = AuthenticationMode.System;
 	public AuthenticationMode AuthenticationMode
 	{
