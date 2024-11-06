@@ -105,15 +105,23 @@ jobs:
         
         7z x Keyden-win-x64.zip -oKeyden-win-x64
         pushd Keyden-win-x64
-            ScSignTool.exe -pin $PIN sign /fd sha256 /tr http://ts.ssl.com/ /td sha256 /n "Ashleigh Adams" Keyden.exe
+            ScSignTool.exe -pin $PIN sign -fd sha256 -tr http://ts.ssl.com/ -td sha256 -n "Ashleigh Adams" Keyden.exe
             7z a "../../artifacts/Keyden-win-x64.zip" .
         popd
 
         7z x Keyden-win-arm64.zip -oKeyden-win-arm64
         pushd Keyden-win-arm64
-            ScSignTool.exe -pin $PIN sign /fd sha256 /tr http://ts.ssl.com/ /td sha256 /n "Ashleigh Adams" Keyden.exe
+            ScSignTool.exe -pin $PIN sign -fd sha256 -tr http://ts.ssl.com/ -td sha256 -n "Ashleigh Adams" Keyden.exe
             7z a "../../artifacts/Keyden-win-arm64.zip" .
         popd
+      env:
+        PIN: ${{ secrets.CODESIGN_PIN }}
+
+    - name: Copy Unsigned Binaries
+      run: |
+        mkdir -p artifacts
+        cp artifacts-unsigned/Keyden-linux-x64.zip artifacts/
+        cp artifacts-unsigned/Keyden-osx-x64.zip artifacts/
       env:
         PIN: ${{ secrets.CODESIGN_PIN }}
 
@@ -129,7 +137,7 @@ jobs:
             -DArtifactsDir=../../artifacts-unsigned/Keyden-win-x64 \
             -FKeydenSetup-x64 -O../../artifacts \
             -DEnableSigning \
-            -Sst="ScSignTool.exe -pin $PIN sign /fd sha256 /tr http://ts.ssl.com/ /td sha256 /n \$qAshleigh Adams\$q \$f"
+            -Sst="ScSignTool.exe -pin $PIN sign -fd sha256 -tr http://ts.ssl.com/ -td sha256 -n \$qAshleigh Adams\$q \$f"
 
         ./InnoSetup/ISCC.exe \
             Keyden.iss \
@@ -138,7 +146,7 @@ jobs:
             -DArtifactsDir=../../artifacts-unsigned/Keyden-win-amd64 \
             -FKeydenSetup-amd64 -O../../artifacts \
             -DEnableSigning \
-            -Sst="ScSignTool.exe -pin $PIN sign /fd sha256 /tr http://ts.ssl.com/ /td sha256 /n \$qAshleigh Adams\$q \$f"
+            -Sst="ScSignTool.exe -pin $PIN sign -fd sha256 -tr http://ts.ssl.com/ -td sha256 -n \$qAshleigh Adams\$q \$f"
       env:
         PIN: ${{ secrets.CODESIGN_PIN }}
 
