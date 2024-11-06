@@ -10,6 +10,7 @@ if [[ ! -d artifacts-arm64 ]]; then
 fi
 
 VERSION="$(verlite .)"
+PWD="$(pwd -W)"
 
-./InnoSetup/ISCC.exe Keyden.iss -DVersion="$VERSION" -DArch=x64 -DArtifactsDir=artifacts-x64 -FKeydenSetup-x64
-./InnoSetup/ISCC.exe Keyden.iss -DVersion="$VERSION" -DArch=arm64 -DArtifactsDir=artifacts-arm64 -FKeydenSetup-arm64
+./InnoSetup/ISCC.exe Keyden.iss -DVersion="$VERSION" -DArch=x64 -DArtifactsDir=artifacts-x64 -FKeydenSetup-x64 -DEnableSigning -Sst="signtool.exe sign /fd sha256 /tr http://ts.ssl.com /td sha256 /f ${PWD}/dev.pfx /p hello \$f"
+./InnoSetup/ISCC.exe Keyden.iss -DVersion="$VERSION" -DArch=arm64 -DArtifactsDir=artifacts-arm64 -FKeydenSetup-arm64 -DEnableSigning -Sst="signtool.exe sign /fd sha256 /tr http://ts.ssl.com /td sha256 /f ${PWD}/dev.pfx /p hello \$f"

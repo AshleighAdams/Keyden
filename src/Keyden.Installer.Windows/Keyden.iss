@@ -49,6 +49,12 @@ Compression=lzma
 SolidCompression=yes
 ShowLanguageDialog=no
 
+;signing
+#ifdef EnableSigning
+SignedUninstaller=yes
+SignTool=st
+#endif
+
 ; visuals
 WizardStyle=classic
 SetupIconFile=..\Keyden.App\Assets\keyden-logo.ico

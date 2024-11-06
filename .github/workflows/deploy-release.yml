@@ -55,7 +55,7 @@ jobs:
         dotnet tool install --global Verlite.CLI --version "$verlite_version"
         verlite . --enable-shadow-repo --auto-fetch --verbosity verbatim
 
-    - name: Build bins
+    - name: Build Binaries
       run: |
         dotnet publish "${project}" --configuration Release -r "${rid}" -o "artifacts-publish"
         mkdir artifacts
@@ -72,27 +72,88 @@ jobs:
         rid: ${{ matrix.rid }}
         project: ${{ matrix.project }}
 
-    - name: Build installer
-      if: ${{ matrix.installer-arch != '' }}
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+        name: unsigned-artifacts-${{ matrix.rid }}
+        if-no-files-found: error
+        path:  |
+          artifacts/*
+
+  sign-and-build-installers:
+    name: Sign Binaries & Build Installers
+    needs: build
+    runs-on: keymaker
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: '1'
+        submodules: recursive
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts-unsigned
+        pattern: 'unsigned-artifacts-*'
+        merge-multiple: true
+
+    - name: Sign Binaries
+      run: |
+        mkdir -p artifacts
+        cd artifacts-unsigned
+        
+        7z x Keyden-win-x64.zip -oKeyden-win-x64
+        pushd Keyden-win-x64
+            ScSignTool.exe -pin $PIN sign /fd sha256 /tr http://ts.ssl.com/ /td sha256 /n "Ashleigh Adams" Keyden.exe
+            7z a "../../artifacts/Keyden-win-x64.zip" .
+        popd
+
+        7z x Keyden-win-arm64.zip -oKeyden-win-arm64
+        pushd Keyden-win-arm64
+            ScSignTool.exe -pin $PIN sign /fd sha256 /tr http://ts.ssl.com/ /td sha256 /n "Ashleigh Adams" Keyden.exe
+            7z a "../../artifacts/Keyden-win-arm64.zip" .
+        popd
+      env:
+        PIN: ${{ secrets.CODESIGN_PIN }}
+
+    - name: Build Signed Installers
       run: |
         version=$(verlite . --enable-shadow-repo)
         cd src/Keyden.Installer.Windows
-        ./InnoSetup/ISCC.exe Keyden.iss -DVersion="$version" -DArch=$arch -DArtifactsDir=../../artifacts-publish -FKeydenSetup-$arch -O../../artifacts
+
+        ./InnoSetup/ISCC.exe \
+            Keyden.iss \
+            -DVersion="$version" \
+            -DArch=x64 \
+            -DArtifactsDir=../../artifacts-unsigned/Keyden-win-x64 \
+            -FKeydenSetup-x64 -O../../artifacts \
+            -DEnableSigning \
+            -Sst="ScSignTool.exe -pin $PIN sign /fd sha256 /tr http://ts.ssl.com/ /td sha256 /n \$qAshleigh Adams\$q \$f"
+
+        ./InnoSetup/ISCC.exe \
+            Keyden.iss \
+            -DVersion="$version" \
+            -DArch=amd64 \
+            -DArtifactsDir=../../artifacts-unsigned/Keyden-win-amd64 \
+            -FKeydenSetup-amd64 -O../../artifacts \
+            -DEnableSigning \
+            -Sst="ScSignTool.exe -pin $PIN sign /fd sha256 /tr http://ts.ssl.com/ /td sha256 /n \$qAshleigh Adams\$q \$f"
       env:
-        arch: ${{ matrix.installer-arch }}
+        PIN: ${{ secrets.CODESIGN_PIN }}
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
-        name: artifacts-${{ matrix.rid }}
+        name: signed-artifacts
         if-no-files-found: error
         path:  |
           artifacts/*
 
   release:
     name: Release
-    needs: build
+    needs: sign-and-build-installers
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -104,8 +165,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: artifacts
-        pattern: '*'
-        merge-multiple: true
+        name: signed-artifacts
 
     - name: Upload release
       run: |

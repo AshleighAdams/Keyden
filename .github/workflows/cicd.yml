@@ -106,7 +106,7 @@ jobs:
         dotnet tool install --global Verlite.CLI --version "$verlite_version"
         verlite . --enable-shadow-repo --auto-fetch --verbosity verbatim
 
-    - name: Build bins
+    - name: Build Binaries
       run: |
         dotnet publish "${project}" --configuration Release -r "${rid}" -o "artifacts-publish"
         mkdir artifacts
@@ -123,7 +123,7 @@ jobs:
         rid: ${{ matrix.rid }}
         project: ${{ matrix.project }}
 
-    - name: Build installer
+    - name: Build Installer
       if: ${{ matrix.installer-arch != '' }}
       run: |
         version=$(verlite . --enable-shadow-repo)
