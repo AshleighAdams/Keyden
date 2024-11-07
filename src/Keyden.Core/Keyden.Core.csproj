@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SSH.NET" Version="2024.1.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="SSH.NET" />
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
 </Project>

@@ -33,6 +33,39 @@
     <Copyright>Copyright $([System.DateTime]::Now.Year) $(Authors)</Copyright>
   </PropertyGroup>
 
+  <!-- centrally managed versions -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Verlite.MsBuild" Version="2.5.0" />
+    
+    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
+    <PackageVersion Include="SSH.NET" Version="2024.1.0" />
+
+    <PackageVersion Include="Avalonia" Version="11.2.0" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.2.0" />
+    <PackageVersion Include="Avalonia.Diagnostics" Version="11.2.0" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.2.0" />
+    <PackageVersion Include="Avalonia.ReactiveUI" Version="11.2.0" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.2.0" />
+
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.3.1" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Win32.SystemEvents" Version="8.0.0" />
+    <PackageVersion Include="Projektanker.Icons.Avalonia" Version="9.4.0" />
+    <PackageVersion Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.4.0" />
+    <PackageVersion Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="9.4.0" />
+    
+    <PackageVersion Include="coverlet.msbuild" Version="6.0.2" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.1" />
+    <PackageVersion Include="GitHubActionsTestLogger" Version="2.4.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+  </ItemGroup>
+
   <!--<PropertyGroup>
     <PackageIcon>images/packageicon.png</PackageIcon>
   </PropertyGroup>
@@ -52,7 +85,7 @@
     <VerliteEnableShadowRepo>true</VerliteEnableShadowRepo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Condition="'$(DisableVerlite)'!='true'" Include="Verlite.MsBuild" Version="2.5.0" PrivateAssets="All" />
+    <PackageReference Condition="'$(DisableVerlite)'!='true'" Include="Verlite.MsBuild" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Reproducible builds  -->
@@ -65,7 +98,7 @@
     <RestoreLockedMode Condition="'$(CI)' != ''">true</RestoreLockedMode>
   </PropertyGroup>
   <ItemGroup>
-    <GlobalPackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1" />
+    <GlobalPackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.25" />
   </ItemGroup>
 
 </Project>
