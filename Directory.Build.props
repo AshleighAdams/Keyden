@@ -7,7 +7,7 @@
     <!-- Enable the new nullability syntax and analyzing -->
     <Nullable>enable</Nullable>
     <!-- Allow using `init` and records in .NET Core versions prior to .NET 5 -->
-    <LangVersion Condition="'$(LangVersion)' == ''">12.0</LangVersion>
+    <LangVersion Condition="'$(LangVersion)' == ''">13.0</LangVersion>
     <!--<Optimize>false</Optimize>-->
     <!-- CA2007, RCS1090: Don't want ConfigureAwait(false), we *do* want to use the sync context! -->
     <!-- 1591: Ignore missing inline documentation. -->
