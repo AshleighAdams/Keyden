@@ -26,7 +26,8 @@ internal sealed class Program
 			.Register<MaterialDesignIconProvider>();
 
 		return AppBuilder.Configure(() => new App(new WindowsSystemServices()))
-			.UsePlatformDetect()
+			.UseWin32()
+			.UseSkia()
 			.WithInterFont()
 			.LogToTrace()
 			.UseReactiveUI();
