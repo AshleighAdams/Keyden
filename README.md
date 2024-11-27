@@ -4,6 +4,8 @@
 
 Make sure when you install Git for Windows, you do ***not*** use the bundled OpenSSH, but rather Window's OpenSSH.
 
+[![https://get.microsoft.com/images/en-us%20dark.svg]()](https://apps.microsoft.com/detail/xpfnjv4f031nvw?mode=full)
+
 > [!NOTE]
 > If you installed Git's bundled OpenSSH, and you do not wish to reinstall Git, you may configure Git to use it with
 > 
@@ -16,7 +18,7 @@ Make sure when you install Git for Windows, you do ***not*** use the bundled Ope
 
 Configure the daemon:
 
-For `~/.ssh/configs
+For `~/.ssh/configs`
 
 ```
 Host *
