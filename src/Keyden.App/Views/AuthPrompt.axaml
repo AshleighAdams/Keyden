@@ -18,7 +18,8 @@
         ExtendClientAreaTitleBarHeightHint="-1"
         TransparencyLevelHint="Mica,AcrylicBlur,Blur"
         Background="Transparent"
-        Topmost="True">
+        Topmost="True"
+        ShowActivated="True">
   <Panel Name="RootPanel">
     
     <ExperimentalAcrylicBorder IsHitTestVisible="False" Margin="-24" Name="Acrylic">
