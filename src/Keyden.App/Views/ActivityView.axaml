@@ -23,9 +23,10 @@
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="32"/>
             <ColumnDefinition />
+            <ColumnDefinition Width="auto"/>
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
-            <RowDefinition MinHeight="16" />
+            <RowDefinition MinHeight="16"/>
             <RowDefinition MinHeight="16"/>
           </Grid.RowDefinitions>
 
@@ -36,11 +37,19 @@
                     VerticalAlignment="Top"
                     HorizontalAlignment="Left"/>
           </Border>
+          <TextBlock Grid.Column="2" Grid.Row="0"
+                     FontSize="10" FontWeight="Normal"
+                     Padding="0,4,0,0"
+                     Opacity="0.5"
+                     Text="{Binding When}"
+                     VerticalAlignment="Top"
+                     HorizontalAlignment="Right"/>
           <TextBlock Grid.Column="1" Grid.Row="0"
                      FontSize="16" FontWeight="SemiBold"
                      Text="{Binding Title}"
                      VerticalAlignment="Center"/>
           <TextBlock Grid.Column="1" Grid.Row="1"
+                     Grid.ColumnSpan="2"
                      Text="{Binding Description}"
                      VerticalAlignment="Top"
                      TextWrapping="Wrap"/>
