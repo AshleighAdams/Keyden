@@ -33,6 +33,8 @@ public class ActivityViewModel : ViewModelBase
 
 	private void Kay_NewActivity(ActivityItem e)
 	{
+		if (Activities.Count >= 100)
+			Activities.RemoveAt(0);
 		Activities.Add(e);
 	}
 
