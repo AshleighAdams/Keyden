@@ -36,9 +36,6 @@ var responseMsg = await client.ReadMessage();
 var response = new BufferReader(responseMsg.Contents.ContiguousMemory);
 var sig = response.ReadBlob();
 
-
-int x = 0;
-
 file class TestAgent : ISshAgentHandler
 {
 	private readonly List<SshKey> Keys = new()
@@ -108,7 +105,7 @@ file class TestAgent : ISshAgentHandler
 		},
 	};
 
-	public event EventHandler<EventArgs> PipePathChanged;
+	public event EventHandler<EventArgs> PipePathChanged { add { } remove { } }
 
 	public string PipePath { get; } = string.Empty;
 	public Exception? ListenException { get; set; }

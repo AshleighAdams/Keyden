@@ -178,9 +178,10 @@ internal sealed class WindowsSystemServices : ISystemServices
 
 				// position the window over the application requesting auth if possible:
 				var clientWindow = clientInfo.MainProcess?.MainWindowHandle ?? nint.Zero;
+				bool clientWindowIsFocused = false;
 				if (clientWindow != nint.Zero)
 				{
-					bool clientWindowIsFocused = Win32.GetForegroundWindow() == clientInfo.MainProcess!.MainWindowHandle;
+					clientWindowIsFocused = Win32.GetForegroundWindow() == clientInfo.MainProcess!.MainWindowHandle;
 					if (clientWindowIsFocused && Win32.GetWindowRect(clientWindow, out var clientRect))
 					{
 						window.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
@@ -191,12 +192,26 @@ internal sealed class WindowsSystemServices : ISystemServices
 						var newY = (clientRect.Top + height / 2) - (int)(window.DesiredSize.Height / 2);
 
 						window.Position = new(newX, newY);
-						window.WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.Manual;
+						window.WindowStartupLocation = WindowStartupLocation.Manual;
 					}
 				}
 
 				window.Show();
 				window.Activate();
+
+				// forcably focus the window if the user has the requesting app focused
+				var windowHwnd = window.TryGetPlatformHandle()?.Handle ?? nint.Zero;
+				if (windowHwnd != nint.Zero && clientWindowIsFocused)
+				{
+					var windowThreadProcessId = Win32.GetWindowThreadProcessId(clientWindow, nint.Zero);
+					var currentThreadId = Win32.GetCurrentThreadId();
+					Win32.AttachThreadInput(windowThreadProcessId, currentThreadId, true);
+					Win32.BringWindowToTop(windowHwnd);
+					Win32.ShowWindow(windowHwnd, Win32.CONST_SW_SHOW);
+					Win32.AttachThreadInput(windowThreadProcessId, currentThreadId, false);
+					//Win32.SetForegroundWindow(windowHwnd);
+				}
+
 				result = await window.Result;
 				window.Topmost = false;
 			}
