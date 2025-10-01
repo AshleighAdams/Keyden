@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ public interface ISystemServices
 	bool IsAutomaticStart { get; }
 
 	TimeSpan UserIdleDuration { get; }
-	public event EventHandler<EventArgs> MachineLocked;
+	event EventHandler<EventArgs> MachineLocked;
 
 	Task<AuthResult> TryAuthUser(
 			AuthRequired authRequired,

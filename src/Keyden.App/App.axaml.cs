@@ -17,6 +17,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Reflection.Metadata;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Keyden;
 
@@ -64,8 +65,10 @@ public partial class App : Application
 	{
 		get
 		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				return "keyden";
+			if (false&&RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return $"{Environment.UserName}/keyden";
+			}
 
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
@@ -99,35 +102,51 @@ public partial class App : Application
 
 	private async void MainAppPipeThread(CancellationToken ct)
 	{
-		using var pipeServer = new NamedPipeServerStream(
-				pipeName: AppPipePath,
-				direction: PipeDirection.InOut,
-				maxNumberOfServerInstances: NamedPipeServerStream.MaxAllowedServerInstances,
-				transmissionMode: PipeTransmissionMode.Byte,
-				options: PipeOptions.Asynchronous | PipeOptions.WriteThrough | PipeOptions.CurrentUserOnly,
-				inBufferSize: 1,
-		outBufferSize: 1);
-
-		while (!ct.IsCancellationRequested)
+		var agentK = GetService<AgentK>();
+		try
 		{
-			try
+			using var pipeServer = new NamedPipeServerStream(
+					pipeName: AppPipePath,
+					direction: PipeDirection.InOut,
+					maxNumberOfServerInstances: NamedPipeServerStream.MaxAllowedServerInstances,
+					transmissionMode: PipeTransmissionMode.Byte,
+					options: PipeOptions.Asynchronous | PipeOptions.WriteThrough | PipeOptions.CurrentUserOnly | PipeOptions.FirstPipeInstance,
+					inBufferSize: 1,
+			outBufferSize: 1);
+
+
+			while (!ct.IsCancellationRequested)
 			{
-				await pipeServer.WaitForConnectionAsync(ct);
-				var byteRead = pipeServer.ReadByte();
-				if (byteRead == 0x0A)
+				try
 				{
-					ShowMainWindow();
-					pipeServer.WriteByte(0xA0);
-					pipeServer.Flush();
+					await pipeServer.WaitForConnectionAsync(ct);
+					var byteRead = pipeServer.ReadByte();
+					if (byteRead == 0x0A)
+					{
+						agentK.AddActivity("Keyden opened", "Another Keyden instance was opened, showing main window instead.");
+
+						ShowMainWindow();
+						pipeServer.WriteByte(0xA0);
+						pipeServer.Flush();
+						await Task.Delay(100);
+					}
+				}
+				catch (OperationCanceledException) { }
+				catch (IOException) { }
+				catch (Exception ex)
+				{
+					agentK.AddActivity("Error in single instance host", ex.ToString(), "fa-circle-exclamation", ViewModels.ActivityImportance.Warning);
+				}
+				finally
+				{
+					if (pipeServer.IsConnected)
+						pipeServer.Disconnect();
 				}
 			}
-			catch (OperationCanceledException) { }
-			catch (IOException) { }
-			finally
-			{
-				if (pipeServer.IsConnected)
-					pipeServer.Disconnect();
-			}
+		}
+		catch (Exception ex)
+		{
+			agentK.AddActivity("Critical error in single instance host", ex.ToString(), "fa-circle-exclamation", ViewModels.ActivityImportance.Critical);
 		}
 	}
 
@@ -135,15 +154,15 @@ public partial class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
+		Exception? singleInstanceEx = null;
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
 		{
 			try
 			{
 				using var client = new NamedPipeClientStream(pipeName: AppPipePath);
+				client.Connect(100);
 				if (client.IsConnected)
 				{
-					client.ReadTimeout = 1000;
-					client.WriteTimeout = 1000;
 					client.WriteByte(0x0A);
 					client.Flush();
 					if (client.ReadByte() == 0xA0)
@@ -152,6 +171,10 @@ public partial class App : Application
 			}
 			catch (IOException) { }
 			catch (TimeoutException) { }
+			catch (Exception ex)
+			{
+				singleInstanceEx = ex;
+			}
 		}
 
 		var collection = new ServiceCollection();
@@ -181,6 +204,12 @@ public partial class App : Application
 			singleViewPlatform.MainView = new MainView();
 
 		base.OnFrameworkInitializationCompleted();
+
+		if (singleInstanceEx is not null)
+		{
+			var agentK = GetService<AgentK>();
+			agentK.AddActivity("Error in single instance client", singleInstanceEx.ToString(), "fa-circle-exclamation", ViewModels.ActivityImportance.Critical);
+		}
 	}
 
 	private void DesktopAppExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)

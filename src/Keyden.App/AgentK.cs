@@ -386,6 +386,16 @@ public class AgentK : ISshAgentHandler
 	}
 	private readonly Dictionary<string, KeyInfo> KeyInfos = new();
 
+	public void AddActivity(string title, string description, string icon = "fa-circle-info", ActivityImportance importance = ActivityImportance.Normal)
+	{
+		NewActivity?.Invoke(new ActivityItem()
+		{
+			Title = title,
+			Description = description,
+			Icon = icon,
+			Importance = importance,
+		});
+	}
 
 	private AuthRequired QueryAuth(SshKey key, SshKeyOptions options, ClientInfo clientInfo)
 	{
