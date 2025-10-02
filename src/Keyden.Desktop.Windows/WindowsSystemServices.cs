@@ -207,9 +207,11 @@ internal sealed class WindowsSystemServices : ISystemServices
 					var currentThreadId = Win32.GetCurrentThreadId();
 					Win32.AttachThreadInput(windowThreadProcessId, currentThreadId, true);
 					Win32.BringWindowToTop(windowHwnd);
+					Win32.SetForegroundWindow(windowHwnd);
+					Win32.SetFocus(windowHwnd);
+					Win32.SetActiveWindow(windowHwnd);
 					Win32.ShowWindow(windowHwnd, Win32.CONST_SW_SHOW);
 					Win32.AttachThreadInput(windowThreadProcessId, currentThreadId, false);
-					//Win32.SetForegroundWindow(windowHwnd);
 				}
 
 				result = await window.Result;
