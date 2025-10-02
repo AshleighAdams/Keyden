@@ -65,7 +65,7 @@ public partial class App : Application
 	{
 		get
 		{
-			if (false&&RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return $"{Environment.UserName}/keyden";
 			}
