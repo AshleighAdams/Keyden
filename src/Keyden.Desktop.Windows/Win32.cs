@@ -31,6 +31,12 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool SetForegroundWindow(nint hWnd);
 
+	[LibraryImport("user32.dll", EntryPoint = "SetFocus")]
+	public static partial nint SetFocus(nint hWnd);
+
+	[LibraryImport("user32.dll", EntryPoint = "SetActiveWindow")]
+	public static partial nint SetActiveWindow(nint hWnd);
+
 	public const uint CONST_SW_SHOW = 5;
 
 	[LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
