@@ -33,6 +33,7 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 
 	private readonly DeveloperTestKeyStore DevTestStore;
 	private readonly OnePassCliSshKeyStore OnePassCliStore;
+	private readonly OnePassSdkSshKeyStore OnePassSdkStore;
 
 	private KeyStoreControllerData Data { get; }
 	private const string DataLocation = "keystore-controller-data.json";
@@ -46,6 +47,7 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 
 		DevTestStore = App.GetKeyedService<DeveloperTestKeyStore>("devtest");
 		OnePassCliStore = App.GetKeyedService<OnePassCliSshKeyStore>("op");
+		OnePassSdkStore = App.GetKeyedService<OnePassSdkSshKeyStore>("opsdk");
 
 		if (FileSystem.TryReadBytes(DataLocation, out var contents))
 		{
@@ -63,7 +65,11 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 		else
 			Data = new();
 
+		// assign current settings
 		UpdateBackend();
+		OnePassSdkStore.AccountName = Settings.OnepassAccountName;
+
+		// listen for new settings
 		Settings.PropertyChanged += Settings_PropertyChanged;
 	}
 
@@ -71,9 +77,13 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 	{
 		switch (Settings.KeystoreBackend)
 		{
-			case KeystoreBackend.OnePassCLI:
+			case KeystoreBackend.OnePassCli:
 				BaseKeyStore = OnePassCliStore;
 				BaseOptionsStore = OnePassCliStore;
+				break;
+			case KeystoreBackend.OnePassSdk:
+				BaseKeyStore = OnePassSdkStore;
+				BaseOptionsStore = OnePassSdkStore;
 				break;
 			case KeystoreBackend.DeveloperTest:
 				BaseKeyStore = DevTestStore;
@@ -91,6 +101,8 @@ public sealed class KeyStoreController : ISshKeyStore, ISshKeyOptionsStore
 	{
 		if (e.PropertyName == nameof(Settings.KeystoreBackend))
 			UpdateBackend();
+		if (e.PropertyName == nameof(Settings.OnepassAccountName))
+			OnePassSdkStore.AccountName = Settings.OnepassAccountName;
 	}
 
 	public IReadOnlyList<SshKey> PublicKeys =>

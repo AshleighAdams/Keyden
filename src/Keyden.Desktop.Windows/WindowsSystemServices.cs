@@ -290,5 +290,43 @@ internal sealed class WindowsSystemServices : ISystemServices
 		// TODO: popup a notification if the setting is enabled
 	}
 
+	private readonly static string[] WindowsNativeMessagingPaths =
+	[
+		@"SOFTWARE\Mozilla\NativeMessagingHosts",
+		@"SOFTWARE\Google\Chrome\NativeMessagingHosts",
+	];
+
+	public string? GetNativeClientManifest(string id)
+	{
+		foreach (var path in WindowsNativeMessagingPaths)
+		{
+			RegistryKey? key = null;
+
+			try
+			{
+				key = Registry.CurrentUser.OpenSubKey(@$"{path}\{id}", false)!;
+				if (key is not null && key.GetValue(null) is string keyValue)
+					return keyValue;
+			}
+			finally
+			{
+				key?.Dispose();
+			}
+
+			try
+			{
+				key = Registry.LocalMachine.OpenSubKey(@$"{path}\{id}", false)!;
+				if (key is not null && key.GetValue(null) is string keyValue)
+					return keyValue;
+			}
+			finally
+			{
+				key?.Dispose();
+			}
+		}
+
+		return null;
+	}
+
 	public string AuthenticationBranding => "Windows Hello";
 }

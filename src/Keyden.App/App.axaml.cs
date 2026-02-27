@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Keyden;
 
@@ -155,7 +156,7 @@ public partial class App : Application
 	public override void OnFrameworkInitializationCompleted()
 	{
 		Exception? singleInstanceEx = null;
-		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
+		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime && !Debugger.IsAttached)
 		{
 			try
 			{

@@ -94,7 +94,8 @@ public class EnumDescriptionConverter : IValueConverter
 			{
 				KeystoreBackend.None => "None",
 				KeystoreBackend.DeveloperTest => "Developer Test",
-				KeystoreBackend.OnePassCLI => "1Password CLI",
+				KeystoreBackend.OnePassCli => "1Password CLI",
+				KeystoreBackend.OnePassSdk => "1Password SDK",
 				_ => backend.ToString(),
 			},
 			AuthenticationMode authMode => authMode switch

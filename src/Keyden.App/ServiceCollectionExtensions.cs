@@ -67,6 +67,7 @@ public static class ServiceCollectionExtensions
 
 			collection.AddKeyedSingleton<DeveloperTestKeyStore>("devtest");
 			collection.AddKeyedSingleton<OnePassCliSshKeyStore>("op");
+			collection.AddKeyedSingleton<OnePassSdkSshKeyStore>("opsdk");
 
 			collection.AddSingleton<KeyStoreController>();
 			collection.AddSingletonAlias<ISshKeyStore, KeyStoreController>();

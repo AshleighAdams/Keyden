@@ -178,6 +178,13 @@ namespace Keyden.Views
 				Pin.Focus();
 		}
 
+		protected override void OnOpened(EventArgs e)
+		{
+			base.OnOpened(e);
+
+			Pin.Focus();
+		}
+
 		private void AuthPrompt_Closed(object? sender, EventArgs e)
 		{
 			AuthButtonEnabled = false;

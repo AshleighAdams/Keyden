@@ -41,7 +41,10 @@ namespace Keyden.Views
 			if (e.Root is not Window window)
 				return;
 
-			bool usingClientChrome = window.IsExtendedIntoWindowDecorations;
+			bool usingClientChrome =
+				window.IsExtendedIntoWindowDecorations ||
+				(window.PlatformImpl?.IsClientAreaExtendedToDecorations ?? false);
+
 			MinimizeButton.IsVisible = usingClientChrome;
 			MaximizeButton.IsVisible = usingClientChrome;
 			CloseButton.IsVisible = usingClientChrome;
