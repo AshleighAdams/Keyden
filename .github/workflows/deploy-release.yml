@@ -121,7 +121,7 @@ jobs:
       run: |
         mkdir -p artifacts
         cp artifacts-unsigned/Keyden-linux-x64.zip artifacts/
-        cp artifacts-unsigned/Keyden-osx-x64.zip artifacts/
+        #cp artifacts-unsigned/Keyden-osx-x64.zip artifacts/
       env:
         PIN: ${{ secrets.CODESIGN_PIN }}
 
