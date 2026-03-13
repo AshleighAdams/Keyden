@@ -25,6 +25,14 @@ public class SettingsViewModel : ViewModelBase
 	{
 		SystemServices = systemServices;
 		Settings = settings;
+
+		Settings.PropertyChanged += Settings_PropertyChanged;
+	}
+
+	private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+	{
+		if (e.PropertyName == nameof(Settings.KeystoreBackend))
+			this.RaisePropertyChanged(nameof(UsingOnepassSdk));
 	}
 
 	private int _TabIndexSelected = 0;
@@ -53,11 +61,12 @@ public class SettingsViewModel : ViewModelBase
 	public bool IsSecurityTabSelectedAndLocked => TabIndexSelected == 2 && !SecurityUnlocked;
 	public bool IsSecurityTabSelectedAndUnlocked => TabIndexSelected == 2 && SecurityUnlocked;
 	public bool IsAdvancedTabSelected => TabIndexSelected == 1;
+	public bool UsingOnepassSdk => Settings.KeystoreBackend == KeystoreBackend.OnePassSdk;
 
 	public IReadOnlyList<KeystoreBackend> KeystoreBackends =>
 		Settings.DeveloperMode
-			? [KeystoreBackend.None, KeystoreBackend.OnePassCLI, KeystoreBackend.DeveloperTest]
-			: [KeystoreBackend.None, KeystoreBackend.OnePassCLI];
+			? [KeystoreBackend.None, KeystoreBackend.OnePassSdk, KeystoreBackend.OnePassCli, KeystoreBackend.DeveloperTest]
+			: [KeystoreBackend.None, KeystoreBackend.OnePassSdk, KeystoreBackend.OnePassCli];
 
 	public IReadOnlyList<AuthenticationMode> AuthenticationModes { get; } = [AuthenticationMode.System, AuthenticationMode.InternalPIN];
 

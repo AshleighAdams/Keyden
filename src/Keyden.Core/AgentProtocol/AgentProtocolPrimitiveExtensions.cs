@@ -16,6 +16,16 @@ internal static class AgentProtocolPrimitiveExtensions
 		self.NextBlock(1).Span[0] = value;
 	}
 
+	public static Memory<byte> ReadBytes(this BufferWriter self, int length)
+	{
+		return self.NextBlock(length);
+	}
+	public static void WriteBytes(this BufferWriter self, ReadOnlySpan<byte> value)
+	{
+		var block = self.NextBlock(value.Length);
+		value.CopyTo(block.Span);
+	}
+
 	public static bool ReadBool(this BufferReader self)
 	{
 		return self.ReadByte() != 0;

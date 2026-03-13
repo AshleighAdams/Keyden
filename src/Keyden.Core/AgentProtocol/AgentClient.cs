@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace Keyden.AgentProtocol;
 
 // https://datatracker.ietf.org/doc/html/draft-miller-ssh-agent#name-private-key-operations
+// https://datatracker.ietf.org/doc/html/draft-ietf-sshm-ssh-agent
 // https://www.rfc-editor.org/rfc/rfc4251.html
 internal enum AgentMessageType : byte
 {

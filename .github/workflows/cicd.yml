@@ -45,12 +45,12 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.x
+        dotnet-version: 10.x
 
     - name: Setup Verlite
       run: |
         #verlite_version="$(dotnet msbuild Directory.Build.props -getitem:PackageReference | jq -r '.Items.PackageReference[] | select(.Identity=="Verlite.MsBuild") .Version')"
-        verlite_version="2.5.0"
+        verlite_version="2.7.0"
         dotnet tool install --global Verlite.CLI --version "$verlite_version"
         verlite . --enable-shadow-repo --auto-fetch --verbosity verbatim
 
@@ -97,12 +97,12 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.x
+        dotnet-version: 10.x
 
     - name: Setup Verlite
       run: |
         #verlite_version="$(dotnet msbuild Directory.Build.props -getitem:PackageReference | jq -r '.Items.PackageReference[] | select(.Identity=="Verlite.MsBuild") .Version')"
-        verlite_version="2.5.0"
+        verlite_version="2.7.0"
         dotnet tool install --global Verlite.CLI --version "$verlite_version"
         verlite . --enable-shadow-repo --auto-fetch --verbosity verbatim
 

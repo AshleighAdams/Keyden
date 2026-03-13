@@ -78,4 +78,25 @@ public sealed class GenericSystemServices : ISystemServices
 	}
 
 	public string AuthenticationBranding => "None";
+
+	private readonly static string[] MacNativeMessagingPaths =
+	[
+		"~/Library/Application Support/Google/Chrome/NativeMessagingHosts",
+		"~/Library/Application Support/Chromium/NativeMessagingHosts",
+		"/Library/Google/Chrome/NativeMessagingHosts",
+		"/Library/Application Support/Chromium/NativeMessagingHosts",
+	];
+	private readonly static string[] LinuxNativeMessagingPaths =
+	[
+		"~/.config/google-chrome/NativeMessagingHosts",
+		"~/.config/chromium/NativeMessagingHosts",
+		"/etc/opt/chrome/native-messaging-hosts",
+		"/etc/chromium/native-messaging-hosts",
+	];
+	public string? GetNativeClientManifest(string id)
+	{
+		// throw new NotImplementedException();
+		return null;
+	}
+
 }

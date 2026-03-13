@@ -25,6 +25,8 @@ public interface ISystemServices
 
 	Process? GetPipeClientProcess(NamedPipeServerStream pipeServer);
 	Process? GetParentProcess(Process process);
+
+	string? GetNativeClientManifest(string id);
 }
 
 public struct AuthResult

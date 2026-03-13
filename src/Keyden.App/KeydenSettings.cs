@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Text.Unicode;
 
 namespace Keyden;
 
@@ -14,6 +13,13 @@ public partial class KeydenSettings : ObservableObject
 	{
 		get => _KeystoreBackend;
 		set => SetProperty(ref _KeystoreBackend, value);
+	}
+
+	private string _OnepassAccountName = string.Empty;
+	public string OnepassAccountName
+	{
+		get => _OnepassAccountName;
+		set => SetProperty(ref _OnepassAccountName, value);
 	}
 
 	private float _AuthButtonEnableDelay = 0.5f;
@@ -109,7 +115,8 @@ public enum KeystoreBackend
 {
 	None,
 	DeveloperTest,
-	OnePassCLI,
+	OnePassCli,
+	OnePassSdk,
 }
 
 public enum AuthenticationMode
